@@ -142,6 +142,57 @@ describe("ResultsView", () => {
     expect(screen.getByText("Glucose")).toBeInTheDocument();
   });
 
+  it("names medications from fetched Medication resources and reference display", () => {
+    const response = {
+      ...POPULATED_RESPONSE,
+      MedicationRequest: [
+        {
+          resourceType: "MedicationRequest",
+          id: "mr-referenced",
+          status: "active",
+          intent: "order",
+          subject: { reference: "Patient/p1" },
+          medicationReference: { reference: "Medication/med-1" },
+        },
+        {
+          resourceType: "MedicationRequest",
+          id: "mr-display-only",
+          status: "stopped",
+          intent: "order",
+          subject: { reference: "Patient/p1" },
+          // No Medication resource for this one — Epic puts the drug name in
+          // the reference's display.
+          medicationReference: {
+            reference: "Medication/med-unfetched",
+            display: "emtricitabine-tenofovir (TDF) (TRUVADA)",
+          },
+        },
+      ],
+      Medication: [
+        {
+          resourceType: "Medication",
+          id: "med-1",
+          code: { text: "Doxycycline" },
+        },
+      ],
+    } as unknown as PatientRecordsResponse;
+
+    renderWithUser(
+      <ResultsView
+        patientRecordsResponse={response}
+        selectedQuery={TEST_QUERY}
+        goBack={() => {}}
+        goToBeginning={() => {}}
+        loading={false}
+      />,
+    );
+
+    expect(screen.getByText("Doxycycline")).toBeInTheDocument();
+    expect(
+      screen.getByText("emtricitabine-tenofovir (TDF) (TRUVADA)"),
+    ).toBeInTheDocument();
+  });
+
   it("invokes goBack and goToBeginning from the banner controls", async () => {
     const goBack = jest.fn();
     const goToBeginning = jest.fn();

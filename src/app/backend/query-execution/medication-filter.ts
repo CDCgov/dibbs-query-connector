@@ -1,4 +1,5 @@
 import {
+  CodeableConcept,
   FhirResource,
   Medication,
   MedicationAdministration,
@@ -22,7 +23,12 @@ import { QueryResponse } from "@/app/models/entities/query";
 
 type MedicationOrder = MedicationRequest | MedicationStatement;
 
-function buildMedicationIndex(
+/**
+ * Builds an id → Medication lookup for resolving medication references.
+ * @param medications Medication resources returned with the query
+ * @returns the Medications indexed by id
+ */
+export function buildMedicationIndex(
   medications: Medication[],
 ): Map<string, Medication> {
   const index = new Map<string, Medication>();
@@ -58,9 +64,8 @@ function resolveMedication(
     );
   }
 
-  const idMatch = reference.match(/(?:^|\/)Medication\/([^/?]+)/);
-  const id = idMatch ? idMatch[1] : reference;
-  return medicationIndex.get(id);
+  const id = referencedMedicationKey(resource);
+  return id ? medicationIndex.get(id) : undefined;
 }
 
 /**
@@ -96,7 +101,55 @@ function medicationOrderMatches(
   return null;
 }
 
-function referencedMedicationKey(
+function conceptHasName(concept: CodeableConcept | undefined): boolean {
+  // Mirrors what formatCodeableConcept actually renders — the text, falling
+  // back to the first coding's display. A display on a later coding never
+  // reaches the screen, so it doesn't count as a name here.
+  return !!(concept?.text || concept?.coding?.[0]?.display);
+}
+
+function conceptHasContent(concept: CodeableConcept | undefined): boolean {
+  return !!(concept?.text || concept?.coding?.length);
+}
+
+/**
+ * Resolves the CodeableConcept naming a medication order's drug, for display.
+ * Candidates are considered in order — the inline medicationCodeableConcept,
+ * the referenced or contained Medication's code, then the reference's display
+ * text (Epic populates the drug name there even though its searches don't
+ * return the Medication resources) — preferring the first with a
+ * human-readable name over one carrying only bare codes. When the reference
+ * display wins, the resolved Medication's codings are carried along so the
+ * code still renders beneath the name.
+ * @param order the MedicationRequest or MedicationStatement to name
+ * @param medicationIndex Medication resources returned with the query,
+ * indexed by id (see buildMedicationIndex)
+ * @returns a CodeableConcept for display, or undefined when nothing in the
+ * order names the drug
+ */
+export function resolveMedicationConcept(
+  order: MedicationOrder,
+  medicationIndex: Map<string, Medication>,
+): CodeableConcept | undefined {
+  const medicationCode = resolveMedication(order, medicationIndex)?.code;
+  const display = order.medicationReference?.display;
+  const candidates = [
+    order.medicationCodeableConcept,
+    medicationCode,
+    display ? { text: display, coding: medicationCode?.coding } : undefined,
+  ];
+
+  return candidates.find(conceptHasName) ?? candidates.find(conceptHasContent);
+}
+
+/**
+ * Extracts the id of the Medication an order references, for non-contained
+ * references. Handles relative (Medication/{id}), absolute-URL, and bare-id
+ * reference forms; contained (#id) references return undefined.
+ * @param resource the medication order whose reference to parse
+ * @returns the referenced Medication id, or undefined when there is none
+ */
+export function referencedMedicationKey(
   resource: MedicationOrder,
 ): string | undefined {
   const reference = resource.medicationReference?.reference;

@@ -20,7 +20,13 @@ const EPIC_ENCOUNTER_DIAGNOSIS_CHUNK_SIZE = 25;
 // at their own maximum per the FHIR spec).
 const EPIC_MEDICATION_PAGE_SIZE = "1000";
 
-function chunkArray<T>(items: T[], chunkSize: number): T[][] {
+/**
+ * Splits an array into consecutive chunks of at most chunkSize items.
+ * @param items the array to split
+ * @param chunkSize the maximum size of each chunk
+ * @returns the chunks, in order; empty for an empty input
+ */
+export function chunkArray<T>(items: T[], chunkSize: number): T[][] {
   const chunks: T[][] = [];
   for (let i = 0; i < items.length; i += chunkSize) {
     chunks.push(items.slice(i, i + chunkSize));
@@ -173,7 +179,11 @@ export class CustomQuery {
       // FHIR R4 Immunization has no "subject" search param; the patient-scoping
       // param is "patient". Using "subject" leaves the query unscoped and the IZ
       // Gateway rejects it ("must contain patient.identifier or name+birthDate").
-      formattedParams.append("patient", `Patient/${patientId}`);
+      // Epic's search expects a bare patient id, not a Patient/ reference.
+      formattedParams.append(
+        "patient",
+        this.queryStrategy === "epic" ? patientId : `Patient/${patientId}`,
+      );
 
       this.fhirResourceQueries["immunization"] = {
         basePath: `/Immunization`,
@@ -272,7 +282,8 @@ export class CustomQuery {
         // parameter set (patient, category, status, authoredon, date, intent)
         // — no "code". Fetch all of the patient's medication requests; the
         // service layer filters them to the query's RxNorm codes client-side.
-        formattedParams.append("patient", `Patient/${patientId}`);
+        // Epic's search expects a bare patient id, not a Patient/ reference.
+        formattedParams.append("patient", patientId);
         formattedParams.append("_count", EPIC_MEDICATION_PAGE_SIZE);
       } else {
         formattedParams.append("subject", `Patient/${patientId}`);
@@ -283,9 +294,9 @@ export class CustomQuery {
         // Epic's MedicationRequest GET doesn't document _revinclude support
         // and unrecognized search parameters can fail the whole request, which
         // would lose every medication. Forgo MedicationAdministration in Epic
-        // mode rather than risk that. The _include above is kept because the
-        // client-side code filter needs the referenced Medications (and fails
-        // open if the server ignores it).
+        // mode rather than risk that. The _include above is kept because
+        // servers that honor it spare the follow-up Medication reads the Epic
+        // path otherwise performs to resolve medication codes.
         formattedParams.append(
           "_revinclude",
           "MedicationAdministration:request",
@@ -305,31 +316,25 @@ export class CustomQuery {
 
       // MedicationStatement is a separate resource recording medications a
       // patient is (or was) taking. Query it with the same RXNorm codes; its
-      // date search param is "effective" (not "authoredon").
-      const statementParams = new URLSearchParams();
-      if (isEpic) {
-        // Epic returns 404 for POST /MedicationStatement/_search and doesn't
-        // support "code" filtering; GET by patient and filter client-side.
-        statementParams.append("patient", `Patient/${patientId}`);
-        statementParams.append("_count", EPIC_MEDICATION_PAGE_SIZE);
-      } else {
+      // date search param is "effective" (not "authoredon"). Epic has no R4
+      // MedicationStatement endpoint (DSTU2/STU3 only — R4 requests 404), so
+      // the query isn't compiled at all in Epic mode.
+      if (!isEpic) {
+        const statementParams = new URLSearchParams();
         statementParams.append("subject", `Patient/${patientId}`);
         statementParams.append("code", medicationsFilter);
-      }
-      statementParams.append("_include", "MedicationStatement:medication");
+        statementParams.append("_include", "MedicationStatement:medication");
 
-      if (medicationsTimeFilter) {
-        statementParams.append("effective", medicationsTimeFilter.startDate);
-        statementParams.append("effective", medicationsTimeFilter.endDate);
-      }
+        if (medicationsTimeFilter) {
+          statementParams.append("effective", medicationsTimeFilter.startDate);
+          statementParams.append("effective", medicationsTimeFilter.endDate);
+        }
 
-      this.fhirResourceQueries["medicationStatement"] = {
-        basePath: isEpic
-          ? `/MedicationStatement`
-          : `/MedicationStatement/_search`,
-        params: statementParams,
-        excludeFromPost: isEpic,
-      };
+        this.fhirResourceQueries["medicationStatement"] = {
+          basePath: `/MedicationStatement/_search`,
+          params: statementParams,
+        };
+      }
     }
   }
 
@@ -349,7 +354,8 @@ export class CustomQuery {
     return chunkArray(this.conditionCodes, EPIC_CONDITION_CODE_CHUNK_SIZE).map(
       (codes) => {
         const params = new URLSearchParams();
-        params.append("patient", `Patient/${this.patientId}`);
+        // Epic's search expects a bare patient id, not a Patient/ reference.
+        params.append("patient", this.patientId);
         params.append("code", codes.join(","));
         if (conditionsTimeFilter) {
           params.append("onset-date", conditionsTimeFilter.startDate);
@@ -378,7 +384,8 @@ export class CustomQuery {
     return chunkArray(conditionIds, EPIC_ENCOUNTER_DIAGNOSIS_CHUNK_SIZE).map(
       (ids) => {
         const params = new URLSearchParams();
-        params.append("patient", `Patient/${this.patientId}`);
+        // Epic's search expects a bare patient id, not a Patient/ reference.
+        params.append("patient", this.patientId);
         params.append(
           "diagnosis",
           ids.map((id) => `Condition/${id}`).join(","),

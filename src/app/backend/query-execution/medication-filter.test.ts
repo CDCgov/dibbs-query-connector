@@ -5,7 +5,12 @@ import {
   MedicationStatement,
 } from "fhir/r4";
 import { QueryResponse } from "@/app/models/entities/query";
-import { filterMedicationResourcesByCode } from "./medication-filter";
+import {
+  buildMedicationIndex,
+  filterMedicationResourcesByCode,
+  referencedMedicationKey,
+  resolveMedicationConcept,
+} from "./medication-filter";
 
 const MATCHING_CODE = "1665005";
 const OTHER_CODE = "999999";
@@ -241,5 +246,175 @@ describe("filterMedicationResourcesByCode", () => {
       MedicationRequest: [makeRequest("kept")],
     };
     expect(filterMedicationResourcesByCode(response, [])).toBe(response);
+  });
+});
+
+describe("resolveMedicationConcept", () => {
+  const emptyIndex = new Map<string, Medication>();
+
+  it("prefers the inline medicationCodeableConcept", () => {
+    const request = makeRequest("r1", {
+      medicationCodeableConcept: { text: "Azithromycin" },
+      medicationReference: { display: "wrong name" },
+    });
+
+    expect(resolveMedicationConcept(request, emptyIndex)).toEqual({
+      text: "Azithromycin",
+    });
+  });
+
+  it("resolves the referenced Medication's code", () => {
+    const request = makeRequest("r1", {
+      medicationReference: { reference: "Medication/med-1" },
+    });
+    const medication = makeMedication("med-1", MATCHING_CODE);
+    medication.code!.text = "Truvada";
+
+    const concept = resolveMedicationConcept(
+      request,
+      buildMedicationIndex([medication]),
+    );
+    expect(concept?.text).toBe("Truvada");
+  });
+
+  it("resolves contained Medication resources via local references", () => {
+    const request = makeRequest("r1", {
+      medicationReference: { reference: "#local-med" },
+      contained: [
+        {
+          resourceType: "Medication",
+          id: "local-med",
+          code: { text: "Truvada" },
+        } as Medication,
+      ],
+    });
+
+    expect(resolveMedicationConcept(request, emptyIndex)).toEqual({
+      text: "Truvada",
+    });
+  });
+
+  it("falls back to the reference display when the Medication isn't available", () => {
+    // Epic returns the drug name in medicationReference.display but doesn't
+    // return the Medication resources its searches reference.
+    const request = makeRequest("r1", {
+      medicationReference: {
+        reference: "Medication/med-unfetched",
+        display: "emtricitabine-tenofovir (TDF) (TRUVADA) 200-300 mg",
+      },
+    });
+
+    expect(resolveMedicationConcept(request, emptyIndex)).toEqual({
+      text: "emtricitabine-tenofovir (TDF) (TRUVADA) 200-300 mg",
+    });
+  });
+
+  it("prefers a named concept over one carrying only bare codes", () => {
+    // The resolved Medication has an RxNorm code but no display text; the
+    // reference display is the only human-readable name available. The
+    // Medication's codings ride along so the code still renders under the
+    // name.
+    const request = makeRequest("r1", {
+      medicationReference: {
+        reference: "Medication/med-1",
+        display: "Truvada",
+      },
+    });
+
+    const concept = resolveMedicationConcept(
+      request,
+      buildMedicationIndex([makeMedication("med-1", MATCHING_CODE)]),
+    );
+    expect(concept).toEqual({
+      text: "Truvada",
+      coding: [
+        {
+          system: "http://www.nlm.nih.gov/research/umls/rxnorm",
+          code: MATCHING_CODE,
+        },
+      ],
+    });
+  });
+
+  it("doesn't count a display on a later coding as a name", () => {
+    // formatCodeableConcept renders text or the first coding's display, so a
+    // name buried in a later coding would still show as a bare code — the
+    // reference display should win instead.
+    const request = makeRequest("r1", {
+      medicationCodeableConcept: {
+        coding: [{ code: "123" }, { code: "456", display: "buried name" }],
+      },
+      medicationReference: { display: "Truvada" },
+    });
+
+    expect(resolveMedicationConcept(request, emptyIndex)).toEqual({
+      text: "Truvada",
+    });
+  });
+
+  it("ignores an empty inline concept in favor of the reference display", () => {
+    const request = makeRequest("r1", {
+      medicationCodeableConcept: {},
+      medicationReference: { display: "Truvada" },
+    });
+
+    expect(resolveMedicationConcept(request, emptyIndex)).toEqual({
+      text: "Truvada",
+    });
+  });
+
+  it("returns a code-only concept when nothing has a name", () => {
+    const request = makeRequest("r1", {
+      medicationReference: { reference: "Medication/med-1" },
+    });
+
+    const concept = resolveMedicationConcept(
+      request,
+      buildMedicationIndex([makeMedication("med-1", MATCHING_CODE)]),
+    );
+    expect(concept?.coding?.[0].code).toBe(MATCHING_CODE);
+  });
+
+  it("returns undefined when nothing names the drug", () => {
+    expect(
+      resolveMedicationConcept(makeRequest("r1"), emptyIndex),
+    ).toBeUndefined();
+    expect(
+      resolveMedicationConcept(
+        makeStatement("s1", {
+          medicationReference: { reference: "Medication/gone" },
+        }),
+        emptyIndex,
+      ),
+    ).toBeUndefined();
+  });
+});
+
+describe("referencedMedicationKey", () => {
+  it("extracts ids from relative and absolute references and skips contained ones", () => {
+    expect(
+      referencedMedicationKey(
+        makeRequest("r1", {
+          medicationReference: { reference: "Medication/med-1" },
+        }),
+      ),
+    ).toBe("med-1");
+    expect(
+      referencedMedicationKey(
+        makeRequest("r2", {
+          medicationReference: {
+            reference: "https://fhir.example.com/api/FHIR/R4/Medication/med-2",
+          },
+        }),
+      ),
+    ).toBe("med-2");
+    expect(
+      referencedMedicationKey(
+        makeRequest("r3", {
+          medicationReference: { reference: "#contained-med" },
+        }),
+      ),
+    ).toBeUndefined();
+    expect(referencedMedicationKey(makeRequest("r4"))).toBeUndefined();
   });
 });
