@@ -10,8 +10,10 @@ import {
 
 import { isFhirResource } from "../../constants";
 
+// ChainedPatientDemographics appears in a decorated method signature, which
+// requires a type-only import under emitDecoratorMetadata + isolatedModules.
+import type { ChainedPatientDemographics } from "./custom-query";
 import {
-  ChainedPatientDemographics,
   chunkArray,
   CustomQuery,
   extractChainedPatientDemographics,
