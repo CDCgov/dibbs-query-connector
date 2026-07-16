@@ -18,14 +18,22 @@ import { FhirServersModal } from "./fhirServersModal";
 import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 
 export type AuthMethodType =
-  "none" | "basic" | "client_credentials" | "SMART" | "mutual-tls";
+  | "none"
+  | "basic"
+  | "client_credentials"
+  | "SMART"
+  | "mutual-tls";
 
 /**
  * The kind of FHIR endpoint a server exposes. Drives which resource the
  * connection check probes and how patient discovery is routed:
  * - "standard": direct /Patient search and clinical record queries
  * - "immunization": an Immunization Gateway (probes /Immunization), discovery
- *   still uses the standard /Patient path
+ *   still uses the standard /Patient path. Record queries send only the
+ *   Immunization search, built from the patient's demographics
+ *   (patient.given/patient.family/patient.birthdate) — the gateway
+ *   translates it into an HL7v2 QBP query and can't resolve FHIR patient
+ *   ids or answer other resource searches
  * - "fanout": TEFCA-style fanout via /Task resources (POST + polling)
  */
 export type EndpointType = "standard" | "immunization" | "fanout";
