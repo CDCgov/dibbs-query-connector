@@ -69,6 +69,9 @@ const SelectQuery: React.FC<SelectQueryProps> = ({
         queryName: queryName,
         patientId: patientForQuery.id ?? hyperUnluckyPatient.Id,
         fhirServer: fhirServer,
+        // Immunization Gateway servers build the Immunization search from the
+        // patient's demographics rather than the FHIR id.
+        patient: patientForQuery,
       };
       setLoadingResultResponse(true);
       const queryResponse = await patientRecordsQuery(newRequest);
