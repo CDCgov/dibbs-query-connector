@@ -36,7 +36,7 @@
     "classnames": "^2.5.1",
     "csv-parse": "^7.0.1",
     "date-fns": "^4.4.0",
-    "fhirpath": "^4.11.0",
+    "fhirpath": "^5.0.0",
     "jose": "^5.2.2",
     "next": "^16.2.10",
     "next-auth": "^5.0.0-beta.30",
@@ -97,7 +97,7 @@
     "sass-embedded": "^1.100.0",
     "supertest": "^7.2.2",
     "testcontainers": "^12.0.4",
-    "typescript": "^6.0.3",
+    "typescript": "^7.0.2",
     "typescript-eslint": "^8.35.0"
   }
 }
