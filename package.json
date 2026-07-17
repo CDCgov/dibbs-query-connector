@@ -23,13 +23,13 @@
     "test:playwright:ui": "bash ./setup-scripts/e2e_tests_local.sh"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.1085.0",
+    "@aws-sdk/client-secrets-manager": "^3.1090.0",
     "@axe-core/playwright": "^4.12.1",
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
     "@next/mdx": "^16.2.10",
-    "@scalar/nextjs-api-reference": "^0.11.9",
-    "@trussworks/react-uswds": "^11.1.0",
+    "@scalar/nextjs-api-reference": "^0.11.11",
+    "@trussworks/react-uswds": "^11.2.0",
     "@types/mdx": "^2.0.14",
     "@uswds/uswds": "^3.13.0",
     "base-64": "^1.0.0",
@@ -41,7 +41,7 @@
     "next": "^16.2.10",
     "next-auth": "^5.0.0-beta.30",
     "next-nprogress-bar": "^2.4.4",
-    "node-hl7-client": "^4.0.0",
+    "node-hl7-client": "^4.1.0",
     "pg": "^8.22.0",
     "pg-promise": "^12.7.0",
     "react": "^19.2.7",
@@ -50,7 +50,7 @@
     "react-idle-timer": "^5.7.3",
     "react-loading-skeleton": "^3.5.0",
     "react-toastify": "^11.1.0",
-    "request-mocking-protocol": "^0.5.0",
+    "request-mocking-protocol": "^0.6.0",
     "sharp": "^0.35.3",
     "undici": "^8.7.0"
   },
@@ -65,7 +65,7 @@
     "@eslint/js": "^10.0.1",
     "@next/eslint-plugin-next": "^16.2.10",
     "@playwright/test": "^1.61.1",
-    "@smithy/util-stream": "^4.7.8",
+    "@smithy/util-stream": "^4.7.10",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -78,13 +78,13 @@
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "@types/react-highlight-words": "^0.20.1",
-    "@typescript-eslint/eslint-plugin": "^8.35.0",
-    "@typescript-eslint/parser": "^8.35.0",
+    "@typescript-eslint/eslint-plugin": "^8.64.0",
+    "@typescript-eslint/parser": "^8.64.0",
     "dotenv": "^17.4.2",
     "dotenv-cli": "^11.0.0",
     "eslint": "^10.7.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-jsdoc": "^63.0.13",
+    "eslint-plugin-jsdoc": "^63.0.14",
     "eslint-plugin-unused-imports": "^4.4.1",
     "focus-trap-react": "^11.0.6",
     "jest": "^30.4.2",
@@ -98,6 +98,6 @@
     "supertest": "^7.2.2",
     "testcontainers": "^12.0.4",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.35.0"
+    "typescript-eslint": "^8.64.0"
   }
 }
