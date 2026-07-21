@@ -206,6 +206,9 @@ jest.mock("@/app/backend/query-building/service", () => ({
 }));
 
 jest.mock("@/app/api/query/parsers", () => ({
+  // Pull in the real module so pure helpers (e.g. the HL7 code mappers) keep
+  // working when the route imports them; only the stubs below are overridden.
+  ...jest.requireActual("@/app/api/query/parsers"),
   parseHL7FromRequestBody: jest.fn().mockImplementation((body) => body),
   parsePatientDemographics: jest.fn().mockReturnValue({
     first_name: "John",
