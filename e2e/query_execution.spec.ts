@@ -334,4 +334,89 @@ test.describe("alternate queries with the Query Connector", () => {
       page.getByRole("heading", { name: "Patient Record" }),
     ).toBeVisible();
   });
+
+  test("MDRO case investigation returns colonization and infection results", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "Fill fields" }).click();
+    // Select FHIR server from drop down
+    await page.getByRole("button", { name: "Advanced" }).click();
+    await page
+      .getByLabel("Healthcare Organization (HCO)")
+      .selectOption(DEFAULT_FHIR_SERVER);
+
+    await page.getByRole("button", { name: "Search for patient" }).click();
+    await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
+
+    await page.getByRole("button", { name: "Select patient" }).nth(0).click();
+    await expect(
+      page.getByRole("heading", { name: "Select a query" }),
+    ).toBeVisible();
+    await page.getByTestId("Select").selectOption("MDRO case investigation");
+    await page.getByRole("button", { name: "Submit" }).click();
+    await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
+
+    await expect(
+      page.getByRole("heading", { name: "Patient Record" }),
+    ).toBeVisible();
+    await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
+
+    // Every result-bearing section for this query renders as an expanded
+    // accordion: the admission screening Observations + DiagnosticReports and
+    // the June infection Conditions + LTCF Encounter.
+    await expect(
+      page.getByRole("button", { name: "Observations", expanded: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Conditions", expanded: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Diagnostic Reports", expanded: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Encounters", expanded: true }),
+    ).toBeVisible();
+
+    // Admission screening Observations: one positive row per headline organism
+    // plus the negative vancomycin-resistance gene result. These display texts
+    // are unique to a single Observation row across all result tables.
+    await expect(
+      page
+        .getByRole("table")
+        .getByRole("row")
+        .filter({ hasText: "Candida auris" }),
+    ).toHaveCount(1);
+    await expect(
+      page
+        .getByRole("table")
+        .getByRole("row")
+        .filter({ hasText: "Vancomycin resistant enterococcus" }),
+    ).toHaveCount(1);
+    await expect(
+      page
+        .getByRole("table")
+        .getByRole("row")
+        .filter({ hasText: "Methicillin resistance mecA gene" }),
+    ).toHaveCount(1);
+    await expect(
+      page
+        .getByRole("table")
+        .getByRole("row")
+        .filter({ hasText: "Vancomycin resistance vanA gene" }),
+    ).toHaveCount(1);
+
+    // June infections: the MRSA sacral-wound Condition is a single row, while
+    // the carbapenem-resistant Enterobacteriaceae code drives both a Condition
+    // row and the LTCF Encounter's Visit Reason.
+    await expect(
+      page.getByRole("table").getByRole("row").filter({
+        hasText: "Skin infection caused by Methicillin resistant",
+      }),
+    ).toHaveCount(1);
+    await expect(
+      page.getByRole("table").getByRole("row").filter({
+        hasText: "Infection due to carbapenem resistant Enterobacteriaceae",
+      }),
+    ).toHaveCount(2);
+  });
 });

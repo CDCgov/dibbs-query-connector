@@ -35,6 +35,11 @@ export const USE_CASE_DETAILS = {
     condition: "Cancer (Leukemia)",
     id: "3389540d-1cca-4253-aa75-c1684dc5430f",
   },
+  mdro: {
+    queryName: "MDRO case investigation",
+    condition: "Healthcare-Associated Events",
+    id: "b4c9d2e7-6a1f-4e83-9c25-7f0a3d8b1e46",
+  },
 } as const;
 
 export type USE_CASES = keyof typeof USE_CASE_DETAILS;
@@ -167,7 +172,12 @@ export type BuildStep = "selection" | "condition" | "valueset";
 
 /* Mode that all pages can be in; used to set page data in context */
 export type PageType =
-  "/" | "queryBuilding" | "fhir-servers" | "userManagement" | BuildStep | Mode;
+  | "/"
+  | "queryBuilding"
+  | "fhir-servers"
+  | "userManagement"
+  | BuildStep
+  | Mode;
 
 export const metadata = {
   title: "Query Connector",
@@ -177,7 +187,12 @@ export const metadata = {
 export const DEFAULT_ERSD_VERSION = "3";
 
 export type ErsdConceptType =
-  "ostc" | "lotc" | "lrtc" | "mrtc" | "dxtc" | "sdtc";
+  | "ostc"
+  | "lotc"
+  | "lrtc"
+  | "mrtc"
+  | "dxtc"
+  | "sdtc";
 
 export const ersdToDibbsConceptMap: {
   [k in ErsdConceptType]: DibbsConceptType;
