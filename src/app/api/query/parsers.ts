@@ -1,6 +1,12 @@
 import { Patient } from "fhir/r4";
 import { FormatPhoneAsDigits } from "@/app/utils/format-service";
-import { AddressData, USE_CASES, USE_CASE_DETAILS } from "@/app/constants";
+import {
+  AddressData,
+  USE_CASES,
+  USE_CASE_DETAILS,
+  raceOptions,
+  ethnicityOptions,
+} from "@/app/constants";
 
 export type PatientIdentifiers = {
   first_name?: string;
@@ -14,7 +20,15 @@ export type PatientIdentifiers = {
   state?: string;
   zip?: string;
   email?: string;
+  gender?: string;
+  race?: string;
+  ethnicity?: string;
 };
+
+const US_CORE_RACE_EXTENSION_URL =
+  "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race";
+const US_CORE_ETHNICITY_EXTENSION_URL =
+  "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity";
 
 /**
  * Parses a patient resource to extract patient demographics.
@@ -79,7 +93,43 @@ export function parsePatientDemographics(patient: Patient): PatientIdentifiers {
     }
   }
 
+  if (patient.gender) {
+    identifiers.gender = patient.gender;
+  }
+
+  const race = parseOmbCategoryCode(patient, US_CORE_RACE_EXTENSION_URL);
+  if (race) {
+    identifiers.race = race;
+  }
+
+  const ethnicity = parseOmbCategoryCode(
+    patient,
+    US_CORE_ETHNICITY_EXTENSION_URL,
+  );
+  if (ethnicity) {
+    identifiers.ethnicity = ethnicity;
+  }
+
   return identifiers;
+}
+
+/**
+ * Extracts the OMB category code from a US Core race or ethnicity extension.
+ * @param patient - The patient resource to parse.
+ * @param extensionUrl - The US Core race or ethnicity StructureDefinition URL.
+ * @returns The OMB category code (e.g. 2106-3), or undefined if not present.
+ */
+export function parseOmbCategoryCode(
+  patient: Patient,
+  extensionUrl: string,
+): string | undefined {
+  const demographicExtension = patient.extension?.find(
+    (extension) => extension.url === extensionUrl,
+  );
+  const ombCategory = demographicExtension?.extension?.find(
+    (subExtension) => subExtension.url === "ombCategory",
+  );
+  return ombCategory?.valueCoding?.code;
 }
 
 /**
@@ -204,6 +254,57 @@ export function parseEmails(
       .map((contactPoint) => contactPoint.value)
       .filter((email) => validEmail(email));
     return emailAddresses.length > 0 ? emailAddresses : undefined;
+  }
+}
+
+/**
+ * Maps an HL7v2 administrative sex code (PID.8, table 0001) to a FHIR
+ * administrative-gender code.
+ * @param sex - The HL7v2 administrative sex code (e.g. M, F, O, U).
+ * @returns The FHIR administrative-gender code, or empty string if unmapped.
+ */
+export function mapHL7SexToGender(sex: string): string {
+  switch (sex.toUpperCase()) {
+    case "M":
+      return "male";
+    case "F":
+      return "female";
+    case "O":
+    case "A":
+      return "other";
+    case "U":
+      return "unknown";
+    default:
+      return "";
+  }
+}
+
+/**
+ * Validates an HL7v2 race code (PID.10, table 0005, which uses CDC Race &
+ * Ethnicity codes) against the supported OMB race categories.
+ * @param race - The HL7v2 race code (e.g. 2106-3).
+ * @returns The race code if it is a supported OMB category, else empty string.
+ */
+export function mapHL7RaceToCode(race: string): string {
+  return raceOptions.some((option) => option.value === race) ? race : "";
+}
+
+/**
+ * Maps an HL7v2 ethnic group code (PID.22, table 0189) to an OMB ethnicity
+ * category code. CDC Race & Ethnicity codes are passed through when supported.
+ * @param ethnicGroup - The HL7v2 ethnic group code (e.g. H, N, or 2135-2).
+ * @returns The OMB ethnicity category code, or empty string if unmapped.
+ */
+export function mapHL7EthnicGroupToCode(ethnicGroup: string): string {
+  switch (ethnicGroup.toUpperCase()) {
+    case "H":
+      return "2135-2";
+    case "N":
+      return "2186-5";
+    default:
+      return ethnicityOptions.some((option) => option.value === ethnicGroup)
+        ? ethnicGroup
+        : "";
   }
 }
 

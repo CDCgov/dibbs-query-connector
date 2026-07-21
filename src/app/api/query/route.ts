@@ -15,6 +15,9 @@ import {
 } from "@/app/constants";
 import {
   mapDeprecatedUseCaseToId,
+  mapHL7EthnicGroupToCode,
+  mapHL7RaceToCode,
+  mapHL7SexToGender,
   parseHL7FromRequestBody,
   parsePatientDemographics,
 } from "./parsers";
@@ -88,6 +91,9 @@ export async function GET(request: NextRequest) {
   const zip = params.get("zip") ?? "";
 
   const email = params.get("email") ?? "";
+  const gender = params.get("gender") ?? "";
+  const race = params.get("race") ?? "";
+  const ethnicity = params.get("ethnicity") ?? "";
   const noParamsDefined = [
     given,
     family,
@@ -127,6 +133,9 @@ export async function GET(request: NextRequest) {
       zip,
     },
     email,
+    gender,
+    race,
+    ethnicity,
   };
 
   if (!validatedPatientSearch(QueryRequest)) {
@@ -211,6 +220,15 @@ export async function POST(request: NextRequest) {
       const zip = parsedMessage.get("PID.11.5").toString() ?? "";
       const phone = parsedMessage.get("NK1.5.1").toString() ?? "";
       const email = parsedMessage.get("PID.13.4").toString() ?? ""; //https://hl7-definition.caristix.com/v2/HL7v2.3/Fields/PID.13.4
+      const gender = mapHL7SexToGender(
+        parsedMessage.get("PID.8").toString() ?? "",
+      );
+      const race = mapHL7RaceToCode(
+        parsedMessage.get("PID.10.1").toString() ?? "",
+      );
+      const ethnicity = mapHL7EthnicGroupToCode(
+        parsedMessage.get("PID.22.1").toString() ?? "",
+      );
       const noPatientIdentifierDefined = [
         firstName,
         lastName,
@@ -239,6 +257,9 @@ export async function POST(request: NextRequest) {
         address: { street1, street2, city, state, zip },
         phone,
         email,
+        gender,
+        race,
+        ethnicity,
       };
     } catch (error: unknown) {
       return await handleAndReturnError(error);
@@ -281,6 +302,9 @@ export async function POST(request: NextRequest) {
         },
         phone: PatientIdentifiers?.phone,
         email: PatientIdentifiers?.email,
+        gender: PatientIdentifiers?.gender,
+        race: PatientIdentifiers?.race,
+        ethnicity: PatientIdentifiers?.ethnicity,
       };
     } catch (error: unknown) {
       return await handleAndReturnError(error);

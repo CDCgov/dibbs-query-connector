@@ -12,6 +12,9 @@ import {
 import { useSearchParams } from "next/navigation";
 import {
   stateOptions,
+  genderOptions,
+  raceOptions,
+  ethnicityOptions,
   Mode,
   hyperUnluckyPatient,
   AddressData,
@@ -78,6 +81,11 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       zip: "",
     },
   );
+  const [gender, setGender] = useState<string>(initialValues?.gender ?? "");
+  const [race, setRace] = useState<string>(initialValues?.race ?? "");
+  const [ethnicity, setEthnicity] = useState<string>(
+    initialValues?.ethnicity ?? "",
+  );
 
   const [fhirServerConfig, setFhirServerConfig] =
     useState<FhirServerConfig | null>(null);
@@ -95,6 +103,20 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
     setPhone(params?.get("phone") || "");
     setDOB(params?.get("dob") || "");
     setMRN(params?.get("mrn") || "");
+
+    // Only accept demographic codes that match a known dropdown option
+    const genderParam = params?.get("gender") || "";
+    setGender(
+      genderOptions.some((o) => o.value === genderParam) ? genderParam : "",
+    );
+    const raceParam = params?.get("race") || "";
+    setRace(raceOptions.some((o) => o.value === raceParam) ? raceParam : "");
+    const ethnicityParam = params?.get("ethnicity") || "";
+    setEthnicity(
+      ethnicityOptions.some((o) => o.value === ethnicityParam)
+        ? ethnicityParam
+        : "",
+    );
 
     const zipAddr = params?.get("zip");
     const stateAddr = params?.get("state") || "";
@@ -159,6 +181,9 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       fhirServer,
       phone: FormatPhoneAsDigits(phone),
       email,
+      gender,
+      race,
+      ethnicity,
       address: {
         street1: address.street1,
         street2: address.street2,
@@ -231,6 +256,9 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
       phone,
       email,
       address,
+      gender,
+      race,
+      ethnicity,
     });
 
     const patientDiscoveryRequest = getPatientDiscoveryRequest();
@@ -426,6 +454,71 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
                 />
               </div>
               {renderFieldError(dob)}
+            </div>
+          </div>
+          <div className="grid-row grid-gap margin-bottom-4">
+            <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
+              Demographics
+            </h3>
+            <div className="tablet:grid-col-4">
+              <Label htmlFor="gender" className="margin-top-0-important">
+                Sex
+              </Label>
+              <Select
+                id="gender"
+                name="gender"
+                value={gender}
+                onChange={(event) => {
+                  setGender(event.target.value);
+                }}
+              >
+                <option value="">- Select -</option>
+                {genderOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div className="tablet:grid-col-4">
+              <Label htmlFor="race" className="margin-top-0-important">
+                Race
+              </Label>
+              <Select
+                id="race"
+                name="race"
+                value={race}
+                onChange={(event) => {
+                  setRace(event.target.value);
+                }}
+              >
+                <option value="">- Select -</option>
+                {raceOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div className="tablet:grid-col-4">
+              <Label htmlFor="ethnicity" className="margin-top-0-important">
+                Ethnicity
+              </Label>
+              <Select
+                id="ethnicity"
+                name="ethnicity"
+                value={ethnicity}
+                onChange={(event) => {
+                  setEthnicity(event.target.value);
+                }}
+              >
+                <option value="">- Select -</option>
+                {ethnicityOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
             </div>
           </div>
           <div className="grid-row grid-gap margin-bottom-4">

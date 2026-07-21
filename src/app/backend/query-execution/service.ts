@@ -8,7 +8,12 @@ import {
   Task,
 } from "fhir/r4";
 
-import { isFhirResource } from "../../constants";
+import {
+  isFhirResource,
+  CDC_RACE_ETHNICITY_SYSTEM,
+  raceOptions,
+  ethnicityOptions,
+} from "../../constants";
 
 // ChainedPatientDemographics appears in a decorated method signature, which
 // requires a type-only import under emitDecoratorMetadata + isolatedModules.
@@ -58,6 +63,9 @@ interface PatientSearchParams {
     zip?: string;
   };
   email?: string;
+  gender?: string;
+  race?: string;
+  ethnicity?: string;
 }
 
 // Constants for configuration
@@ -108,13 +116,29 @@ class QueryService {
   private static async buildPatientSearchQuery(
     params: PatientSearchParams,
   ): Promise<string> {
-    const { firstName, lastName, dob, mrn, phone, address, email } = params;
+    const {
+      firstName,
+      lastName,
+      dob,
+      mrn,
+      phone,
+      address,
+      email,
+      gender,
+      race,
+      ethnicity,
+    } = params;
     let patientQuery = "Patient?";
 
     if (firstName) patientQuery += `given=${firstName}&`;
     if (lastName) patientQuery += `family=${lastName}&`;
     if (dob) patientQuery += `birthdate=${dob}&`;
     if (mrn) patientQuery += `identifier=${mrn}&`;
+    if (gender) patientQuery += `gender=${gender}&`;
+    // race/ethnicity are US Core SearchParameters (not base FHIR); servers
+    // without US Core support will ignore them under lenient search handling
+    if (race) patientQuery += `race=${race}&`;
+    if (ethnicity) patientQuery += `ethnicity=${ethnicity}&`;
 
     if (phone) {
       const phonesToSearch = phone.split(";");
@@ -893,6 +917,9 @@ class QueryService {
       phone,
       address,
       email,
+      gender,
+      race,
+      ethnicity,
       patientMatchConfiguration,
     } = request;
 
@@ -966,6 +993,52 @@ class QueryService {
           value: mrn,
         },
       ];
+    }
+
+    if (gender) {
+      patientResource["gender"] = gender;
+    }
+
+    const usCoreDemographicExtension = (
+      structureDefinitionUrl: string,
+      code: string,
+      display: string | undefined,
+    ) => ({
+      url: structureDefinitionUrl,
+      extension: [
+        {
+          url: "ombCategory",
+          valueCoding: {
+            system: CDC_RACE_ETHNICITY_SYSTEM,
+            code,
+            display,
+          },
+        },
+        { url: "text", valueString: display ?? code },
+      ],
+    });
+
+    const demographicExtensions = [];
+    if (race) {
+      demographicExtensions.push(
+        usCoreDemographicExtension(
+          "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
+          race,
+          raceOptions.find((o) => o.value === race)?.label,
+        ),
+      );
+    }
+    if (ethnicity) {
+      demographicExtensions.push(
+        usCoreDemographicExtension(
+          "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity",
+          ethnicity,
+          ethnicityOptions.find((o) => o.value === ethnicity)?.label,
+        ),
+      );
+    }
+    if (demographicExtensions.length > 0) {
+      patientResource["extension"] = demographicExtensions;
     }
 
     const hasIdentifiers = [
