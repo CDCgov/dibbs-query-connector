@@ -71,7 +71,7 @@ exports[`SearchForm does not prefill address with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Name
           </h3>
@@ -122,7 +122,7 @@ exports[`SearchForm does not prefill address with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Date of Birth
           </h3>
@@ -153,7 +153,140 @@ exports[`SearchForm does not prefill address with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
+          >
+            Demographics
+          </h3>
+          <div
+            class="tablet:grid-col-4"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="gender"
+            >
+              Sex
+            </label>
+            <select
+              class="usa-select"
+              data-testid="Select"
+              id="gender"
+              name="gender"
+            >
+              <option
+                value=""
+              >
+                - Select -
+              </option>
+              <option
+                value="female"
+              >
+                Female
+              </option>
+              <option
+                value="male"
+              >
+                Male
+              </option>
+              <option
+                value="other"
+              >
+                Other
+              </option>
+              <option
+                value="unknown"
+              >
+                Unknown
+              </option>
+            </select>
+          </div>
+          <div
+            class="tablet:grid-col-4"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="race"
+            >
+              Race
+            </label>
+            <select
+              class="usa-select"
+              data-testid="Select"
+              id="race"
+              name="race"
+            >
+              <option
+                value=""
+              >
+                - Select -
+              </option>
+              <option
+                value="1002-5"
+              >
+                American Indian or Alaska Native
+              </option>
+              <option
+                value="2028-9"
+              >
+                Asian
+              </option>
+              <option
+                value="2054-5"
+              >
+                Black or African American
+              </option>
+              <option
+                value="2076-8"
+              >
+                Native Hawaiian or Other Pacific Islander
+              </option>
+              <option
+                value="2106-3"
+              >
+                White
+              </option>
+            </select>
+          </div>
+          <div
+            class="tablet:grid-col-4"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="ethnicity"
+            >
+              Ethnicity
+            </label>
+            <select
+              class="usa-select"
+              data-testid="Select"
+              id="ethnicity"
+              name="ethnicity"
+            >
+              <option
+                value=""
+              >
+                - Select -
+              </option>
+              <option
+                value="2135-2"
+              >
+                Hispanic or Latino
+              </option>
+              <option
+                value="2186-5"
+              >
+                Not Hispanic or Latino
+              </option>
+            </select>
+          </div>
+        </div>
+        <div
+          class="grid-row grid-gap margin-bottom-4"
+        >
+          <h3
+            class="font-sans-md searchFormSectionLabel"
           >
             Phone number
           </h3>
@@ -181,7 +314,7 @@ exports[`SearchForm does not prefill address with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Email address
           </h3>
@@ -209,7 +342,7 @@ exports[`SearchForm does not prefill address with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Address
           </h3>
@@ -642,7 +775,7 @@ exports[`SearchForm does not prefill address with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Medical Record Number (MRN)
           </h3>
@@ -749,7 +882,7 @@ exports[`SearchForm does not prefill fhir server with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Name
           </h3>
@@ -800,7 +933,7 @@ exports[`SearchForm does not prefill fhir server with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Date of Birth
           </h3>
@@ -831,7 +964,140 @@ exports[`SearchForm does not prefill fhir server with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
+          >
+            Demographics
+          </h3>
+          <div
+            class="tablet:grid-col-4"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="gender"
+            >
+              Sex
+            </label>
+            <select
+              class="usa-select"
+              data-testid="Select"
+              id="gender"
+              name="gender"
+            >
+              <option
+                value=""
+              >
+                - Select -
+              </option>
+              <option
+                value="female"
+              >
+                Female
+              </option>
+              <option
+                value="male"
+              >
+                Male
+              </option>
+              <option
+                value="other"
+              >
+                Other
+              </option>
+              <option
+                value="unknown"
+              >
+                Unknown
+              </option>
+            </select>
+          </div>
+          <div
+            class="tablet:grid-col-4"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="race"
+            >
+              Race
+            </label>
+            <select
+              class="usa-select"
+              data-testid="Select"
+              id="race"
+              name="race"
+            >
+              <option
+                value=""
+              >
+                - Select -
+              </option>
+              <option
+                value="1002-5"
+              >
+                American Indian or Alaska Native
+              </option>
+              <option
+                value="2028-9"
+              >
+                Asian
+              </option>
+              <option
+                value="2054-5"
+              >
+                Black or African American
+              </option>
+              <option
+                value="2076-8"
+              >
+                Native Hawaiian or Other Pacific Islander
+              </option>
+              <option
+                value="2106-3"
+              >
+                White
+              </option>
+            </select>
+          </div>
+          <div
+            class="tablet:grid-col-4"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="ethnicity"
+            >
+              Ethnicity
+            </label>
+            <select
+              class="usa-select"
+              data-testid="Select"
+              id="ethnicity"
+              name="ethnicity"
+            >
+              <option
+                value=""
+              >
+                - Select -
+              </option>
+              <option
+                value="2135-2"
+              >
+                Hispanic or Latino
+              </option>
+              <option
+                value="2186-5"
+              >
+                Not Hispanic or Latino
+              </option>
+            </select>
+          </div>
+        </div>
+        <div
+          class="grid-row grid-gap margin-bottom-4"
+        >
+          <h3
+            class="font-sans-md searchFormSectionLabel"
           >
             Phone number
           </h3>
@@ -859,7 +1125,7 @@ exports[`SearchForm does not prefill fhir server with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Email address
           </h3>
@@ -887,7 +1153,7 @@ exports[`SearchForm does not prefill fhir server with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Address
           </h3>
@@ -1320,7 +1586,7 @@ exports[`SearchForm does not prefill fhir server with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Medical Record Number (MRN)
           </h3>
@@ -1427,7 +1693,7 @@ exports[`SearchForm prefills form fields from query params 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Name
           </h3>
@@ -1478,7 +1744,7 @@ exports[`SearchForm prefills form fields from query params 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Date of Birth
           </h3>
@@ -1509,7 +1775,140 @@ exports[`SearchForm prefills form fields from query params 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
+          >
+            Demographics
+          </h3>
+          <div
+            class="tablet:grid-col-4"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="gender"
+            >
+              Sex
+            </label>
+            <select
+              class="usa-select"
+              data-testid="Select"
+              id="gender"
+              name="gender"
+            >
+              <option
+                value=""
+              >
+                - Select -
+              </option>
+              <option
+                value="female"
+              >
+                Female
+              </option>
+              <option
+                value="male"
+              >
+                Male
+              </option>
+              <option
+                value="other"
+              >
+                Other
+              </option>
+              <option
+                value="unknown"
+              >
+                Unknown
+              </option>
+            </select>
+          </div>
+          <div
+            class="tablet:grid-col-4"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="race"
+            >
+              Race
+            </label>
+            <select
+              class="usa-select"
+              data-testid="Select"
+              id="race"
+              name="race"
+            >
+              <option
+                value=""
+              >
+                - Select -
+              </option>
+              <option
+                value="1002-5"
+              >
+                American Indian or Alaska Native
+              </option>
+              <option
+                value="2028-9"
+              >
+                Asian
+              </option>
+              <option
+                value="2054-5"
+              >
+                Black or African American
+              </option>
+              <option
+                value="2076-8"
+              >
+                Native Hawaiian or Other Pacific Islander
+              </option>
+              <option
+                value="2106-3"
+              >
+                White
+              </option>
+            </select>
+          </div>
+          <div
+            class="tablet:grid-col-4"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="ethnicity"
+            >
+              Ethnicity
+            </label>
+            <select
+              class="usa-select"
+              data-testid="Select"
+              id="ethnicity"
+              name="ethnicity"
+            >
+              <option
+                value=""
+              >
+                - Select -
+              </option>
+              <option
+                value="2135-2"
+              >
+                Hispanic or Latino
+              </option>
+              <option
+                value="2186-5"
+              >
+                Not Hispanic or Latino
+              </option>
+            </select>
+          </div>
+        </div>
+        <div
+          class="grid-row grid-gap margin-bottom-4"
+        >
+          <h3
+            class="font-sans-md searchFormSectionLabel"
           >
             Phone number
           </h3>
@@ -1537,7 +1936,7 @@ exports[`SearchForm prefills form fields from query params 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Email address
           </h3>
@@ -1565,7 +1964,7 @@ exports[`SearchForm prefills form fields from query params 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Address
           </h3>
@@ -1998,7 +2397,7 @@ exports[`SearchForm prefills form fields from query params 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Medical Record Number (MRN)
           </h3>
@@ -2105,7 +2504,7 @@ exports[`SearchForm renders fhir server form options on button click 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Name
           </h3>
@@ -2156,7 +2555,7 @@ exports[`SearchForm renders fhir server form options on button click 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Date of Birth
           </h3>
@@ -2187,7 +2586,140 @@ exports[`SearchForm renders fhir server form options on button click 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
+          >
+            Demographics
+          </h3>
+          <div
+            class="tablet:grid-col-4"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="gender"
+            >
+              Sex
+            </label>
+            <select
+              class="usa-select"
+              data-testid="Select"
+              id="gender"
+              name="gender"
+            >
+              <option
+                value=""
+              >
+                - Select -
+              </option>
+              <option
+                value="female"
+              >
+                Female
+              </option>
+              <option
+                value="male"
+              >
+                Male
+              </option>
+              <option
+                value="other"
+              >
+                Other
+              </option>
+              <option
+                value="unknown"
+              >
+                Unknown
+              </option>
+            </select>
+          </div>
+          <div
+            class="tablet:grid-col-4"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="race"
+            >
+              Race
+            </label>
+            <select
+              class="usa-select"
+              data-testid="Select"
+              id="race"
+              name="race"
+            >
+              <option
+                value=""
+              >
+                - Select -
+              </option>
+              <option
+                value="1002-5"
+              >
+                American Indian or Alaska Native
+              </option>
+              <option
+                value="2028-9"
+              >
+                Asian
+              </option>
+              <option
+                value="2054-5"
+              >
+                Black or African American
+              </option>
+              <option
+                value="2076-8"
+              >
+                Native Hawaiian or Other Pacific Islander
+              </option>
+              <option
+                value="2106-3"
+              >
+                White
+              </option>
+            </select>
+          </div>
+          <div
+            class="tablet:grid-col-4"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="ethnicity"
+            >
+              Ethnicity
+            </label>
+            <select
+              class="usa-select"
+              data-testid="Select"
+              id="ethnicity"
+              name="ethnicity"
+            >
+              <option
+                value=""
+              >
+                - Select -
+              </option>
+              <option
+                value="2135-2"
+              >
+                Hispanic or Latino
+              </option>
+              <option
+                value="2186-5"
+              >
+                Not Hispanic or Latino
+              </option>
+            </select>
+          </div>
+        </div>
+        <div
+          class="grid-row grid-gap margin-bottom-4"
+        >
+          <h3
+            class="font-sans-md searchFormSectionLabel"
           >
             Phone number
           </h3>
@@ -2215,7 +2747,7 @@ exports[`SearchForm renders fhir server form options on button click 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Email address
           </h3>
@@ -2243,7 +2775,7 @@ exports[`SearchForm renders fhir server form options on button click 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Address
           </h3>
@@ -2676,7 +3208,7 @@ exports[`SearchForm renders fhir server form options on button click 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Medical Record Number (MRN)
           </h3>
@@ -2783,7 +3315,7 @@ exports[`SearchForm renders the patient search form 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Name
           </h3>
@@ -2834,7 +3366,7 @@ exports[`SearchForm renders the patient search form 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Date of Birth
           </h3>
@@ -2865,7 +3397,140 @@ exports[`SearchForm renders the patient search form 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
+          >
+            Demographics
+          </h3>
+          <div
+            class="tablet:grid-col-4"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="gender"
+            >
+              Sex
+            </label>
+            <select
+              class="usa-select"
+              data-testid="Select"
+              id="gender"
+              name="gender"
+            >
+              <option
+                value=""
+              >
+                - Select -
+              </option>
+              <option
+                value="female"
+              >
+                Female
+              </option>
+              <option
+                value="male"
+              >
+                Male
+              </option>
+              <option
+                value="other"
+              >
+                Other
+              </option>
+              <option
+                value="unknown"
+              >
+                Unknown
+              </option>
+            </select>
+          </div>
+          <div
+            class="tablet:grid-col-4"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="race"
+            >
+              Race
+            </label>
+            <select
+              class="usa-select"
+              data-testid="Select"
+              id="race"
+              name="race"
+            >
+              <option
+                value=""
+              >
+                - Select -
+              </option>
+              <option
+                value="1002-5"
+              >
+                American Indian or Alaska Native
+              </option>
+              <option
+                value="2028-9"
+              >
+                Asian
+              </option>
+              <option
+                value="2054-5"
+              >
+                Black or African American
+              </option>
+              <option
+                value="2076-8"
+              >
+                Native Hawaiian or Other Pacific Islander
+              </option>
+              <option
+                value="2106-3"
+              >
+                White
+              </option>
+            </select>
+          </div>
+          <div
+            class="tablet:grid-col-4"
+          >
+            <label
+              class="usa-label margin-top-0-important"
+              data-testid="label"
+              for="ethnicity"
+            >
+              Ethnicity
+            </label>
+            <select
+              class="usa-select"
+              data-testid="Select"
+              id="ethnicity"
+              name="ethnicity"
+            >
+              <option
+                value=""
+              >
+                - Select -
+              </option>
+              <option
+                value="2135-2"
+              >
+                Hispanic or Latino
+              </option>
+              <option
+                value="2186-5"
+              >
+                Not Hispanic or Latino
+              </option>
+            </select>
+          </div>
+        </div>
+        <div
+          class="grid-row grid-gap margin-bottom-4"
+        >
+          <h3
+            class="font-sans-md searchFormSectionLabel"
           >
             Phone number
           </h3>
@@ -2893,7 +3558,7 @@ exports[`SearchForm renders the patient search form 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Email address
           </h3>
@@ -2921,7 +3586,7 @@ exports[`SearchForm renders the patient search form 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Address
           </h3>
@@ -3354,7 +4019,7 @@ exports[`SearchForm renders the patient search form 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Medical Record Number (MRN)
           </h3>

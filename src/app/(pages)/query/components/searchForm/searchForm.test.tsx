@@ -97,7 +97,8 @@ describe("SearchForm", () => {
   });
 
   it("prefills form fields from query params", async () => {
-    const queryParams = "last=unlucky&mrn=1234";
+    const queryParams =
+      "last=unlucky&mrn=1234&gender=female&race=2106-3&ethnicity=not-a-code";
 
     const formattedParams = new URLSearchParams(queryParams);
     (useSearchParams as jest.Mock).mockReturnValue(formattedParams);
@@ -137,6 +138,13 @@ describe("SearchForm", () => {
     expect(lastName).toHaveValue("unlucky");
     expect(phone).toHaveValue("");
     expect(mrn).toHaveValue("1234");
+
+    // Known demographic codes prefill; unrecognized ones are rejected.
+    expect(screen.getByRole("combobox", { name: "Sex" })).toHaveValue("female");
+    expect(screen.getByRole("combobox", { name: "Race" })).toHaveValue(
+      "2106-3",
+    );
+    expect(screen.getByRole("combobox", { name: "Ethnicity" })).toHaveValue("");
   });
 
   it("repopulates fields from initialValues when revising a search", () => {
@@ -160,6 +168,9 @@ describe("SearchForm", () => {
         state: "MA",
         zip: "02101",
       },
+      gender: "female",
+      race: "2054-5",
+      ethnicity: "2186-5",
     };
 
     renderWithUser(
@@ -201,6 +212,13 @@ describe("SearchForm", () => {
     );
     expect(screen.getByRole("textbox", { name: "Zip code" })).toHaveValue(
       "02101",
+    );
+    expect(screen.getByRole("combobox", { name: "Sex" })).toHaveValue("female");
+    expect(screen.getByRole("combobox", { name: "Race" })).toHaveValue(
+      "2054-5",
+    );
+    expect(screen.getByRole("combobox", { name: "Ethnicity" })).toHaveValue(
+      "2186-5",
     );
   });
 
@@ -399,6 +417,64 @@ describe("SearchForm", () => {
     expect(setMode).toHaveBeenCalledWith("patient-results");
     expect(setUncertainMatchError).toHaveBeenCalledWith(false);
     expect(setLoading).toHaveBeenLastCalledWith(false);
+  });
+
+  it("includes selected demographics in the patient discovery request", async () => {
+    (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams(""));
+    (patientDiscoveryQuery as jest.Mock).mockClear();
+    (patientDiscoveryQuery as jest.Mock).mockResolvedValue([
+      { resourceType: "Patient", id: "p1" },
+    ]);
+
+    const setSearchFormValues = jest.fn();
+
+    const { user } = renderWithUser(
+      <RootProviderMock currentPage="/query">
+        <SearchForm
+          setMode={jest.fn()}
+          setLoading={jest.fn()}
+          setPatientDiscoveryQueryResponse={jest.fn()}
+          selectedFhirServer="Default server"
+          setFhirServer={jest.fn()}
+          fhirServers={["Default server"]}
+          setUncertainMatchError={jest.fn()}
+          setSearchFormValues={setSearchFormValues}
+        />
+      </RootProviderMock>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Fill fields" }));
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Sex" }),
+      "female",
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Race" }),
+      "2106-3",
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Ethnicity" }),
+      "2135-2",
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Search for patient" }),
+    );
+
+    expect(patientDiscoveryQuery).toHaveBeenCalledWith(
+      expect.objectContaining({
+        gender: "female",
+        race: "2106-3",
+        ethnicity: "2135-2",
+      }),
+    );
+    expect(setSearchFormValues).toHaveBeenCalledWith(
+      expect.objectContaining({
+        gender: "female",
+        race: "2106-3",
+        ethnicity: "2135-2",
+      }),
+    );
   });
 
   it("shows validation errors and does not query when required fields are missing", async () => {

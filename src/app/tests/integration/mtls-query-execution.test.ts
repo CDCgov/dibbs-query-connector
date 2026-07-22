@@ -425,5 +425,140 @@ describe("Query Execution with Mutual TLS", () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual(mockPatient);
     });
+
+    it("should include gender, race, and ethnicity search params when provided", async () => {
+      const nonMtlsServerConfig = {
+        ...mockServerConfig,
+        authType: "none",
+        endpointType: "standard",
+      };
+
+      const {
+        getFhirServerConfigs,
+        getFhirServerNames,
+      } = require("@/app/backend/fhir-servers/service");
+      (getFhirServerConfigs as jest.Mock).mockResolvedValue([
+        nonMtlsServerConfig,
+      ]);
+      (getFhirServerNames as jest.Mock).mockResolvedValue([
+        nonMtlsServerConfig.name,
+      ]);
+
+      const standardPatientResponse = {
+        status: 200,
+        headers: new Headers({ "content-type": "application/json" }),
+        json: async () => mockPatientBundle,
+        clone: () => standardPatientResponse,
+      } as Response;
+      mockFhirClient.get.mockResolvedValueOnce(standardPatientResponse);
+
+      const request = {
+        fhirServer: "Test mTLS Server",
+        firstName: "John",
+        lastName: "Doe",
+        dob: "1990-01-01",
+        gender: "male",
+        race: "2106-3",
+        ethnicity: "2186-5",
+      };
+
+      await patientDiscoveryQuery(request);
+
+      expect(mockFhirClient.get).toHaveBeenCalledWith(
+        "/Patient?given=John&family=Doe&birthdate=1990-01-01&gender=male&race=2106-3&ethnicity=2186-5",
+      );
+    });
+
+    it("should include gender and US Core race/ethnicity extensions in $match requests", async () => {
+      const matchServerConfig = {
+        ...mockServerConfig,
+        authType: "none",
+        endpointType: "standard",
+      };
+
+      const {
+        getFhirServerConfigs,
+        getFhirServerNames,
+      } = require("@/app/backend/fhir-servers/service");
+      (getFhirServerConfigs as jest.Mock).mockResolvedValue([
+        matchServerConfig,
+      ]);
+      (getFhirServerNames as jest.Mock).mockResolvedValue([
+        matchServerConfig.name,
+      ]);
+
+      const matchResponse = {
+        status: 200,
+        headers: new Headers({ "content-type": "application/json" }),
+        json: async () => mockPatientBundle,
+        clone: () => matchResponse,
+      } as Response;
+      mockFhirClient.postJson.mockResolvedValueOnce(matchResponse);
+
+      const request = {
+        fhirServer: "Test mTLS Server",
+        firstName: "John",
+        lastName: "Doe",
+        dob: "1990-01-01",
+        gender: "female",
+        race: "2054-5",
+        ethnicity: "2135-2",
+        patientMatchConfiguration: {
+          enabled: true,
+          supportsMatch: true,
+          onlyCertainMatches: false,
+          onlySingleMatch: false,
+          matchCount: 0,
+        },
+      };
+
+      await patientDiscoveryQuery(request);
+
+      expect(mockFhirClient.postJson).toHaveBeenCalledWith(
+        "/Patient/$match",
+        expect.objectContaining({
+          resourceType: "Parameters",
+        }),
+      );
+
+      const parameters = mockFhirClient.postJson.mock.calls[0][1] as {
+        parameter: { name: string; resource?: Record<string, unknown> }[];
+      };
+      const patientResource = parameters.parameter.find(
+        (p) => p.name === "resource",
+      )?.resource as Record<string, unknown>;
+
+      expect(patientResource["gender"]).toBe("female");
+      expect(patientResource["extension"]).toEqual([
+        {
+          url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
+          extension: [
+            {
+              url: "ombCategory",
+              valueCoding: {
+                system: "urn:oid:2.16.840.1.113883.6.238",
+                code: "2054-5",
+                display: "Black or African American",
+              },
+            },
+            { url: "text", valueString: "Black or African American" },
+          ],
+        },
+        {
+          url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity",
+          extension: [
+            {
+              url: "ombCategory",
+              valueCoding: {
+                system: "urn:oid:2.16.840.1.113883.6.238",
+                code: "2135-2",
+                display: "Hispanic or Latino",
+              },
+            },
+            { url: "text", valueString: "Hispanic or Latino" },
+          ],
+        },
+      ]);
+    });
   });
 });

@@ -40,6 +40,12 @@ export type PatientDiscoveryRequest = {
   phone?: string;
   address?: Address;
   email?: string;
+  /** FHIR administrative-gender code: male | female | other | unknown */
+  gender?: string;
+  /** OMB race category code from urn:oid:2.16.840.1.113883.6.238 (e.g. 2106-3) */
+  race?: string;
+  /** OMB ethnicity category code from urn:oid:2.16.840.1.113883.6.238 (e.g. 2135-2) */
+  ethnicity?: string;
   patientMatchConfiguration?: PatientMatchData;
 };
 
