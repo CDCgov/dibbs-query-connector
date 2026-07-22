@@ -97,7 +97,7 @@
     "sass-embedded": "^1.100.0",
     "supertest": "^7.2.2",
     "testcontainers": "^12.0.4",
-    "typescript": "^7.0.2",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.64.0"
   }
 }
