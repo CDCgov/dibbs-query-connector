@@ -4,10 +4,17 @@ import {
   parseMRNs,
   parsePhoneNumbers,
   parseAddresses,
+  parseOmbCategoryCode,
   validEmail,
   parseEmails,
   parseHL7FromRequestBody,
   mapDeprecatedUseCaseToId,
+  mapHL7SexToGender,
+  mapHL7RaceToCode,
+  mapHL7EthnicGroupToCode,
+  validateGenderCode,
+  validateRaceCode,
+  validateEthnicityCode,
 } from "./parsers";
 import { USE_CASE_DETAILS, USE_CASES } from "@/app/constants";
 
@@ -213,6 +220,160 @@ describe("parsePatientDemographics", () => {
 
   it("returns an empty object for a bare patient", () => {
     expect(parsePatientDemographics(makePatient())).toEqual({});
+  });
+
+  it("extracts gender and US Core race/ethnicity OMB category codes", () => {
+    const patient = makePatient({
+      gender: "female",
+      extension: [
+        {
+          url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
+          extension: [
+            {
+              url: "ombCategory",
+              valueCoding: {
+                system: "urn:oid:2.16.840.1.113883.6.238",
+                code: "2106-3",
+                display: "White",
+              },
+            },
+            { url: "text", valueString: "White" },
+          ],
+        },
+        {
+          url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity",
+          extension: [
+            {
+              url: "ombCategory",
+              valueCoding: {
+                system: "urn:oid:2.16.840.1.113883.6.238",
+                code: "2186-5",
+                display: "Not Hispanic or Latino",
+              },
+            },
+            { url: "text", valueString: "Not Hispanic or Latino" },
+          ],
+        },
+      ],
+    });
+
+    expect(parsePatientDemographics(patient)).toEqual({
+      gender: "female",
+      race: "2106-3",
+      ethnicity: "2186-5",
+    });
+  });
+
+  it("drops unrecognized gender and OMB category codes", () => {
+    const patient = makePatient({
+      gender: "nonbinary" as Patient["gender"],
+      extension: [
+        {
+          url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
+          extension: [
+            {
+              url: "ombCategory",
+              valueCoding: {
+                system: "urn:oid:2.16.840.1.113883.6.238",
+                code: "not-a-code",
+              },
+            },
+          ],
+        },
+        {
+          url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity",
+          extension: [
+            {
+              url: "ombCategory",
+              valueCoding: {
+                system: "urn:oid:2.16.840.1.113883.6.238",
+                code: "ASKU",
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(parsePatientDemographics(patient)).toEqual({});
+  });
+});
+
+describe("demographic code validators", () => {
+  it("passes through supported codes", () => {
+    expect(validateGenderCode("female")).toBe("female");
+    expect(validateRaceCode("2106-3")).toBe("2106-3");
+    expect(validateEthnicityCode("2135-2")).toBe("2135-2");
+  });
+
+  it("returns empty string for unsupported codes", () => {
+    expect(validateGenderCode("Female")).toBe("");
+    expect(validateGenderCode("male&_revinclude=Provenance:target")).toBe("");
+    expect(validateRaceCode("W")).toBe("");
+    expect(validateEthnicityCode("H")).toBe("");
+    expect(validateGenderCode("")).toBe("");
+    expect(validateRaceCode("")).toBe("");
+    expect(validateEthnicityCode("")).toBe("");
+  });
+});
+
+describe("parseOmbCategoryCode", () => {
+  const RACE_URL =
+    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race";
+
+  it("returns undefined when the patient has no extensions", () => {
+    expect(parseOmbCategoryCode(makePatient(), RACE_URL)).toBeUndefined();
+  });
+
+  it("returns undefined when the extension has no ombCategory", () => {
+    const patient = makePatient({
+      extension: [
+        {
+          url: RACE_URL,
+          extension: [{ url: "text", valueString: "White" }],
+        },
+      ],
+    });
+    expect(parseOmbCategoryCode(patient, RACE_URL)).toBeUndefined();
+  });
+});
+
+describe("mapHL7SexToGender", () => {
+  it.each([
+    ["M", "male"],
+    ["F", "female"],
+    ["f", "female"],
+    ["O", "other"],
+    ["A", "other"],
+    ["U", "unknown"],
+    ["", ""],
+    ["X", ""],
+  ])("maps %s to %s", (sex, expected) => {
+    expect(mapHL7SexToGender(sex)).toBe(expected);
+  });
+});
+
+describe("mapHL7RaceToCode", () => {
+  it("passes through supported OMB race category codes", () => {
+    expect(mapHL7RaceToCode("2106-3")).toBe("2106-3");
+    expect(mapHL7RaceToCode("1002-5")).toBe("1002-5");
+  });
+
+  it("returns empty string for unsupported codes", () => {
+    expect(mapHL7RaceToCode("W")).toBe("");
+    expect(mapHL7RaceToCode("")).toBe("");
+  });
+});
+
+describe("mapHL7EthnicGroupToCode", () => {
+  it.each([
+    ["H", "2135-2"],
+    ["N", "2186-5"],
+    ["2135-2", "2135-2"],
+    ["U", ""],
+    ["", ""],
+  ])("maps %s to %s", (ethnicGroup, expected) => {
+    expect(mapHL7EthnicGroupToCode(ethnicGroup)).toBe(expected);
   });
 });
 

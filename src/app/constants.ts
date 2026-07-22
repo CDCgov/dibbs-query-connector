@@ -62,7 +62,41 @@ export type PatientSearchFormValues = {
   phone: string;
   email: string;
   address: AddressData;
+  gender: string;
+  race: string;
+  ethnicity: string;
 };
+
+// CDC Race & Ethnicity code system used by the US Core race/ethnicity
+// extensions and search parameters.
+export const CDC_RACE_ETHNICITY_SYSTEM = "urn:oid:2.16.840.1.113883.6.238";
+
+/* Labels and FHIR administrative-gender codes for the sex dropdown on the
+ * query page. Labeled "Sex" in the UI to match the results display convention
+ * (see formatSex), but all administrative-gender codes are searchable. */
+export const genderOptions = [
+  { value: "female", label: "Female" },
+  { value: "male", label: "Male" },
+  { value: "other", label: "Other" },
+  { value: "unknown", label: "Unknown" },
+];
+
+/* Labels and OMB race category codes (CDC Race & Ethnicity code system) for
+ * the race dropdown on the query page */
+export const raceOptions = [
+  { value: "1002-5", label: "American Indian or Alaska Native" },
+  { value: "2028-9", label: "Asian" },
+  { value: "2054-5", label: "Black or African American" },
+  { value: "2076-8", label: "Native Hawaiian or Other Pacific Islander" },
+  { value: "2106-3", label: "White" },
+];
+
+/* Labels and OMB ethnicity category codes (CDC Race & Ethnicity code system)
+ * for the ethnicity dropdown on the query page */
+export const ethnicityOptions = [
+  { value: "2135-2", label: "Hispanic or Latino" },
+  { value: "2186-5", label: "Not Hispanic or Latino" },
+];
 
 //Create type to specify the demographic data fields for a patient
 export type DemoDataFields = {
