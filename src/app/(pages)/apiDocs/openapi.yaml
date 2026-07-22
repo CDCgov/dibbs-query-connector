@@ -230,6 +230,27 @@ paths:
           schema:
             type: string
             example: 517-425-1398
+        - name: gender
+          in: query
+          description: Patient sex as a FHIR administrative-gender code. Optional search refinement; does not count toward required patient identifiers
+          schema:
+            type: string
+            enum: [female, male, other, unknown]
+            example: female
+        - name: race
+          in: query
+          description: Patient race as an OMB category code from the CDC Race & Ethnicity code system (urn:oid:2.16.840.1.113883.6.238). Uses the US Core race SearchParameter; servers without US Core support may ignore it
+          schema:
+            type: string
+            enum: ["1002-5", "2028-9", "2054-5", "2076-8", "2106-3"]
+            example: "2106-3"
+        - name: ethnicity
+          in: query
+          description: Patient ethnicity as an OMB category code from the CDC Race & Ethnicity code system (urn:oid:2.16.840.1.113883.6.238). Uses the US Core ethnicity SearchParameter; servers without US Core support may ignore it
+          schema:
+            type: string
+            enum: ["2135-2", "2186-5"]
+            example: "2135-2"
       responses:
         200:
           description: The FHIR resources returned that match the information configured in the query referenced
