@@ -11095,6 +11095,102 @@
       }
     },
     {
+      "fullUrl": "DiagnosticReport/1f0b7c34-9d52-4a18-bb60-2c4e8a7d5109",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "1f0b7c34-9d52-4a18-bb60-2c4e8a7d5109",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "LAB",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "52969-3",
+              "display": "Methicillin resistant Staphylococcus aureus [Presence] in Nose by Organism specific culture"
+            }
+          ],
+          "text": "Methicillin resistant Staphylococcus aureus [Presence] in Nose by Organism specific culture"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
+          "display": "Hyper A Unlucky"
+        },
+        "effectiveDateTime": "2026-05-04",
+        "result": [
+          {
+            "reference": "Observation/a38fb8a1-d73e-4e92-84d8-0957d070afd0",
+            "display": "Methicillin resistant Staphylococcus aureus [Presence] in Nose by Organism specific culture"
+          },
+          {
+            "reference": "Observation/8eeef7e0-c1c8-451a-a209-e750ca1f3eef",
+            "display": "Methicillin resistance mecA gene [Presence] by Molecular method"
+          },
+          {
+            "reference": "Observation/b25bc48b-9dda-4645-80a4-67b87d954735",
+            "display": "Vancomycin resistance vanA gene [Presence] by Molecular method"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "DiagnosticReport/1f0b7c34-9d52-4a18-bb60-2c4e8a7d5109"
+      }
+    },
+    {
+      "fullUrl": "DiagnosticReport/6ad24e81-3f97-45c0-9e13-b8752da0c64f",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "6ad24e81-3f97-45c0-9e13-b8752da0c64f",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "LAB",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "59150-3",
+              "display": "Vancomycin resistant enterococcus [Presence] in Anal by Organism specific culture"
+            }
+          ],
+          "text": "Vancomycin resistant enterococcus [Presence] in Anal by Organism specific culture"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
+          "display": "Hyper A Unlucky"
+        },
+        "effectiveDateTime": "2026-05-04",
+        "result": [
+          {
+            "reference": "Observation/c87a6d2d-370f-45ef-82b4-f1db689f458b",
+            "display": "Vancomycin resistant enterococcus [Presence] in Anal by Organism specific culture"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "DiagnosticReport/6ad24e81-3f97-45c0-9e13-b8752da0c64f"
+      }
+    },
+    {
       "fullUrl": "DiagnosticReport/b78d8981-5151-4120-b931-8c94d9ca7d14",
       "resource": {
         "resourceType": "DiagnosticReport",
@@ -11128,29 +11224,53 @@
         "effectiveDateTime": "2026-05-04",
         "result": [
           {
-            "reference": "Observation/a38fb8a1-d73e-4e92-84d8-0957d070afd0",
-            "display": "Methicillin resistant Staphylococcus aureus [Presence] in Nose by Organism specific culture"
-          },
-          {
-            "reference": "Observation/8eeef7e0-c1c8-451a-a209-e750ca1f3eef",
-            "display": "Methicillin resistance mecA gene [Presence] by Molecular method"
-          },
-          {
-            "reference": "Observation/b25bc48b-9dda-4645-80a4-67b87d954735",
-            "display": "Vancomycin resistance vanA gene [Presence] by Molecular method"
-          },
-          {
-            "reference": "Observation/c87a6d2d-370f-45ef-82b4-f1db689f458b",
-            "display": "Vancomycin resistant enterococcus [Presence] in Anal by Organism specific culture"
-          },
-          {
             "reference": "Observation/697e1ae3-c282-409d-aad7-8b49b3a857d8",
             "display": "Enterobacteriaceae.carbapenemase resistance phenotype [Identifier] in Anal by Organism specific culture"
           },
           {
             "reference": "Observation/8fbbe0ef-5bd1-48f5-912d-31bf64fb0cc4",
             "display": "KPC carbapenemase [Presence] in Isolate by Rapid immunoassay"
-          },
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "DiagnosticReport/b78d8981-5151-4120-b931-8c94d9ca7d14"
+      }
+    },
+    {
+      "fullUrl": "DiagnosticReport/d5c31b7a-08e4-4f26-a91d-63be7c40f2d8",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "d5c31b7a-08e4-4f26-a91d-63be7c40f2d8",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "LAB",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "90002-7",
+              "display": "Candida auris [Presence] in Specimen by Organism specific culture"
+            }
+          ],
+          "text": "Candida auris [Presence] in Specimen by Organism specific culture"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
+          "display": "Hyper A Unlucky"
+        },
+        "effectiveDateTime": "2026-05-04",
+        "result": [
           {
             "reference": "Observation/8b2a0a3b-2f08-4044-98c4-c9a76383c333",
             "display": "Candida auris [Presence] in Specimen by Organism specific culture"
@@ -11159,7 +11279,7 @@
       },
       "request": {
         "method": "PUT",
-        "url": "DiagnosticReport/b78d8981-5151-4120-b931-8c94d9ca7d14"
+        "url": "DiagnosticReport/d5c31b7a-08e4-4f26-a91d-63be7c40f2d8"
       }
     },
     {

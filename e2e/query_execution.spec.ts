@@ -377,21 +377,25 @@ test.describe("alternate queries with the Query Connector", () => {
       page.getByRole("button", { name: "Encounters", expanded: true }),
     ).toBeVisible();
 
-    // Admission screening Observations: one positive row per headline organism
-    // plus the negative vancomycin-resistance gene result. These display texts
-    // are unique to a single Observation row across all result tables.
+    // Admission screening: one positive Observation per headline organism plus
+    // the negative vancomycin-resistance gene result. Each specimen's culture
+    // also gets its own DiagnosticReport carrying that culture's LOINC, so the
+    // culture display texts appear twice — once under Observations and once
+    // under Diagnostic Reports.
     await expect(
       page
         .getByRole("table")
         .getByRole("row")
         .filter({ hasText: "Candida auris" }),
-    ).toHaveCount(1);
+    ).toHaveCount(2);
     await expect(
       page
         .getByRole("table")
         .getByRole("row")
         .filter({ hasText: "Vancomycin resistant enterococcus" }),
-    ).toHaveCount(1);
+    ).toHaveCount(2);
+    // The molecular results are members of the nares report rather than reports
+    // in their own right, so they stay at one row each.
     await expect(
       page
         .getByRole("table")
