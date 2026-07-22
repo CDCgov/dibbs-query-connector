@@ -4,6 +4,7 @@ import {
   AddressData,
   USE_CASES,
   USE_CASE_DETAILS,
+  genderOptions,
   raceOptions,
   ethnicityOptions,
 } from "@/app/constants";
@@ -93,18 +94,20 @@ export function parsePatientDemographics(patient: Patient): PatientIdentifiers {
     }
   }
 
-  if (patient.gender) {
-    identifiers.gender = patient.gender;
+  const gender = validateGenderCode(patient.gender ?? "");
+  if (gender) {
+    identifiers.gender = gender;
   }
 
-  const race = parseOmbCategoryCode(patient, US_CORE_RACE_EXTENSION_URL);
+  const race = validateRaceCode(
+    parseOmbCategoryCode(patient, US_CORE_RACE_EXTENSION_URL) ?? "",
+  );
   if (race) {
     identifiers.race = race;
   }
 
-  const ethnicity = parseOmbCategoryCode(
-    patient,
-    US_CORE_ETHNICITY_EXTENSION_URL,
+  const ethnicity = validateEthnicityCode(
+    parseOmbCategoryCode(patient, US_CORE_ETHNICITY_EXTENSION_URL) ?? "",
   );
   if (ethnicity) {
     identifiers.ethnicity = ethnicity;
@@ -258,6 +261,39 @@ export function parseEmails(
 }
 
 /**
+ * Validates a FHIR administrative-gender code against the supported options.
+ * @param gender - The candidate gender code (e.g. female).
+ * @returns The code if it is a valid administrative-gender code, else empty
+ * string.
+ */
+export function validateGenderCode(gender: string): string {
+  return genderOptions.some((option) => option.value === gender) ? gender : "";
+}
+
+/**
+ * Validates a race code against the supported OMB race categories from the
+ * CDC Race & Ethnicity code system.
+ * @param race - The candidate race code (e.g. 2106-3).
+ * @returns The code if it is a supported OMB race category, else empty string.
+ */
+export function validateRaceCode(race: string): string {
+  return raceOptions.some((option) => option.value === race) ? race : "";
+}
+
+/**
+ * Validates an ethnicity code against the supported OMB ethnicity categories
+ * from the CDC Race & Ethnicity code system.
+ * @param ethnicity - The candidate ethnicity code (e.g. 2135-2).
+ * @returns The code if it is a supported OMB ethnicity category, else empty
+ * string.
+ */
+export function validateEthnicityCode(ethnicity: string): string {
+  return ethnicityOptions.some((option) => option.value === ethnicity)
+    ? ethnicity
+    : "";
+}
+
+/**
  * Maps an HL7v2 administrative sex code (PID.8, table 0001) to a FHIR
  * administrative-gender code.
  * @param sex - The HL7v2 administrative sex code (e.g. M, F, O, U).
@@ -286,7 +322,7 @@ export function mapHL7SexToGender(sex: string): string {
  * @returns The race code if it is a supported OMB category, else empty string.
  */
 export function mapHL7RaceToCode(race: string): string {
-  return raceOptions.some((option) => option.value === race) ? race : "";
+  return validateRaceCode(race);
 }
 
 /**
@@ -302,9 +338,7 @@ export function mapHL7EthnicGroupToCode(ethnicGroup: string): string {
     case "N":
       return "2186-5";
     default:
-      return ethnicityOptions.some((option) => option.value === ethnicGroup)
-        ? ethnicGroup
-        : "";
+      return validateEthnicityCode(ethnicGroup);
   }
 }
 

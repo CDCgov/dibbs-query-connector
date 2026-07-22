@@ -351,7 +351,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
         <Fieldset className={`${styles.searchFormContainer} bg-white`}>
           {showAdvanced && (
             <div className="grid-row grid-gap margin-bottom-4">
-              <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
+              <h3 className={`font-sans-md ${styles.searchFormSectionLabel}`}>
                 Advanced
               </h3>
               <Label
@@ -395,7 +395,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
           )}
 
           <div className="grid-row grid-gap margin-bottom-4">
-            <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
+            <h3 className={`font-sans-md ${styles.searchFormSectionLabel}`}>
               Name
             </h3>
             <div className="tablet:grid-col-6">
@@ -434,7 +434,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
             </div>
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
-            <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
+            <h3 className={`font-sans-md ${styles.searchFormSectionLabel}`}>
               Date of Birth
             </h3>
             <div className="grid-col-6">
@@ -457,7 +457,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
             </div>
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
-            <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
+            <h3 className={`font-sans-md ${styles.searchFormSectionLabel}`}>
               Demographics
             </h3>
             <div className="tablet:grid-col-4">
@@ -522,7 +522,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
             </div>
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
-            <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
+            <h3 className={`font-sans-md ${styles.searchFormSectionLabel}`}>
               Phone number
             </h3>
             <div className="grid-col-6">
@@ -541,7 +541,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
             </div>
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
-            <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
+            <h3 className={`font-sans-md ${styles.searchFormSectionLabel}`}>
               Email address
             </h3>
             <div className="grid-col-6">
@@ -560,7 +560,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
             </div>
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
-            <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
+            <h3 className={`font-sans-md ${styles.searchFormSectionLabel}`}>
               Address
             </h3>
             <div className="grid-col">
@@ -655,7 +655,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
             </div>
           </div>
           <div className="grid-row grid-gap margin-bottom-4">
-            <h3 className={`"font-sans-md" ${styles.searchFormSectionLabel}`}>
+            <h3 className={`font-sans-md ${styles.searchFormSectionLabel}`}>
               Medical Record Number (MRN)
             </h3>
             <div className="grid-col-6">

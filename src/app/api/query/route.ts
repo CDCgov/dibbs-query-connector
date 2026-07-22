@@ -20,6 +20,9 @@ import {
   mapHL7SexToGender,
   parseHL7FromRequestBody,
   parsePatientDemographics,
+  validateEthnicityCode,
+  validateGenderCode,
+  validateRaceCode,
 } from "./parsers";
 import { Message } from "node-hl7-client";
 import { Bundle } from "fhir/r4";
@@ -91,9 +94,11 @@ export async function GET(request: NextRequest) {
   const zip = params.get("zip") ?? "";
 
   const email = params.get("email") ?? "";
-  const gender = params.get("gender") ?? "";
-  const race = params.get("race") ?? "";
-  const ethnicity = params.get("ethnicity") ?? "";
+  // Unrecognized demographic codes are dropped rather than forwarded to the
+  // FHIR server, matching the HL7v2 branch and the search form
+  const gender = validateGenderCode(params.get("gender") ?? "");
+  const race = validateRaceCode(params.get("race") ?? "");
+  const ethnicity = validateEthnicityCode(params.get("ethnicity") ?? "");
   const noParamsDefined = [
     given,
     family,

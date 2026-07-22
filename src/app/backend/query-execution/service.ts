@@ -964,7 +964,7 @@ class QueryService {
     }
 
     if (dob) {
-      patientResource["birthdate"] = dob;
+      patientResource["birthDate"] = dob;
     }
 
     if (telecom.length > 0) {

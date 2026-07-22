@@ -71,7 +71,7 @@ exports[`SearchForm does not prefill address with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Name
           </h3>
@@ -122,7 +122,7 @@ exports[`SearchForm does not prefill address with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Date of Birth
           </h3>
@@ -153,7 +153,7 @@ exports[`SearchForm does not prefill address with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Demographics
           </h3>
@@ -286,7 +286,7 @@ exports[`SearchForm does not prefill address with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Phone number
           </h3>
@@ -314,7 +314,7 @@ exports[`SearchForm does not prefill address with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Email address
           </h3>
@@ -342,7 +342,7 @@ exports[`SearchForm does not prefill address with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Address
           </h3>
@@ -775,7 +775,7 @@ exports[`SearchForm does not prefill address with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Medical Record Number (MRN)
           </h3>
@@ -882,7 +882,7 @@ exports[`SearchForm does not prefill fhir server with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Name
           </h3>
@@ -933,7 +933,7 @@ exports[`SearchForm does not prefill fhir server with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Date of Birth
           </h3>
@@ -964,7 +964,7 @@ exports[`SearchForm does not prefill fhir server with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Demographics
           </h3>
@@ -1097,7 +1097,7 @@ exports[`SearchForm does not prefill fhir server with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Phone number
           </h3>
@@ -1125,7 +1125,7 @@ exports[`SearchForm does not prefill fhir server with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Email address
           </h3>
@@ -1153,7 +1153,7 @@ exports[`SearchForm does not prefill fhir server with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Address
           </h3>
@@ -1586,7 +1586,7 @@ exports[`SearchForm does not prefill fhir server with bad data 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Medical Record Number (MRN)
           </h3>
@@ -1693,7 +1693,7 @@ exports[`SearchForm prefills form fields from query params 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Name
           </h3>
@@ -1744,7 +1744,7 @@ exports[`SearchForm prefills form fields from query params 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Date of Birth
           </h3>
@@ -1775,7 +1775,7 @@ exports[`SearchForm prefills form fields from query params 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Demographics
           </h3>
@@ -1908,7 +1908,7 @@ exports[`SearchForm prefills form fields from query params 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Phone number
           </h3>
@@ -1936,7 +1936,7 @@ exports[`SearchForm prefills form fields from query params 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Email address
           </h3>
@@ -1964,7 +1964,7 @@ exports[`SearchForm prefills form fields from query params 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Address
           </h3>
@@ -2397,7 +2397,7 @@ exports[`SearchForm prefills form fields from query params 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Medical Record Number (MRN)
           </h3>
@@ -2504,7 +2504,7 @@ exports[`SearchForm renders fhir server form options on button click 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Name
           </h3>
@@ -2555,7 +2555,7 @@ exports[`SearchForm renders fhir server form options on button click 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Date of Birth
           </h3>
@@ -2586,7 +2586,7 @@ exports[`SearchForm renders fhir server form options on button click 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Demographics
           </h3>
@@ -2719,7 +2719,7 @@ exports[`SearchForm renders fhir server form options on button click 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Phone number
           </h3>
@@ -2747,7 +2747,7 @@ exports[`SearchForm renders fhir server form options on button click 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Email address
           </h3>
@@ -2775,7 +2775,7 @@ exports[`SearchForm renders fhir server form options on button click 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Address
           </h3>
@@ -3208,7 +3208,7 @@ exports[`SearchForm renders fhir server form options on button click 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Medical Record Number (MRN)
           </h3>
@@ -3315,7 +3315,7 @@ exports[`SearchForm renders the patient search form 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Name
           </h3>
@@ -3366,7 +3366,7 @@ exports[`SearchForm renders the patient search form 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Date of Birth
           </h3>
@@ -3397,7 +3397,7 @@ exports[`SearchForm renders the patient search form 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Demographics
           </h3>
@@ -3530,7 +3530,7 @@ exports[`SearchForm renders the patient search form 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Phone number
           </h3>
@@ -3558,7 +3558,7 @@ exports[`SearchForm renders the patient search form 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Email address
           </h3>
@@ -3586,7 +3586,7 @@ exports[`SearchForm renders the patient search form 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Address
           </h3>
@@ -4019,7 +4019,7 @@ exports[`SearchForm renders the patient search form 1`] = `
           class="grid-row grid-gap margin-bottom-4"
         >
           <h3
-            class=""font-sans-md" searchFormSectionLabel"
+            class="font-sans-md searchFormSectionLabel"
           >
             Medical Record Number (MRN)
           </h3>

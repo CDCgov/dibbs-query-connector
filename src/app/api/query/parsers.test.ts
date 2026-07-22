@@ -12,6 +12,9 @@ import {
   mapHL7SexToGender,
   mapHL7RaceToCode,
   mapHL7EthnicGroupToCode,
+  validateGenderCode,
+  validateRaceCode,
+  validateEthnicityCode,
 } from "./parsers";
 import { USE_CASE_DETAILS, USE_CASES } from "@/app/constants";
 
@@ -259,6 +262,58 @@ describe("parsePatientDemographics", () => {
       race: "2106-3",
       ethnicity: "2186-5",
     });
+  });
+
+  it("drops unrecognized gender and OMB category codes", () => {
+    const patient = makePatient({
+      gender: "nonbinary" as Patient["gender"],
+      extension: [
+        {
+          url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
+          extension: [
+            {
+              url: "ombCategory",
+              valueCoding: {
+                system: "urn:oid:2.16.840.1.113883.6.238",
+                code: "not-a-code",
+              },
+            },
+          ],
+        },
+        {
+          url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity",
+          extension: [
+            {
+              url: "ombCategory",
+              valueCoding: {
+                system: "urn:oid:2.16.840.1.113883.6.238",
+                code: "ASKU",
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(parsePatientDemographics(patient)).toEqual({});
+  });
+});
+
+describe("demographic code validators", () => {
+  it("passes through supported codes", () => {
+    expect(validateGenderCode("female")).toBe("female");
+    expect(validateRaceCode("2106-3")).toBe("2106-3");
+    expect(validateEthnicityCode("2135-2")).toBe("2135-2");
+  });
+
+  it("returns empty string for unsupported codes", () => {
+    expect(validateGenderCode("Female")).toBe("");
+    expect(validateGenderCode("male&_revinclude=Provenance:target")).toBe("");
+    expect(validateRaceCode("W")).toBe("");
+    expect(validateEthnicityCode("H")).toBe("");
+    expect(validateGenderCode("")).toBe("");
+    expect(validateRaceCode("")).toBe("");
+    expect(validateEthnicityCode("")).toBe("");
   });
 });
 
