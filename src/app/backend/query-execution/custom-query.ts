@@ -190,6 +190,15 @@ export class CustomQuery {
         }
       });
     });
+
+    // A value set can be attached to several of a query's conditions (the
+    // carbapenemase sets, for instance, belong to CRE, CPO, CRAB and CRPA), so
+    // the same code arrives once per condition. Left as-is those repeats are
+    // sent verbatim in the search body: the MDRO query's 1,314 lab codes are
+    // only 655 distinct ones.
+    this.labCodes = [...new Set(this.labCodes)];
+    this.conditionCodes = [...new Set(this.conditionCodes)];
+    this.medicationCodes = [...new Set(this.medicationCodes)];
   }
 
   /**
