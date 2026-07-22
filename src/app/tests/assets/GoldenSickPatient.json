@@ -10613,6 +10613,898 @@
         "method": "PUT",
         "url": "MedicationStatement/b7d3c2a1-4e5f-4a6b-8c9d-0e1f2a3b4c5d"
       }
+    },
+    {
+      "fullUrl": "Observation/a38fb8a1-d73e-4e92-84d8-0957d070afd0",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "a38fb8a1-d73e-4e92-84d8-0957d070afd0",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "52969-3",
+              "display": "Methicillin resistant Staphylococcus aureus [Presence] in Nose by Organism specific culture"
+            }
+          ],
+          "text": "Methicillin resistant Staphylococcus aureus [Presence] in Nose by Organism specific culture"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af"
+        },
+        "effectiveDateTime": "2026-05-04",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "115329001",
+              "display": "Methicillin resistant Staphylococcus aureus (organism)"
+            }
+          ],
+          "text": "Methicillin resistant Staphylococcus aureus (organism)"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "POS",
+                "display": "Positive"
+              }
+            ],
+            "text": "Positive"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/a38fb8a1-d73e-4e92-84d8-0957d070afd0"
+      }
+    },
+    {
+      "fullUrl": "Observation/8eeef7e0-c1c8-451a-a209-e750ca1f3eef",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8eeef7e0-c1c8-451a-a209-e750ca1f3eef",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "48813-0",
+              "display": "Methicillin resistance mecA gene [Presence] by Molecular method"
+            }
+          ],
+          "text": "Methicillin resistance mecA gene [Presence] by Molecular method"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af"
+        },
+        "effectiveDateTime": "2026-05-04",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "260373001",
+              "display": "Detected"
+            }
+          ],
+          "text": "Detected"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "POS",
+                "display": "Positive"
+              }
+            ],
+            "text": "Positive"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/8eeef7e0-c1c8-451a-a209-e750ca1f3eef"
+      }
+    },
+    {
+      "fullUrl": "Observation/b25bc48b-9dda-4645-80a4-67b87d954735",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "b25bc48b-9dda-4645-80a4-67b87d954735",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "48814-8",
+              "display": "Vancomycin resistance vanA gene [Presence] by Molecular method"
+            }
+          ],
+          "text": "Vancomycin resistance vanA gene [Presence] by Molecular method"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af"
+        },
+        "effectiveDateTime": "2026-05-04",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "260415000",
+              "display": "Not detected"
+            }
+          ],
+          "text": "Not detected"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "NEG",
+                "display": "Negative"
+              }
+            ],
+            "text": "Negative"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/b25bc48b-9dda-4645-80a4-67b87d954735"
+      }
+    },
+    {
+      "fullUrl": "Observation/c87a6d2d-370f-45ef-82b4-f1db689f458b",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "c87a6d2d-370f-45ef-82b4-f1db689f458b",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "59150-3",
+              "display": "Vancomycin resistant enterococcus [Presence] in Anal by Organism specific culture"
+            }
+          ],
+          "text": "Vancomycin resistant enterococcus [Presence] in Anal by Organism specific culture"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af"
+        },
+        "effectiveDateTime": "2026-05-04",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "113727004",
+              "display": "Vancomycin resistant Enterococcus (organism)"
+            }
+          ],
+          "text": "Vancomycin resistant Enterococcus (organism)"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "POS",
+                "display": "Positive"
+              }
+            ],
+            "text": "Positive"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/c87a6d2d-370f-45ef-82b4-f1db689f458b"
+      }
+    },
+    {
+      "fullUrl": "Observation/697e1ae3-c282-409d-aad7-8b49b3a857d8",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "697e1ae3-c282-409d-aad7-8b49b3a857d8",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "100901-8",
+              "display": "Enterobacteriaceae.carbapenemase resistance phenotype [Identifier] in Anal by Organism specific culture"
+            }
+          ],
+          "text": "Enterobacteriaceae.carbapenemase resistance phenotype [Identifier] in Anal by Organism specific culture"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af"
+        },
+        "effectiveDateTime": "2026-05-04",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "713171002",
+              "display": "Klebsiella pneumoniae carbapenemase 2 producing Klebsiella pneumoniae (organism)"
+            }
+          ],
+          "text": "Klebsiella pneumoniae carbapenemase 2 producing Klebsiella pneumoniae (organism)"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "POS",
+                "display": "Positive"
+              }
+            ],
+            "text": "Positive"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/697e1ae3-c282-409d-aad7-8b49b3a857d8"
+      }
+    },
+    {
+      "fullUrl": "Observation/8fbbe0ef-5bd1-48f5-912d-31bf64fb0cc4",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8fbbe0ef-5bd1-48f5-912d-31bf64fb0cc4",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "101673-2",
+              "display": "KPC carbapenemase [Presence] in Isolate by Rapid immunoassay"
+            }
+          ],
+          "text": "KPC carbapenemase [Presence] in Isolate by Rapid immunoassay"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af"
+        },
+        "effectiveDateTime": "2026-05-04",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "260373001",
+              "display": "Detected"
+            }
+          ],
+          "text": "Detected"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "POS",
+                "display": "Positive"
+              }
+            ],
+            "text": "Positive"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/8fbbe0ef-5bd1-48f5-912d-31bf64fb0cc4"
+      }
+    },
+    {
+      "fullUrl": "Observation/8b2a0a3b-2f08-4044-98c4-c9a76383c333",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8b2a0a3b-2f08-4044-98c4-c9a76383c333",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "90002-7",
+              "display": "Candida auris [Presence] in Specimen by Organism specific culture"
+            }
+          ],
+          "text": "Candida auris [Presence] in Specimen by Organism specific culture"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af"
+        },
+        "effectiveDateTime": "2026-05-04",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "260373001",
+              "display": "Detected"
+            }
+          ],
+          "text": "Detected"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "POS",
+                "display": "Positive"
+              }
+            ],
+            "text": "Positive"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/8b2a0a3b-2f08-4044-98c4-c9a76383c333"
+      }
+    },
+    {
+      "fullUrl": "Observation/0984e5ff-4b4a-46cc-ba14-c00f8098fdb1",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "0984e5ff-4b4a-46cc-ba14-c00f8098fdb1",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "13317-3",
+              "display": "Methicillin resistant Staphylococcus aureus [Presence] in Specimen by Organism specific culture"
+            }
+          ],
+          "text": "Methicillin resistant Staphylococcus aureus [Presence] in Specimen by Organism specific culture"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af"
+        },
+        "effectiveDateTime": "2026-06-18",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "115329001",
+              "display": "Methicillin resistant Staphylococcus aureus (organism)"
+            }
+          ],
+          "text": "Methicillin resistant Staphylococcus aureus (organism)"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                "code": "POS",
+                "display": "Positive"
+              }
+            ],
+            "text": "Positive"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/0984e5ff-4b4a-46cc-ba14-c00f8098fdb1"
+      }
+    },
+    {
+      "fullUrl": "DiagnosticReport/1f0b7c34-9d52-4a18-bb60-2c4e8a7d5109",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "1f0b7c34-9d52-4a18-bb60-2c4e8a7d5109",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "LAB",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "52969-3",
+              "display": "Methicillin resistant Staphylococcus aureus [Presence] in Nose by Organism specific culture"
+            }
+          ],
+          "text": "Methicillin resistant Staphylococcus aureus [Presence] in Nose by Organism specific culture"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
+          "display": "Hyper A Unlucky"
+        },
+        "effectiveDateTime": "2026-05-04",
+        "result": [
+          {
+            "reference": "Observation/a38fb8a1-d73e-4e92-84d8-0957d070afd0",
+            "display": "Methicillin resistant Staphylococcus aureus [Presence] in Nose by Organism specific culture"
+          },
+          {
+            "reference": "Observation/8eeef7e0-c1c8-451a-a209-e750ca1f3eef",
+            "display": "Methicillin resistance mecA gene [Presence] by Molecular method"
+          },
+          {
+            "reference": "Observation/b25bc48b-9dda-4645-80a4-67b87d954735",
+            "display": "Vancomycin resistance vanA gene [Presence] by Molecular method"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "DiagnosticReport/1f0b7c34-9d52-4a18-bb60-2c4e8a7d5109"
+      }
+    },
+    {
+      "fullUrl": "DiagnosticReport/6ad24e81-3f97-45c0-9e13-b8752da0c64f",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "6ad24e81-3f97-45c0-9e13-b8752da0c64f",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "LAB",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "59150-3",
+              "display": "Vancomycin resistant enterococcus [Presence] in Anal by Organism specific culture"
+            }
+          ],
+          "text": "Vancomycin resistant enterococcus [Presence] in Anal by Organism specific culture"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
+          "display": "Hyper A Unlucky"
+        },
+        "effectiveDateTime": "2026-05-04",
+        "result": [
+          {
+            "reference": "Observation/c87a6d2d-370f-45ef-82b4-f1db689f458b",
+            "display": "Vancomycin resistant enterococcus [Presence] in Anal by Organism specific culture"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "DiagnosticReport/6ad24e81-3f97-45c0-9e13-b8752da0c64f"
+      }
+    },
+    {
+      "fullUrl": "DiagnosticReport/b78d8981-5151-4120-b931-8c94d9ca7d14",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "b78d8981-5151-4120-b931-8c94d9ca7d14",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "LAB",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "100901-8",
+              "display": "Enterobacteriaceae.carbapenemase resistance phenotype [Identifier] in Anal by Organism specific culture"
+            }
+          ],
+          "text": "Enterobacteriaceae.carbapenemase resistance phenotype [Identifier] in Anal by Organism specific culture"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
+          "display": "Hyper A Unlucky"
+        },
+        "effectiveDateTime": "2026-05-04",
+        "result": [
+          {
+            "reference": "Observation/697e1ae3-c282-409d-aad7-8b49b3a857d8",
+            "display": "Enterobacteriaceae.carbapenemase resistance phenotype [Identifier] in Anal by Organism specific culture"
+          },
+          {
+            "reference": "Observation/8fbbe0ef-5bd1-48f5-912d-31bf64fb0cc4",
+            "display": "KPC carbapenemase [Presence] in Isolate by Rapid immunoassay"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "DiagnosticReport/b78d8981-5151-4120-b931-8c94d9ca7d14"
+      }
+    },
+    {
+      "fullUrl": "DiagnosticReport/d5c31b7a-08e4-4f26-a91d-63be7c40f2d8",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "d5c31b7a-08e4-4f26-a91d-63be7c40f2d8",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "LAB",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "90002-7",
+              "display": "Candida auris [Presence] in Specimen by Organism specific culture"
+            }
+          ],
+          "text": "Candida auris [Presence] in Specimen by Organism specific culture"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
+          "display": "Hyper A Unlucky"
+        },
+        "effectiveDateTime": "2026-05-04",
+        "result": [
+          {
+            "reference": "Observation/8b2a0a3b-2f08-4044-98c4-c9a76383c333",
+            "display": "Candida auris [Presence] in Specimen by Organism specific culture"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "DiagnosticReport/d5c31b7a-08e4-4f26-a91d-63be7c40f2d8"
+      }
+    },
+    {
+      "fullUrl": "DiagnosticReport/02ddd5a5-4b0a-42de-a9c7-cac1a9588988",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "02ddd5a5-4b0a-42de-a9c7-cac1a9588988",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "LAB",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "13317-3",
+              "display": "Methicillin resistant Staphylococcus aureus [Presence] in Specimen by Organism specific culture"
+            }
+          ],
+          "text": "Methicillin resistant Staphylococcus aureus [Presence] in Specimen by Organism specific culture"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
+          "display": "Hyper A Unlucky"
+        },
+        "effectiveDateTime": "2026-06-18",
+        "result": [
+          {
+            "reference": "Observation/0984e5ff-4b4a-46cc-ba14-c00f8098fdb1",
+            "display": "Methicillin resistant Staphylococcus aureus [Presence] in Specimen by Organism specific culture"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "DiagnosticReport/02ddd5a5-4b0a-42de-a9c7-cac1a9588988"
+      }
+    },
+    {
+      "fullUrl": "Condition/c8753b49-389c-4042-ab72-4f662781d93c",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "c8753b49-389c-4042-ab72-4f662781d93c",
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ],
+          "text": "Active"
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ],
+          "text": "Confirmed"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                "code": "encounter-diagnosis",
+                "display": "Encounter Diagnosis"
+              }
+            ],
+            "text": "Encounter Diagnosis"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "1176997000",
+              "display": "Skin infection caused by Methicillin resistant Staphylococcus aureus (disorder)"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10-cm",
+              "code": "A49.02",
+              "display": "Methicillin resistant Staphylococcus aureus infection, unspecified site"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10-cm",
+              "code": "B95.62",
+              "display": "Methicillin resistant Staphylococcus aureus infection as the cause of diseases classified elsewhere"
+            }
+          ],
+          "text": "MRSA skin and soft tissue infection of sacral wound"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
+          "type": "Patient"
+        },
+        "onsetDateTime": "2026-06-18"
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Condition/c8753b49-389c-4042-ab72-4f662781d93c"
+      }
+    },
+    {
+      "fullUrl": "Condition/f4990d98-d527-47e6-972a-d80b985e0861",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "f4990d98-d527-47e6-972a-d80b985e0861",
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ],
+          "text": "Active"
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ],
+          "text": "Confirmed"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                "code": "encounter-diagnosis",
+                "display": "Encounter Diagnosis"
+              }
+            ],
+            "text": "Encounter Diagnosis"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "712830002",
+              "display": "Infection due to carbapenem resistant Enterobacteriaceae (disorder)"
+            }
+          ],
+          "text": "Carbapenem-resistant Klebsiella pneumoniae urinary tract infection"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
+          "type": "Patient"
+        },
+        "onsetDateTime": "2026-06-18"
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Condition/f4990d98-d527-47e6-972a-d80b985e0861"
+      }
+    },
+    {
+      "fullUrl": "Encounter/464eef6f-3750-44c2-9eb0-52abb1e1a3ab",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "464eef6f-3750-44c2-9eb0-52abb1e1a3ab",
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP",
+          "display": "inpatient encounter"
+        },
+        "subject": {
+          "reference": "Patient/f288c654-6885-4f48-999c-48d776dc06af",
+          "type": "Patient"
+        },
+        "period": {
+          "start": "2026-06-18",
+          "end": "2026-06-18"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "712830002",
+                "display": "Infection due to carbapenem resistant Enterobacteriaceae (disorder)"
+              }
+            ],
+            "text": "Infection due to carbapenem resistant Enterobacteriaceae (disorder)"
+          }
+        ],
+        "reasonReference": [
+          {
+            "reference": "Condition/f4990d98-d527-47e6-972a-d80b985e0861",
+            "type": "Condition"
+          }
+        ],
+        "diagnosis": [
+          {
+            "condition": {
+              "reference": "Condition/f4990d98-d527-47e6-972a-d80b985e0861",
+              "type": "Condition"
+            }
+          }
+        ],
+        "serviceProvider": {
+          "display": "Sunrise Long-Term Care Facility"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Encounter/464eef6f-3750-44c2-9eb0-52abb1e1a3ab"
+      }
     }
   ]
 }

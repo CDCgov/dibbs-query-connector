@@ -35,6 +35,11 @@ export const USE_CASE_DETAILS = {
     condition: "Cancer (Leukemia)",
     id: "3389540d-1cca-4253-aa75-c1684dc5430f",
   },
+  mdro: {
+    queryName: "MDRO case investigation",
+    condition: "Healthcare-Associated Events",
+    id: "b4c9d2e7-6a1f-4e83-9c25-7f0a3d8b1e46",
+  },
 } as const;
 
 export type USE_CASES = keyof typeof USE_CASE_DETAILS;
