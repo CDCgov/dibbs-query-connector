@@ -39,7 +39,7 @@
     "fhirpath": "^5.0.0",
     "jose": "^5.2.2",
     "next": "^16.2.10",
-    "next-auth": "^5.0.0-beta.30",
+    "next-auth": "^5.0.0-beta.32",
     "next-nprogress-bar": "^2.4.4",
     "node-hl7-client": "^4.1.0",
     "pg": "^8.22.0",
