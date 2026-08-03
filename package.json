@@ -52,7 +52,7 @@
     "react-toastify": "^11.1.0",
     "request-mocking-protocol": "^0.6.0",
     "sharp": "^0.35.3",
-    "undici": "^8.7.0"
+    "undici": "^8.10.0"
   },
   "overrides": {
     "fast-xml-parser": "^5.5.6",
