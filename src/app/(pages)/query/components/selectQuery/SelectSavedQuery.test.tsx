@@ -117,7 +117,7 @@ describe("SelectSavedQuery", () => {
     });
   });
 
-  it("shows the FHIR servers from props behind the advanced toggle", async () => {
+  it("shows the FHIR servers from props without an advanced toggle", async () => {
     render(
       <RootProviderMock currentPage="/query">
         <SelectSavedQuery {...defaultProps} />
@@ -128,7 +128,10 @@ describe("SelectSavedQuery", () => {
       expect(screen.getByLabelText("Query")).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Advanced..." }));
+    expect(
+      screen.queryByRole("button", { name: "Advanced..." }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByLabelText("FHIR server")).toBeInTheDocument();
 
     TEST_FHIR_SERVERS.forEach((server) => {
       expect(screen.getByRole("option", { name: server })).toBeInTheDocument();

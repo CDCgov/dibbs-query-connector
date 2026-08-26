@@ -428,7 +428,7 @@ async function checkForCancerMedication(
   await expect(
     page.getByRole("heading", { name: "Select a query" }),
   ).toBeVisible();
-  await page.getByTestId("Select").selectOption(queryName);
+  await page.getByTestId("query-select").selectOption(queryName);
 
   await page.getByRole("button", { name: "Submit" }).click();
   await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });

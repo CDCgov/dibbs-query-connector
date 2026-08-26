@@ -17,6 +17,7 @@ import Backlink from "../../../ui/designSystem/backLink/Backlink";
 import { RETURN_LABEL } from "@/app/(pages)/query/components/stepIndicator/StepIndicator";
 import TitleBox from "./stepIndicator/TitleBox";
 import ImmunizationTable from "./resultsView/tableComponents/ImmunizationTable";
+import ImmunizationRecommendationTable from "./resultsView/tableComponents/ImmunizationRecommendationTable";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import Skeleton from "react-loading-skeleton";
 import { Button } from "@trussworks/react-uswds";
@@ -28,6 +29,8 @@ type ResultsViewProps = {
   goBack: () => void;
   goToBeginning: () => void;
   loading: boolean;
+  /** Name of the FHIR server the records were queried from. */
+  fhirServer?: string;
 };
 
 export type ResultsViewAccordionItem = {
@@ -44,6 +47,7 @@ export type ResultsViewAccordionItem = {
  * @param props.goToBeginning - Function to return to patient discover
  * @param props.selectedQuery - query that's been selected to view for results
  * @param props.loading -  whether the component is in a loading state
+ * @param props.fhirServer - name of the FHIR server that was queried
  * @returns The QueryView component.
  */
 const ResultsView: React.FC<ResultsViewProps> = ({
@@ -52,6 +56,7 @@ const ResultsView: React.FC<ResultsViewProps> = ({
   goBack,
   goToBeginning,
   loading,
+  fhirServer,
 }) => {
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -109,6 +114,17 @@ const ResultsView: React.FC<ResultsViewProps> = ({
             View FHIR request &amp; response
           </Button>
         </div>
+        {fhirServer && (
+          <div
+            className="display-flex flex-align-center"
+            data-testid="results-fhir-server"
+          >
+            <strong>FHIR server:&nbsp;</strong>
+            <span className="text-normal display-inline-block">
+              {fhirServer}
+            </span>
+          </div>
+        )}
       </h2>
 
       <div className=" grid-container-desktop-lg grid-row grid-gap-md padding-0 ">
@@ -164,6 +180,8 @@ function mapQueryResponseToAccordionDataStructure(
   const immunizations = resultsQueryResponse.Immunization
     ? resultsQueryResponse.Immunization
     : null;
+  const immunizationRecommendations =
+    resultsQueryResponse.ImmunizationRecommendation ?? null;
 
   const accordionItems: ResultsViewAccordionItem[] = [
     {
@@ -233,7 +251,30 @@ function mapQueryResponseToAccordionDataStructure(
     },
     {
       title: "Immunizations",
-      content: immunizations ? (
+      content: immunizationRecommendations ? (
+        // Immunization Gateways return the forecast alongside the history;
+        // split the section into two sub-tables only when a forecast exists.
+        <>
+          {immunizations && (
+            <>
+              <h4
+                className={`${styles.accordionHeading} ${styles.subTableHeading}`}
+              >
+                Immunization history
+              </h4>
+              <ImmunizationTable immunizations={immunizations} />
+            </>
+          )}
+          <h4
+            className={`${styles.accordionHeading} ${styles.subTableHeading}`}
+          >
+            Immunization forecast
+          </h4>
+          <ImmunizationRecommendationTable
+            recommendations={immunizationRecommendations}
+          />
+        </>
+      ) : immunizations ? (
         <ImmunizationTable immunizations={immunizations} />
       ) : null,
     },

@@ -4,7 +4,7 @@ import {
 } from "@/app/backend/query-execution/service";
 import { isFhirResource } from "@/app/constants";
 import { readJsonFile } from "../shared_utils/readJsonFile";
-import { Bundle, DiagnosticReport, Observation } from "fhir/r4";
+import { Bundle, DiagnosticReport, FhirResource, Observation } from "fhir/r4";
 import { QueryResponse } from "@/app/models/entities/query";
 import { suppressConsoleLogs } from "../integration/fixtures";
 
@@ -59,6 +59,67 @@ describe("process response", () => {
     expect(
       resourceArray.filter((r) => r.resourceType === "Observation").length,
     ).toEqual(2);
+  });
+
+  it("keeps every ImmunizationRecommendation even when they share an id, while still deduping other types", async () => {
+    const sharedId = "TlYwMDAwfDM5NzM1NjV8bnVsbHxudWxs";
+    const bundle: Bundle<FhirResource> = {
+      resourceType: "Bundle",
+      type: "searchset",
+      entry: [
+        {
+          resource: {
+            resourceType: "ImmunizationRecommendation",
+            id: sharedId,
+            patient: { reference: "Patient/p1" },
+            date: "2026-06-05",
+            recommendation: [],
+          },
+        },
+        {
+          resource: {
+            resourceType: "ImmunizationRecommendation",
+            id: sharedId,
+            patient: { reference: "Patient/p1" },
+            date: "2026-06-05",
+            recommendation: [],
+          },
+        },
+        {
+          resource: {
+            resourceType: "Immunization",
+            id: "imm-1",
+            status: "completed",
+            vaccineCode: {},
+            patient: { reference: "Patient/p1" },
+          },
+        },
+        {
+          resource: {
+            resourceType: "Immunization",
+            id: "imm-1",
+            status: "completed",
+            vaccineCode: {},
+            patient: { reference: "Patient/p1" },
+          },
+        },
+      ],
+    };
+    const response = {
+      status: 200,
+      json: async () => bundle,
+    } as unknown as Response;
+
+    const resourceArray = await processFhirResponse(response);
+
+    expect(
+      resourceArray.filter(
+        (r) => r.resourceType === "ImmunizationRecommendation",
+      ),
+    ).toHaveLength(2);
+    expect(
+      resourceArray.filter((r) => r.resourceType === "Immunization"),
+    ).toHaveLength(1);
   });
 
   it("returns an empty array when a 200 response has an unparseable body", async () => {
@@ -131,6 +192,44 @@ describe("parse fhir search", () => {
     queryResponse.Observation?.forEach((o: Observation) => {
       expect(observationResources).toContain(o);
     });
+  });
+
+  it("does not dedupe ImmunizationRecommendation across responses", async () => {
+    const sharedId = "TlYwMDAwfDM5NzM1NjV8bnVsbHxudWxs";
+    const makeResponse = () =>
+      ({
+        status: 200,
+        json: async () => ({
+          resourceType: "Bundle",
+          type: "searchset",
+          entry: [
+            {
+              resource: {
+                resourceType: "ImmunizationRecommendation",
+                id: sharedId,
+                patient: { reference: "Patient/p1" },
+                date: "2026-06-05",
+                recommendation: [],
+              },
+            },
+            {
+              resource: {
+                resourceType: "ImmunizationRecommendation",
+                id: sharedId,
+                patient: { reference: "Patient/p1" },
+                date: "2026-06-05",
+                recommendation: [],
+              },
+            },
+          ],
+        }),
+      }) as unknown as Response;
+
+    const queryResponse: QueryResponse = await parseFhirSearch([
+      makeResponse(),
+    ]);
+
+    expect(queryResponse.ImmunizationRecommendation).toHaveLength(2);
   });
 
   it("keeps resources from good responses when one response in the array fails to parse", async () => {

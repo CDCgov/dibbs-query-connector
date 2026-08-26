@@ -13,6 +13,8 @@ import {
 } from "@/app/(pages)/queryBuilding/utils";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { suppressConsoleLogs } from "@/app/tests/integration/fixtures";
+import { readJsonFile } from "@/app/tests/shared_utils/readJsonFile";
+import { Bundle } from "fhir/r4";
 
 jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn().mockReturnValue(true),
@@ -175,16 +177,20 @@ describe("patientRecordsQuery against an Immunization Gateway", () => {
   );
 
   it.each(["IZ Gateway", "Epic IZ Gateway"])(
-    "sends only the Immunization search to %s, skipping other record sections",
+    "sends only the Immunization and ImmunizationRecommendation searches to %s, skipping other record sections",
     async (server) => {
       await runQuery(server, PATIENT);
 
-      // The gateway only serves immunization history, so the other sections
-      // in the saved query (social history, service requests, labs POST
-      // batch, and the epic medication/condition chains) never fire.
+      // The gateway only serves immunization history and forecast, so the
+      // other sections in the saved query (social history, service requests,
+      // labs POST batch, and the epic medication/condition chains) never fire.
       const getPaths = mockFhirClient.get.mock.calls.map((c) => c[0] as string);
-      expect(getPaths).toHaveLength(1);
-      expect(getPaths[0]).toMatch(/^\/Immunization\?/);
+      const chainedParams =
+        "patient.given=WayneTWOIZG&patient.family=WatersSNHDIZGTWO&patient.birthdate=2018-02-19";
+      expect(getPaths).toEqual([
+        `/Immunization?${chainedParams}`,
+        `/ImmunizationRecommendation?${chainedParams}`,
+      ]);
       expect(mockFhirClient.post).not.toHaveBeenCalled();
       expect(mockFhirClient.postJson).not.toHaveBeenCalled();
     },
@@ -197,6 +203,9 @@ describe("patientRecordsQuery against an Immunization Gateway", () => {
     expect(getPaths.find((p) => p.startsWith("/Immunization?"))).toBe(
       `/Immunization?patient=Patient%2F${PATIENT_ID}`,
     );
+    expect(
+      getPaths.find((p) => p.startsWith("/ImmunizationRecommendation?")),
+    ).toBe(`/ImmunizationRecommendation?patient=Patient%2F${PATIENT_ID}`);
 
     jest.clearAllMocks();
     (prepareFhirClient as jest.Mock).mockResolvedValue(mockFhirClient);
@@ -210,6 +219,9 @@ describe("patientRecordsQuery against an Immunization Gateway", () => {
     expect(getPaths.find((p) => p.startsWith("/Immunization?"))).toBe(
       `/Immunization?patient=${PATIENT_ID}`,
     );
+    expect(
+      getPaths.find((p) => p.startsWith("/ImmunizationRecommendation?")),
+    ).toBe(`/ImmunizationRecommendation?patient=${PATIENT_ID}`);
   });
 
   it("returns the gateway's Immunizations and drops its search-outcome entries", async () => {
@@ -263,5 +275,72 @@ describe("patientRecordsQuery against an Immunization Gateway", () => {
 
     expect(result.Immunization?.map((i) => i.id)).toEqual(["imm-1", "imm-2"]);
     expect(result.OperationOutcome).toBeUndefined();
+  });
+  it("returns every ImmunizationRecommendation from the gateway even though they share one id", async () => {
+    // Real Z42 response captured from the IZ Gateway: two search-outcome
+    // entries, two history-mirror recommendations and one forecast, all
+    // stamped with the same resource id.
+    const immunizationBundle = readJsonFile<Bundle>(
+      "./src/app/tests/assets/BundleIzGatewayImmunization.json",
+    ) as Bundle;
+    const recommendationBundle = readJsonFile<Bundle>(
+      "./src/app/tests/assets/BundleIzGatewayImmunizationRecommendation.json",
+    ) as Bundle;
+    mockFhirClient.get.mockImplementation(async (path: string) => {
+      if (path.startsWith("/ImmunizationRecommendation?")) {
+        return mockBundleResponse(path, recommendationBundle);
+      }
+      if (path.startsWith("/Immunization?")) {
+        return mockBundleResponse(path, immunizationBundle);
+      }
+      return mockBundleResponse(path, EMPTY_BUNDLE);
+    });
+
+    const result = await runQuery("IZ Gateway", PATIENT);
+
+    expect(result.Immunization).toHaveLength(2);
+    expect(result.ImmunizationRecommendation).toHaveLength(3);
+    const ids = new Set(result.ImmunizationRecommendation?.map((r) => r.id));
+    expect(ids.size).toBe(1);
+    expect(
+      result.ImmunizationRecommendation?.some((r) =>
+        r.recommendation?.some((rec) => rec.forecastStatus),
+      ),
+    ).toBe(true);
+    expect(result.OperationOutcome).toBeUndefined();
+  });
+
+  it("still returns Immunizations when the ImmunizationRecommendation search fails", async () => {
+    const immunizationBundle = readJsonFile<Bundle>(
+      "./src/app/tests/assets/BundleIzGatewayImmunization.json",
+    ) as Bundle;
+    mockFhirClient.get.mockImplementation(async (path: string) => {
+      if (path.startsWith("/ImmunizationRecommendation?")) {
+        throw new Error("fetch failed");
+      }
+      return mockBundleResponse(path, immunizationBundle);
+    });
+
+    const result = await runQuery("IZ Gateway", PATIENT);
+
+    expect(result.Immunization).toHaveLength(2);
+    expect(result.ImmunizationRecommendation).toBeUndefined();
+  });
+
+  it("still returns the forecast when the Immunization search fails", async () => {
+    const recommendationBundle = readJsonFile<Bundle>(
+      "./src/app/tests/assets/BundleIzGatewayImmunizationRecommendation.json",
+    ) as Bundle;
+    mockFhirClient.get.mockImplementation(async (path: string) => {
+      if (path.startsWith("/Immunization?")) {
+        throw new Error("fetch failed");
+      }
+      return mockBundleResponse(path, recommendationBundle);
+    });
+
+    const result = await runQuery("IZ Gateway", PATIENT);
+
+    expect(result.Immunization).toBeUndefined();
+    expect(result.ImmunizationRecommendation).toHaveLength(3);
   });
 });

@@ -304,14 +304,8 @@ describe("Search Form mTLS Server Selection", () => {
       />,
     );
 
-    // Open advanced options
-    const advancedButton = screen.getByRole("button", { name: "Advanced" });
-    await user.click(advancedButton);
-
     // Select the mTLS server
-    const serverDropdown = screen.getByLabelText(
-      "Healthcare Organization (HCO)",
-    );
+    const serverDropdown = screen.getByLabelText("FHIR server");
     await user.selectOptions(serverDropdown, "mTLS Server");
 
     // Fill required fields

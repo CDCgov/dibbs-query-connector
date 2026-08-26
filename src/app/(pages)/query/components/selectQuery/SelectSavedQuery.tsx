@@ -44,7 +44,6 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
   handleSubmit,
   setFhirServer,
 }) => {
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [queryOptions, setQueryOptions] = useState<QuerySummary[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -118,6 +117,7 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
             <Select
               id="querySelect"
               name="querySelect"
+              data-testid="query-select"
               value={selectedQuery.queryName}
               onChange={(e) => {
                 handleQuerySelection(e.target.value);
@@ -135,39 +135,26 @@ const SelectSavedQuery: React.FC<SelectSavedQueryProps> = ({
               ))}
             </Select>
           </div>
-          {showAdvanced && (
-            <div>
-              <h3 className={styles.queryDropdownLabel}>
-                Health Care Organization (HCO)
-              </h3>
-              <Select
-                id="fhir_server"
-                name="fhir_server"
-                value={fhirServer}
-                onChange={(e) => setFhirServer(e.target.value as string)}
-                required
-                className={`${styles.queryDropDown}`}
-              >
-                Select HCO
-                {fhirServers.map((fhirServer: string) => (
-                  <option key={fhirServer} value={fhirServer}>
-                    {fhirServer}
-                  </option>
-                ))}
-              </Select>
-            </div>
-          )}
-          {!showAdvanced && (
-            <div>
-              <Button
-                className={`usa-button--unstyled margin-left-auto ${styles.searchCallToActionButton}`}
-                type="button"
-                onClick={() => setShowAdvanced(true)}
-              >
-                Advanced...
-              </Button>
-            </div>
-          )}
+          <div className={styles.queryRow}>
+            <label className={styles.queryDropdownLabel} htmlFor="fhir_server">
+              FHIR server
+            </label>
+            <Select
+              id="fhir_server"
+              name="fhir_server"
+              data-testid="fhir-server-select"
+              value={fhirServer}
+              onChange={(e) => setFhirServer(e.target.value as string)}
+              required
+              className={`${styles.queryDropDown}`}
+            >
+              {fhirServers.map((fhirServer: string) => (
+                <option key={fhirServer} value={fhirServer}>
+                  {fhirServer}
+                </option>
+              ))}
+            </Select>
+          </div>
 
           {/* Submit Button */}
           <div className="margin-top-5">
