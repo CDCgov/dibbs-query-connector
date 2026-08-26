@@ -153,6 +153,7 @@ const Query: React.FC = () => {
               setMode("search");
             }}
             loading={loading}
+            fhirServer={fhirServer}
           />
         )}
       </div>

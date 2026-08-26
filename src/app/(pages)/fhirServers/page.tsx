@@ -26,9 +26,10 @@ export type AuthMethodType =
  * - "standard": direct /Patient search and clinical record queries
  * - "immunization": an Immunization Gateway (probes /Immunization), discovery
  *   still uses the standard /Patient path. Record queries send only the
- *   Immunization search, built from the patient's demographics
+ *   Immunization and ImmunizationRecommendation (history + forecast)
+ *   searches, built from the patient's demographics
  *   (patient.given/patient.family/patient.birthdate) — the gateway
- *   translates it into an HL7v2 QBP query and can't resolve FHIR patient
+ *   translates them into HL7v2 QBP queries and can't resolve FHIR patient
  *   ids or answer other resource searches
  * - "fanout": TEFCA-style fanout via /Task resources (POST + polling)
  */

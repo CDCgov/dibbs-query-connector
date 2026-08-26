@@ -107,6 +107,18 @@ const TASK_TEMPLATE: Partial<Task> = {
   },
 };
 
+/**
+ * Resource types that are never deduplicated by id when parsing search
+ * results. Immunization Gateways (eHealth Exchange's IZ Gateway) stamp every
+ * ImmunizationRecommendation in a bundle with the same id — one per past dose
+ * plus the forecast — so id-based dedupe would keep only the first entry and
+ * silently drop the forecast. The recommendation search is issued once per
+ * patient, so there are no genuine duplicates to remove.
+ */
+const DEDUPE_EXEMPT_RESOURCE_TYPES: ReadonlySet<string> = new Set([
+  "ImmunizationRecommendation",
+]);
+
 class QueryService {
   /**
    * Builds a FHIR patient search query string from provided parameters
@@ -490,13 +502,13 @@ class QueryService {
       patientDemographics,
     });
 
-    // Immunization Gateways only serve immunization history — every other
-    // record-section search is a wasted round trip through the HL7v2
-    // translation layer that returns nothing, so skip them entirely.
+    // Immunization Gateways only serve immunization history and forecast —
+    // every other record-section search is a wasted round trip through the
+    // HL7v2 translation layer that returns nothing, so skip them entirely.
     const isImmunizationGateway = endpointType === "immunization";
     if (isImmunizationGateway) {
       console.log(
-        "Immunization Gateway server %s: skipping non-immunization record sections.",
+        "Immunization Gateway server %s: querying Immunization and ImmunizationRecommendation only; skipping other record sections.",
         fhirServer,
       );
     }
@@ -515,6 +527,28 @@ class QueryService {
         medicalRecordSectionResults.push(await fhirClient.get(fetchString));
       } catch (error) {
         console.error("Immunization FHIR query failed: ", error);
+      }
+    }
+
+    if (
+      isImmunizationGateway &&
+      medicalRecordSections &&
+      medicalRecordSections.immunizations
+    ) {
+      // The gateway's forecast only comes back from ImmunizationRecommendation
+      // (HL7v2 Z44). Dispatched separately from the Immunization search so a
+      // failure on either can't hide the other's results.
+      try {
+        const { basePath, params } = builtQuery.getQuery(
+          "immunizationRecommendation",
+        );
+        if (basePath !== "") {
+          medicalRecordSectionResults.push(
+            await fhirClient.get(`${basePath}?${params}`),
+          );
+        }
+      } catch (error) {
+        console.error("Immunization recommendation FHIR query failed: ", error);
       }
     }
 
@@ -1358,8 +1392,10 @@ class QueryService {
       // Dedupe on type-qualified ids: FHIR ids are only unique per resource
       // type, so two different resources can legitimately share a bare id.
       const resourceKey = `${resourceType}/${resource.id}`;
-      // Check if the resourceID has already been seen & only added resources that haven't been seen before
-      if (resource.id && !resourceIds.has(resourceKey)) {
+      if (DEDUPE_EXEMPT_RESOURCE_TYPES.has(resourceType)) {
+        (runningQueryResponse[resourceType] as FhirResource[]).push(resource);
+      } else if (resource.id && !resourceIds.has(resourceKey)) {
+        // Only add resources whose id hasn't been seen before.
         (runningQueryResponse[resourceType] as FhirResource[]).push(resource);
         resourceIds.add(resourceKey);
       } else if (resource.id && isFanoutSearch) {
@@ -1436,7 +1472,9 @@ class QueryService {
             // returned for the query. Ids are type-qualified: FHIR ids are
             // only unique per resource type.
             const resourceKey = `${entry.resource.resourceType}/${entry.resource.id}`;
-            if (!resourceIds.includes(resourceKey)) {
+            if (DEDUPE_EXEMPT_RESOURCE_TYPES.has(entry.resource.resourceType)) {
+              resourceArray.push(entry.resource);
+            } else if (!resourceIds.includes(resourceKey)) {
               resourceIds.push(resourceKey);
               resourceArray.push(entry.resource);
             }

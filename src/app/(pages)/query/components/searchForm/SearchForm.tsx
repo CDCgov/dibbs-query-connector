@@ -90,7 +90,6 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   const [fhirServerConfig, setFhirServerConfig] =
     useState<FhirServerConfig | null>(null);
   const [patientMatchEnabled, setPatientMatchEnabled] = useState<boolean>();
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const params = useSearchParams();
 
   const prefillFromQueryParams = () => {
@@ -335,64 +334,53 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
               >
                 Fill fields
               </Button>
-              <Button
-                unstyled
-                className={`margin-left-auto`}
-                type="button"
-                onClick={() => {
-                  setShowAdvanced(!showAdvanced);
-                }}
-              >
-                Advanced
-              </Button>
             </div>
           </div>
         }
         <Fieldset className={`${styles.searchFormContainer} bg-white`}>
-          {showAdvanced && (
-            <div className="grid-row grid-gap margin-bottom-4">
-              <h3 className={`font-sans-md ${styles.searchFormSectionLabel}`}>
-                Advanced
-              </h3>
-              <Label
-                htmlFor="fhir_server"
-                className="margin-top-0-important width-full"
-              >
-                Healthcare Organization (HCO)
-              </Label>
-              <div className="grid-col-6">
-                <div className="usa-combo-box">
-                  <Select
-                    id="fhir_server"
-                    name="fhir_server"
-                    value={params?.get("server") || fhirServer}
-                    onChange={(event) => {
-                      setFhirServer(event.target.value as string);
-                    }}
-                    required
-                  >
-                    {fhirServers.map((fhirServer: string) => (
-                      <option key={fhirServer} value={fhirServer}>
-                        {fhirServer}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
-                {fhirServerConfig?.patientMatchConfiguration?.supportsMatch && (
-                  <div className="padding-top-1">
-                    <Checkbox
-                      id="enable-patient-match"
-                      data-testid="enable-patient-match"
-                      label="Enable patient match"
-                      aria-label="Enable patient $match protocol for this query"
-                      checked={patientMatchEnabled}
-                      onChange={(e) => setPatientMatchEnabled(e.target.checked)}
-                    />
-                  </div>
-                )}
+          <div className="grid-row grid-gap margin-bottom-4">
+            <h3 className={`font-sans-md ${styles.searchFormSectionLabel}`}>
+              FHIR server
+            </h3>
+            <Label
+              htmlFor="fhir_server"
+              className="margin-top-0-important width-full"
+            >
+              FHIR server
+            </Label>
+            <div className="grid-col-6">
+              <div className="usa-combo-box">
+                <Select
+                  id="fhir_server"
+                  name="fhir_server"
+                  data-testid="fhir-server-select"
+                  value={fhirServer}
+                  onChange={(event) => {
+                    setFhirServer(event.target.value as string);
+                  }}
+                  required
+                >
+                  {fhirServers.map((fhirServer: string) => (
+                    <option key={fhirServer} value={fhirServer}>
+                      {fhirServer}
+                    </option>
+                  ))}
+                </Select>
               </div>
+              {fhirServerConfig?.patientMatchConfiguration?.supportsMatch && (
+                <div className="padding-top-1">
+                  <Checkbox
+                    id="enable-patient-match"
+                    data-testid="enable-patient-match"
+                    label="Enable patient match"
+                    aria-label="Enable patient $match protocol for this query"
+                    checked={patientMatchEnabled}
+                    onChange={(e) => setPatientMatchEnabled(e.target.checked)}
+                  />
+                </div>
+              )}
             </div>
-          )}
+          </div>
 
           <div className="grid-row grid-gap margin-bottom-4">
             <h3 className={`font-sans-md ${styles.searchFormSectionLabel}`}>

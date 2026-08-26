@@ -51,7 +51,7 @@ Running a basic query has four steps:
    4. Home address
    5. Medical Record Number (MRN)
 
-If you have super admin user privileges, you’ll also need to choose the Health Care Organization (HCO) you’d like to use; changing the HCO will change the data source you’re querying.
+Choose the FHIR server you’d like to query from the **FHIR server** dropdown at the top of the form; changing the server changes the data source you’re querying. The server you choose is carried through to the query selection step and shown on the results page.
 
 The Patient Information page can also pre-fill certain form fields from URL parameters. Available parameters are:
 - `first` (First name)
@@ -64,7 +64,7 @@ The Patient Information page can also pre-fill certain form fields from URL para
 - `state` (Address state abbreviation, e.g. MN) 
 - `zip` (Zip code) 
 - `mrn` (Medical Record Number)
-- `server` (Health Care Organization) 
+- `server` (FHIR server) 
 
 For example, if you navigate to `/query?first=Hyper&last=Unlucky&dob=1975-12-06`, the First name, Last name, and Date of birth fields would be pre-filled; the Phone number, Home address, and Medical Record Number fields would be blank. 
 
@@ -111,6 +111,7 @@ Query Connector retrieves patient data in the form of FHIR resources – the sta
 * **MedicationRequest** – medications ordered or prescribed for the patient
 * **MedicationStatement** – medications the patient is (or was) taking, as reported by the patient or a clinician
 * **Immunization** – the patient’s vaccination history
+* **ImmunizationRecommendation** – the patient’s immunization forecast (returned by Immunization Gateway servers)
 * **ServiceRequest** – lab orders and other requested services
 
 Lab, condition, and medication results are filtered to the value sets and codes selected when the query was built, so you’ll see only the records relevant to the query’s purpose.
