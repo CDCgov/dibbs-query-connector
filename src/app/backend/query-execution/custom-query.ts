@@ -8,12 +8,14 @@ import {
 import { EndpointType, QueryStrategy } from "../../(pages)/fhirServers/page";
 import { HumanName, Patient } from "fhir/r4";
 
-// Epic-mode Condition and Encounter queries go out as GETs, so long code /
-// reference lists are chunked across multiple requests to keep URLs well under
-// common proxy limits. Overlapping results are safe: parseFhirSearch dedupes
-// resources by id.
+// Epic documents GET (never POST _search) as the only search method for every
+// resource, so Epic-mode queries go out as GETs and long code / reference
+// lists are chunked across multiple requests to keep URLs well under common
+// proxy limits. Overlapping results are safe: parseFhirSearch dedupes
+// resources by type and id.
 const EPIC_CONDITION_CODE_CHUNK_SIZE = 50;
 const EPIC_ENCOUNTER_DIAGNOSIS_CHUNK_SIZE = 25;
+const EPIC_RESULT_CODE_CHUNK_SIZE = 50;
 
 // Epic-mode medication searches can't filter by code server-side, so they
 // return every medication in the patient's record. We don't follow bundle
@@ -226,13 +228,23 @@ export class CustomQuery {
     const medicationsTimeFilter = formatTimeFilter(timeboxInfo?.medications);
 
     if (medicalRecordSections && medicalRecordSections.socialDeterminants) {
+      const isEpic = this.queryStrategy === "epic";
       const formattedParams = new URLSearchParams();
-      formattedParams.append("subject", `Patient/${patientId}`);
+      if (isEpic) {
+        // Epic's search expects a bare patient id, not a Patient/ reference.
+        formattedParams.append("patient", patientId);
+      } else {
+        formattedParams.append("subject", `Patient/${patientId}`);
+      }
       formattedParams.append("category", `social-history`);
 
       this.fhirResourceQueries["socialHistory"] = {
-        basePath: `/Observation/_search`,
+        // Epic documents GET-only search; the service layer dispatches this
+        // query itself (GET in Epic mode, POST _search otherwise), so it's
+        // kept out of the POST batch.
+        basePath: isEpic ? `/Observation` : `/Observation/_search`,
         params: formattedParams,
+        excludeFromPost: true,
       };
     }
 
@@ -293,7 +305,7 @@ export class CustomQuery {
       };
     }
 
-    if (labsFilter !== "") {
+    if (labsFilter !== "" && this.queryStrategy !== "epic") {
       const formattedParams = new URLSearchParams();
       formattedParams.append("subject", `Patient/${patientId}`);
       formattedParams.append("code", labsFilter);
@@ -313,6 +325,9 @@ export class CustomQuery {
         params: formattedParams,
       };
     }
+    // In Epic mode, Observation and DiagnosticReport queries aren't compiled
+    // here. Epic documents GET as the only search method, so the service layer
+    // issues chunked GETs built by compileEpicResultQueries() instead.
 
     if (conditionsFilter !== "" && this.queryStrategy !== "epic") {
       const encounterParams = new URLSearchParams();
@@ -418,9 +433,37 @@ export class CustomQuery {
   }
 
   /**
-   * Epic-mode Condition GET queries. Epic's POST _search support is limited
-   * to Observation/DiagnosticReport, so Conditions are searched via GET with
-   * the query's condition codes, chunked to keep URLs bounded.
+   * Epic-mode Observation and DiagnosticReport GET queries. Epic documents
+   * GET as the only search method for every resource (there is no POST
+   * _search), so the query's lab codes are searched via GET, chunked to keep
+   * URLs bounded. Each chunk yields one Observation and one DiagnosticReport
+   * query.
+   * @returns GET query specs for Observation and DiagnosticReport, one pair
+   * per chunk of lab codes; empty when the query has no lab codes.
+   */
+  compileEpicResultQueries(): { basePath: string; params: URLSearchParams }[] {
+    const labsTimeFilter = formatTimeFilter(this.timeboxInfo?.labs);
+
+    return chunkArray(this.labCodes, EPIC_RESULT_CODE_CHUNK_SIZE).flatMap(
+      (codes) =>
+        ["/Observation", "/DiagnosticReport"].map((basePath) => {
+          const params = new URLSearchParams();
+          // Epic's search expects a bare patient id, not a Patient/ reference.
+          params.append("patient", this.patientId);
+          params.append("code", codes.join(","));
+          if (labsTimeFilter) {
+            params.append("date", labsTimeFilter.startDate);
+            params.append("date", labsTimeFilter.endDate);
+          }
+          return { basePath, params };
+        }),
+    );
+  }
+
+  /**
+   * Epic-mode Condition GET queries. Epic documents GET as the only search
+   * method, so Conditions are searched via GET with the query's condition
+   * codes, chunked to keep URLs bounded.
    * @returns One GET query spec per chunk of condition codes; empty when the
    * query has no condition codes.
    */

@@ -187,8 +187,11 @@ that would otherwise cause queries to silently return incomplete records:
   references those Conditions. If no Conditions match, the Encounter search
   is skipped.
 
-Observation and DiagnosticReport queries are unaffected — Epic supports
-code-filtered searches for those natively.
+- Epic's FHIR search APIs are documented as GET only — there is no
+  `POST /{Resource}/_search` support for any resource, including Observation
+  and DiagnosticReport. With the Epic strategy, every patient record search
+  is sent as a GET, with long code lists split across multiple requests to
+  keep URLs short.
 
 Optional settings:
 
