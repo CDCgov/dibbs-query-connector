@@ -18,7 +18,11 @@ import { FhirServersModal } from "./fhirServersModal";
 import { ModalRef } from "@/app/ui/designSystem/modal/Modal";
 
 export type AuthMethodType =
-  "none" | "basic" | "client_credentials" | "SMART" | "mutual-tls";
+  | "none"
+  | "basic"
+  | "client_credentials"
+  | "SMART"
+  | "mutual-tls";
 
 /**
  * The kind of FHIR endpoint a server exposes. Drives which resource the
@@ -46,11 +50,12 @@ const ENDPOINT_TYPE_LABELS: Record<EndpointType, string> = {
  * EndpointType, which routes patient discovery:
  * - "default": spec-standard searches (POST /{Resource}/_search with code
  *   filters, Encounter searched by reason-code)
- * - "epic": Epic-compatible searches — GET-based Condition/Encounter/
- *   MedicationRequest/MedicationStatement queries, medications fetched
- *   patient-wide and filtered to the query's codes client-side, and
- *   Encounters found via references to the patient's matching Conditions
- *   (Epic's reason-code search matches text, not codes)
+ * - "epic": Epic-compatible searches — every search is a GET (Epic documents
+ *   no POST _search) with long code lists chunked across requests;
+ *   medications fetched patient-wide and filtered to the query's codes
+ *   client-side; Encounters found via references to the patient's matching
+ *   Conditions (Epic's reason-code search matches text, not codes); no
+ *   MedicationStatement search (Epic has no R4 endpoint for it)
  */
 export type QueryStrategy = "default" | "epic";
 

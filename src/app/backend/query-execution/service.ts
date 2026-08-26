@@ -525,8 +525,12 @@ class QueryService {
     ) {
       try {
         const { basePath, params } = builtQuery.getQuery("socialHistory");
+        // Epic documents GET-only search; other servers get the spec-standard
+        // POST _search.
         medicalRecordSectionResults.push(
-          await fhirClient.post(basePath, params),
+          queryStrategy === "epic"
+            ? await fhirClient.get(`${basePath}?${params}`)
+            : await fhirClient.post(basePath, params),
         );
       } catch (error) {
         console.error("Social history FHIR query failed: ", error);
@@ -557,12 +561,14 @@ class QueryService {
         });
 
     if (queryStrategy === "epic" && !isImmunizationGateway) {
-      // Epic doesn't support POST _search (or server-side code filtering) for
-      // MedicationRequest, so it goes out as a GET alongside the POST batch,
-      // followed by reads of any referenced Medications the search didn't
-      // include (Epic ignores _include). Medication results are filtered to
-      // the query's codes downstream. MedicationStatement isn't queried in
-      // Epic mode at all — Epic has no R4 endpoint for it.
+      // Epic documents GET as the only search method for every resource (no
+      // POST _search), so every Epic-mode search goes out as a GET and the
+      // POST batch above is empty. MedicationRequest additionally can't be
+      // code-filtered server-side, so its GET is followed by reads of any
+      // referenced Medications the search didn't include (Epic ignores
+      // _include) and the results are filtered to the query's codes
+      // downstream. MedicationStatement isn't queried in Epic mode at all —
+      // Epic has no R4 endpoint for it.
       const { basePath, params } = builtQuery.getQuery("medicationRequest");
       if (basePath !== "") {
         postPromises.push(
@@ -574,6 +580,7 @@ class QueryService {
       }
       postPromises.push(
         QueryService.runEpicConditionEncounterChain(fhirClient, builtQuery),
+        QueryService.runEpicResultQueries(fhirClient, builtQuery),
       );
     }
 
@@ -626,6 +633,31 @@ class QueryService {
       medicationFilterCodes:
         queryStrategy === "epic" ? builtQuery.medicationCodes : undefined,
     };
+  }
+
+  /**
+   * Epic-mode Observation and DiagnosticReport retrieval. Epic documents GET
+   * as the only search method, so the query's lab codes go out as chunked
+   * GETs (one Observation and one DiagnosticReport search per chunk) instead
+   * of the default POST _search. Each request is independent, so one failure
+   * doesn't lose the others.
+   * @param fhirClient - client for the FHIR server being queried
+   * @param builtQuery - the compiled CustomQuery
+   * @returns the Observation and DiagnosticReport responses that succeeded
+   */
+  private static async runEpicResultQueries(
+    fhirClient: FHIRClient,
+    builtQuery: CustomQuery,
+  ): Promise<Response[]> {
+    const results = await Promise.allSettled(
+      builtQuery
+        .compileEpicResultQueries()
+        .map(({ basePath, params }) => fhirClient.get(`${basePath}?${params}`)),
+    );
+    return QueryService.collectSettledResponses(
+      results,
+      "Epic Observation/DiagnosticReport FHIR query rejected: ",
+    );
   }
 
   /**
