@@ -3,6 +3,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import {
   Alert,
+  AlertText,
   Button,
   Icon,
   Pagination,
@@ -884,12 +885,13 @@ const CodeLibrary: React.FC = () => {
             )}
             <Alert
               type="warning"
-              headingLevel="h4"
               noIcon={false}
               className={classNames("info-alert")}
             >
-              Value sets are an organizational structure for easy management of
-              codes. Every code belongs to a value set.
+              <AlertText>
+                Value sets are an organizational structure for easy management
+                of codes. Every code belongs to a value set.
+              </AlertText>
             </Alert>
           </div>
           <div className={classNames(styles.controls)}>

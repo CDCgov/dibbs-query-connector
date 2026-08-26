@@ -1,4 +1,9 @@
-import { Alert, HeadingLevel } from "@trussworks/react-uswds";
+import {
+  Alert,
+  AlertHeading,
+  AlertText,
+  HeadingLevel,
+} from "@trussworks/react-uswds";
 import { toast, ToastPosition } from "react-toastify";
 import type { ToastIcon } from "react-toastify";
 import classNames from "classnames";
@@ -31,18 +36,13 @@ const Toast: React.FC<ToastProps> = ({
   headingLevel = "h4",
 }) => {
   return (
-    <Alert
-      type={toastVariant}
-      heading={
-        heading ? (
-          <span className={`usa-alert__heading ${headingLevel}`}>
-            {heading}
-          </span>
-        ) : undefined
-      }
-      headingLevel={heading ? headingLevel : "h4"}
-    >
-      {body}
+    <Alert type={toastVariant}>
+      {heading && (
+        <AlertHeading level={headingLevel} className={headingLevel}>
+          {heading}
+        </AlertHeading>
+      )}
+      <AlertText>{body}</AlertText>
     </Alert>
   );
 };

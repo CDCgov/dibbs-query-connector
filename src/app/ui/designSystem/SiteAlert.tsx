@@ -1,5 +1,5 @@
 import { Mode, PageType } from "@/app/constants";
-import { Alert } from "@trussworks/react-uswds";
+import { Alert, AlertText } from "@trussworks/react-uswds";
 
 export const CONTACT_US_DISCLAIMER_TEXT =
   "Interested in learning more about using the TEFCA Query Connector for your jurisdiction?";
@@ -50,8 +50,8 @@ const SiteAlert: React.FC<SiteAlertProps> = ({ page }) => {
   const mappedAlert = PageModeToSiteAlertMap[page as Mode];
 
   return (
-    <Alert type="info" headingLevel="h4" slim className="custom-alert">
-      {mappedAlert ?? piiDisclaimer}
+    <Alert type="info" slim className="custom-alert">
+      <AlertText>{mappedAlert ?? piiDisclaimer}</AlertText>
     </Alert>
   );
 };
