@@ -26,8 +26,18 @@ const mockDeleteQueryById = deleteQueryById as jest.Mock;
 const mockToast = showToastConfirmation as jest.Mock;
 
 const QUERIES: CustomUserQuery[] = [
-  { queryId: "id-1", queryName: "Query One", conditionsList: ["1"] },
-  { queryId: "id-2", queryName: "Query Two", conditionsList: ["2"] },
+  {
+    queryId: "id-1",
+    queryName: "Query One",
+    conditionsList: ["1"],
+    valuesets: [],
+  },
+  {
+    queryId: "id-2",
+    queryName: "Query Two",
+    conditionsList: ["2"],
+    valuesets: [],
+  },
 ];
 
 beforeEach(() => {

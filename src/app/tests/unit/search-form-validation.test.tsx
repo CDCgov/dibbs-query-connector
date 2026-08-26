@@ -66,7 +66,7 @@ describe("Search Form Name Validation", () => {
 
     const firstNameInput = screen.getByLabelText("First name");
     const lastNameInput = screen.getByLabelText("Last name");
-    const dobInput = document.getElementById("dob");
+    const dobInput = document.getElementById("dob")!;
 
     await user.type(firstNameInput, "John");
     await user.type(lastNameInput, "Doe");
@@ -106,7 +106,7 @@ describe("Search Form Name Validation", () => {
 
     const firstNameInput = screen.getByLabelText("First name");
     const lastNameInput = screen.getByLabelText("Last name");
-    const dobInput = document.getElementById("dob");
+    const dobInput = document.getElementById("dob")!;
 
     await user.type(firstNameInput, "John123");
     await user.type(lastNameInput, "Doe456");
@@ -146,7 +146,7 @@ describe("Search Form Name Validation", () => {
 
     const firstNameInput = screen.getByLabelText("First name");
     const lastNameInput = screen.getByLabelText("Last name");
-    const dobInput = document.getElementById("dob");
+    const dobInput = document.getElementById("dob")!;
 
     await user.type(firstNameInput, "Mary-Jane");
     await user.type(lastNameInput, "O'Connor-Smith Jr.");
@@ -186,7 +186,7 @@ describe("Search Form Name Validation", () => {
 
     const firstNameInput = screen.getByLabelText("First name");
     const lastNameInput = screen.getByLabelText("Last name");
-    const dobInput = document.getElementById("dob");
+    const dobInput = document.getElementById("dob")!;
 
     await user.type(firstNameInput, "José");
     await user.type(lastNameInput, "García-López");
@@ -263,7 +263,7 @@ describe("Search Form Name Validation", () => {
 
     const firstNameInput = screen.getByLabelText("First name");
     const lastNameInput = screen.getByLabelText("Last name");
-    const dobInput = document.getElementById("dob");
+    const dobInput = document.getElementById("dob")!;
 
     // Test cases that might include numbers in names
     await user.type(firstNameInput, "X Æ A-12"); // Like Elon Musk's child
@@ -317,7 +317,7 @@ describe("Search Form mTLS Server Selection", () => {
     // Fill required fields
     await user.type(screen.getByLabelText("First name"), "John");
     await user.type(screen.getByLabelText("Last name"), "Doe");
-    const dobInput = document.getElementById("dob");
+    const dobInput = document.getElementById("dob")!;
     await user.type(dobInput, "1990-01-01");
 
     // Submit form

@@ -31,16 +31,19 @@ const QUERIES: CustomUserQuery[] = [
     queryId: "cancer-id",
     queryName: "Cancer case investigation",
     conditionsList: ["2"],
+    valuesets: [],
   },
   {
     queryId: "custom-id",
     queryName: "Bespoke query",
     conditionsList: ["custom"],
+    valuesets: [],
   },
   {
     queryId: "medical-id",
     queryName: "Newborn with sections",
     conditionsList: ["1"],
+    valuesets: [],
     medicalRecordSections: {
       immunizations: true,
     } as CustomUserQuery["medicalRecordSections"],

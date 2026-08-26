@@ -4,7 +4,7 @@ import {
 } from "@/app/backend/query-execution/service";
 import { isFhirResource } from "@/app/constants";
 import { readJsonFile } from "../shared_utils/readJsonFile";
-import { DiagnosticReport, Observation } from "fhir/r4";
+import { Bundle, DiagnosticReport, Observation } from "fhir/r4";
 import { QueryResponse } from "@/app/models/entities/query";
 import { suppressConsoleLogs } from "../integration/fixtures";
 
@@ -18,20 +18,22 @@ describe("process response", () => {
     suppressConsoleLogs();
   });
   it("should unpack a response from the server into an array of resources", async () => {
-    const patientBundle = readJsonFile(
+    const patientBundle = readJsonFile<Bundle>(
       "./src/app/tests/assets/BundlePatient.json",
     );
-    const labsBundle = readJsonFile(
+    const labsBundle = readJsonFile<Bundle>(
       "./src/app/tests/assets/BundleLabInfo.json",
     );
-    const diagnosticReportResource = labsBundle?.entry.filter(
-      (e): e is { resource: DiagnosticReport } =>
-        e?.resource?.resourceType === "DiagnosticReport",
-    );
-    const observationResources = labsBundle?.entry.filter(
-      (e): e is { resource: Observation } =>
-        e?.resource?.resourceType === "Observation",
-    );
+    const diagnosticReportResource =
+      labsBundle?.entry?.filter(
+        (e): e is { resource: DiagnosticReport } =>
+          e?.resource?.resourceType === "DiagnosticReport",
+      ) ?? [];
+    const observationResources =
+      labsBundle?.entry?.filter(
+        (e): e is { resource: Observation } =>
+          e?.resource?.resourceType === "Observation",
+      ) ?? [];
     patientBundle?.entry?.push(diagnosticReportResource[0]);
     observationResources.forEach((or) => {
       patientBundle?.entry?.push(or);
@@ -51,8 +53,9 @@ describe("process response", () => {
     });
 
     expect(resourceArray.length).toEqual(4);
-    expect(resourceArray.find((r) => r.resourceType === "Patient")) ===
-      patientBundle?.entry[0].resource;
+    expect(resourceArray.find((r) => r.resourceType === "Patient")).toEqual(
+      patientBundle?.entry?.[0].resource,
+    );
     expect(
       resourceArray.filter((r) => r.resourceType === "Observation").length,
     ).toEqual(2);
@@ -87,20 +90,20 @@ describe("parse fhir search", () => {
     suppressConsoleLogs();
   });
   it("should turn the FHIR server's response into a QueryResponse struct", async () => {
-    const patientBundle = readJsonFile(
+    const patientBundle = readJsonFile<Bundle>(
       "./src/app/tests/assets/BundlePatient.json",
     );
-    const labsBundle = readJsonFile(
+    const labsBundle = readJsonFile<Bundle>(
       "./src/app/tests/assets/BundleLabInfo.json",
     );
-    const diagnosticReportEntry = labsBundle?.entry.filter(
-      (e: { resource?: DiagnosticReport }) =>
-        e?.resource?.resourceType === "DiagnosticReport",
-    );
-    const observationEntries = labsBundle?.entry.filter(
-      (e: { resource?: Observation }) =>
-        e?.resource?.resourceType === "Observation",
-    );
+    const diagnosticReportEntry =
+      labsBundle?.entry?.filter(
+        (e) => e?.resource?.resourceType === "DiagnosticReport",
+      ) ?? [];
+    const observationEntries =
+      labsBundle?.entry?.filter(
+        (e) => e?.resource?.resourceType === "Observation",
+      ) ?? [];
     patientBundle?.entry?.push(diagnosticReportEntry[0]);
     observationEntries.forEach((or) => {
       patientBundle?.entry?.push(or);
@@ -114,15 +117,15 @@ describe("parse fhir search", () => {
 
     // Using isFhirResource
     expect((queryResponse.Patient || [{}])[0]).toEqual(
-      patientBundle?.entry[0]?.resource,
+      patientBundle?.entry?.[0]?.resource,
     );
     expect((queryResponse.DiagnosticReport || [{}])[0]).toEqual(
       diagnosticReportEntry[0]?.resource,
     );
     expect(queryResponse.Observation?.length).toEqual(2);
 
-    const observationResources: Observation[] = observationEntries.map(
-      (oe: { resource?: Observation }) => oe.resource,
+    const observationResources = observationEntries.map(
+      (oe) => oe.resource as Observation,
     );
 
     queryResponse.Observation?.forEach((o: Observation) => {
@@ -131,7 +134,7 @@ describe("parse fhir search", () => {
   });
 
   it("keeps resources from good responses when one response in the array fails to parse", async () => {
-    const patientBundle = readJsonFile(
+    const patientBundle = readJsonFile<Bundle>(
       "./src/app/tests/assets/BundlePatient.json",
     );
 
@@ -156,7 +159,7 @@ describe("parse fhir search", () => {
     ]);
 
     expect((queryResponse.Patient || [{}])[0]).toEqual(
-      patientBundle?.entry[0]?.resource,
+      patientBundle?.entry?.[0]?.resource,
     );
   });
 });

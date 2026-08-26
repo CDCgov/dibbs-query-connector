@@ -9,10 +9,10 @@ import * as fs from "fs";
  * @param filePath The relative string path to the file.
  * @returns A JSON object of the string representation of the file.
  */
-export function readJsonFile(filePath: string): unknown {
+export function readJsonFile<T = unknown>(filePath: string): T | null {
   try {
     const data = fs.readFileSync(filePath, "utf-8");
-    return JSON.parse(data);
+    return JSON.parse(data) as T;
   } catch (error) {
     console.error(`Error reading JSON file from ${filePath}:`, error);
     return null;

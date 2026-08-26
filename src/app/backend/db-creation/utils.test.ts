@@ -150,7 +150,7 @@ describe("indexErsdByOid", () => {
   });
 
   it("indexes referenced oids by umbrella type and strips |version suffixes", () => {
-    const entries: BundleEntry[] = [
+    const entries: BundleEntry<FhirValueSet>[] = [
       {
         resource: {
           resourceType: "ValueSet",
@@ -205,7 +205,7 @@ describe("indexErsdByOid", () => {
       id: "oid-A",
       status: "active",
     };
-    const entries: BundleEntry[] = [
+    const entries: BundleEntry<FhirValueSet>[] = [
       {
         resource: {
           resourceType: "ValueSet",
