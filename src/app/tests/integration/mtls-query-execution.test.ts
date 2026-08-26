@@ -47,7 +47,7 @@ describe("Query Execution with Mutual TLS", () => {
     global.setTimeout = jest.fn((callback: () => void) => {
       callback();
       return 0 as unknown as NodeJS.Timeout;
-    });
+    }) as unknown as typeof setTimeout;
 
     mockFhirClient = {
       get: jest.fn(),
@@ -209,7 +209,7 @@ describe("Query Execution with Mutual TLS", () => {
 
       // Verify the result
       expect(result).toHaveLength(1);
-      expect(result[0]).toEqual(mockPatient);
+      expect((result as Patient[])[0]).toEqual(mockPatient);
     });
 
     it("should handle multiple child tasks from different organizations", async () => {
@@ -329,7 +329,7 @@ describe("Query Execution with Mutual TLS", () => {
 
       // Should only return the successful patient
       expect(result).toHaveLength(1);
-      expect(result[0]).toEqual(mockPatient);
+      expect((result as Patient[])[0]).toEqual(mockPatient);
     });
 
     it("should retry fetching patient resource if initially unavailable", async () => {
@@ -375,7 +375,7 @@ describe("Query Execution with Mutual TLS", () => {
 
       // Should eventually return the patient
       expect(result).toHaveLength(1);
-      expect(result[0]).toEqual(mockPatient);
+      expect((result as Patient[])[0]).toEqual(mockPatient);
       expect(mockFhirClient.get).toHaveBeenCalledTimes(3); // child tasks + 2 patient attempts
     });
 
@@ -423,7 +423,7 @@ describe("Query Execution with Mutual TLS", () => {
       );
 
       expect(result).toHaveLength(1);
-      expect(result[0]).toEqual(mockPatient);
+      expect((result as Patient[])[0]).toEqual(mockPatient);
     });
 
     it("should include gender, race, and ethnicity search params when provided", async () => {

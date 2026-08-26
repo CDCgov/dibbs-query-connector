@@ -21,6 +21,9 @@ updates:
       # keep @types/node on the major matching the node:24 Docker runtime
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
+      # typescript-eslint pins typescript <6.1.0; drop when it supports TS 7
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "docker"
     directory: "/"
