@@ -28,10 +28,7 @@ test.describe("querying with the Query Connector", () => {
     await page.getByLabel("First name").fill("Shouldnt");
     await page.getByLabel("Last name").fill("Findanyone");
     // Select FHIR server from drop down
-    await page.getByRole("button", { name: "Advanced" }).click();
-    await page
-      .getByLabel("Healthcare Organization (HCO)")
-      .selectOption(DEFAULT_FHIR_SERVER);
+    await page.getByLabel("FHIR server").selectOption(DEFAULT_FHIR_SERVER);
 
     await page.getByRole("button", { name: "Search for patient" }).click();
 
@@ -76,10 +73,7 @@ test.describe("querying with the Query Connector", () => {
 
     await page.getByRole("button", { name: "Fill fields" }).click();
     // Select FHIR server from drop down
-    await page.getByRole("button", { name: "Advanced" }).click();
-    await page
-      .getByLabel("Healthcare Organization (HCO)")
-      .selectOption(DEFAULT_FHIR_SERVER);
+    await page.getByLabel("FHIR server").selectOption(DEFAULT_FHIR_SERVER);
     await runAxeAccessibilityChecks(page);
 
     await page.getByRole("button", { name: "Search for patient" }).click();
@@ -91,7 +85,7 @@ test.describe("querying with the Query Connector", () => {
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
     await page
-      .getByTestId("Select")
+      .getByTestId("query-select")
       .selectOption("Chlamydia case investigation");
 
     await runAxeAccessibilityChecks(page);
@@ -104,6 +98,10 @@ test.describe("querying with the Query Connector", () => {
       page.getByRole("heading", { name: "Patient Record" }),
     ).toBeVisible();
     await expect(page.getByText("Patient Name")).toBeVisible();
+    // The results header shows which FHIR server answered the query
+    await expect(page.getByTestId("results-fhir-server")).toContainText(
+      DEFAULT_FHIR_SERVER,
+    );
     await expect(page.getByText(TEST_PATIENT_NAME)).toBeVisible();
     await expect(page.getByText("Patient Identifiers")).toBeVisible();
     await expect(
@@ -257,10 +255,7 @@ test.describe("alternate queries with the Query Connector", () => {
     await page.getByLabel("Medical Record Number").clear();
 
     // Select FHIR server from drop down
-    await page.getByRole("button", { name: "Advanced" }).click();
-    await page
-      .getByLabel("Healthcare Organization (HCO)")
-      .selectOption(DEFAULT_FHIR_SERVER);
+    await page.getByLabel("FHIR server").selectOption(DEFAULT_FHIR_SERVER);
 
     // Among verification, make sure phone number is right
     await page.getByRole("button", { name: "Search for patient" }).click();
@@ -273,7 +268,7 @@ test.describe("alternate queries with the Query Connector", () => {
       page.getByRole("heading", { name: PAGE_TITLES["select-query"].title }),
     ).toBeVisible();
     await page
-      .getByTestId("Select")
+      .getByTestId("query-select")
       .selectOption("Chlamydia case investigation");
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
@@ -290,10 +285,7 @@ test.describe("alternate queries with the Query Connector", () => {
   test("cancer query with generalized function", async ({ page }) => {
     await page.getByRole("button", { name: "Fill fields" }).click();
     // Select FHIR server from drop down
-    await page.getByRole("button", { name: "Advanced" }).click();
-    await page
-      .getByLabel("Healthcare Organization (HCO)")
-      .selectOption(DEFAULT_FHIR_SERVER);
+    await page.getByLabel("FHIR server").selectOption(DEFAULT_FHIR_SERVER);
 
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
@@ -302,7 +294,9 @@ test.describe("alternate queries with the Query Connector", () => {
     await expect(
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
-    await page.getByTestId("Select").selectOption("Cancer case investigation");
+    await page
+      .getByTestId("query-select")
+      .selectOption("Cancer case investigation");
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 
@@ -316,16 +310,13 @@ test.describe("alternate queries with the Query Connector", () => {
   }) => {
     await page.getByRole("button", { name: "Fill fields" }).click();
     // Select FHIR server from drop down
-    await page.getByRole("button", { name: "Advanced" }).click();
-    await page
-      .getByLabel("Healthcare Organization (HCO)")
-      .selectOption(DEFAULT_FHIR_SERVER);
+    await page.getByLabel("FHIR server").selectOption(DEFAULT_FHIR_SERVER);
 
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
     await page.getByRole("button", { name: "Select patient" }).nth(0).click();
     await page
-      .getByTestId("Select")
+      .getByTestId("query-select")
       .selectOption("Chlamydia case investigation");
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
@@ -340,10 +331,7 @@ test.describe("alternate queries with the Query Connector", () => {
   }) => {
     await page.getByRole("button", { name: "Fill fields" }).click();
     // Select FHIR server from drop down
-    await page.getByRole("button", { name: "Advanced" }).click();
-    await page
-      .getByLabel("Healthcare Organization (HCO)")
-      .selectOption(DEFAULT_FHIR_SERVER);
+    await page.getByLabel("FHIR server").selectOption(DEFAULT_FHIR_SERVER);
 
     await page.getByRole("button", { name: "Search for patient" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
@@ -352,7 +340,9 @@ test.describe("alternate queries with the Query Connector", () => {
     await expect(
       page.getByRole("heading", { name: "Select a query" }),
     ).toBeVisible();
-    await page.getByTestId("Select").selectOption("MDRO case investigation");
+    await page
+      .getByTestId("query-select")
+      .selectOption("MDRO case investigation");
     await page.getByRole("button", { name: "Submit" }).click();
     await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 

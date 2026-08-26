@@ -54,19 +54,49 @@ exports[`SearchForm does not prefill address with bad data 1`] = `
           >
             Fill fields
           </button>
-          <button
-            class="usa-button usa-button--unstyled margin-left-auto"
-            data-testid="button"
-            type="button"
-          >
-            Advanced
-          </button>
         </div>
       </div>
       <fieldset
         class="usa-fieldset searchFormContainer bg-white"
         data-testid="fieldset"
       >
+        <div
+          class="grid-row grid-gap margin-bottom-4"
+        >
+          <h3
+            class="font-sans-md searchFormSectionLabel"
+          >
+            FHIR server
+          </h3>
+          <label
+            class="usa-label margin-top-0-important width-full"
+            data-testid="label"
+            for="fhir_server"
+          >
+            FHIR server
+          </label>
+          <div
+            class="grid-col-6"
+          >
+            <div
+              class="usa-combo-box"
+            >
+              <select
+                class="usa-select"
+                data-testid="fhir-server-select"
+                id="fhir_server"
+                name="fhir_server"
+                required=""
+              >
+                <option
+                  value="Default server"
+                >
+                  Default server
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
         <div
           class="grid-row grid-gap margin-bottom-4"
         >
@@ -865,19 +895,54 @@ exports[`SearchForm does not prefill fhir server with bad data 1`] = `
           >
             Fill fields
           </button>
-          <button
-            class="usa-button usa-button--unstyled margin-left-auto"
-            data-testid="button"
-            type="button"
-          >
-            Advanced
-          </button>
         </div>
       </div>
       <fieldset
         class="usa-fieldset searchFormContainer bg-white"
         data-testid="fieldset"
       >
+        <div
+          class="grid-row grid-gap margin-bottom-4"
+        >
+          <h3
+            class="font-sans-md searchFormSectionLabel"
+          >
+            FHIR server
+          </h3>
+          <label
+            class="usa-label margin-top-0-important width-full"
+            data-testid="label"
+            for="fhir_server"
+          >
+            FHIR server
+          </label>
+          <div
+            class="grid-col-6"
+          >
+            <div
+              class="usa-combo-box"
+            >
+              <select
+                class="usa-select"
+                data-testid="fhir-server-select"
+                id="fhir_server"
+                name="fhir_server"
+                required=""
+              >
+                <option
+                  value="Default FHIR"
+                >
+                  Default FHIR
+                </option>
+                <option
+                  value="Some other server name"
+                >
+                  Some other server name
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
         <div
           class="grid-row grid-gap margin-bottom-4"
         >
@@ -1676,19 +1741,43 @@ exports[`SearchForm prefills form fields from query params 1`] = `
           >
             Fill fields
           </button>
-          <button
-            class="usa-button usa-button--unstyled margin-left-auto"
-            data-testid="button"
-            type="button"
-          >
-            Advanced
-          </button>
         </div>
       </div>
       <fieldset
         class="usa-fieldset searchFormContainer bg-white"
         data-testid="fieldset"
       >
+        <div
+          class="grid-row grid-gap margin-bottom-4"
+        >
+          <h3
+            class="font-sans-md searchFormSectionLabel"
+          >
+            FHIR server
+          </h3>
+          <label
+            class="usa-label margin-top-0-important width-full"
+            data-testid="label"
+            for="fhir_server"
+          >
+            FHIR server
+          </label>
+          <div
+            class="grid-col-6"
+          >
+            <div
+              class="usa-combo-box"
+            >
+              <select
+                class="usa-select"
+                data-testid="fhir-server-select"
+                id="fhir_server"
+                name="fhir_server"
+                required=""
+              />
+            </div>
+          </div>
+        </div>
         <div
           class="grid-row grid-gap margin-bottom-4"
         >
@@ -2487,19 +2576,43 @@ exports[`SearchForm renders fhir server form options on button click 1`] = `
           >
             Fill fields
           </button>
-          <button
-            class="usa-button usa-button--unstyled margin-left-auto"
-            data-testid="button"
-            type="button"
-          >
-            Advanced
-          </button>
         </div>
       </div>
       <fieldset
         class="usa-fieldset searchFormContainer bg-white"
         data-testid="fieldset"
       >
+        <div
+          class="grid-row grid-gap margin-bottom-4"
+        >
+          <h3
+            class="font-sans-md searchFormSectionLabel"
+          >
+            FHIR server
+          </h3>
+          <label
+            class="usa-label margin-top-0-important width-full"
+            data-testid="label"
+            for="fhir_server"
+          >
+            FHIR server
+          </label>
+          <div
+            class="grid-col-6"
+          >
+            <div
+              class="usa-combo-box"
+            >
+              <select
+                class="usa-select"
+                data-testid="fhir-server-select"
+                id="fhir_server"
+                name="fhir_server"
+                required=""
+              />
+            </div>
+          </div>
+        </div>
         <div
           class="grid-row grid-gap margin-bottom-4"
         >
@@ -3298,19 +3411,43 @@ exports[`SearchForm renders the patient search form 1`] = `
           >
             Fill fields
           </button>
-          <button
-            class="usa-button usa-button--unstyled margin-left-auto"
-            data-testid="button"
-            type="button"
-          >
-            Advanced
-          </button>
         </div>
       </div>
       <fieldset
         class="usa-fieldset searchFormContainer bg-white"
         data-testid="fieldset"
       >
+        <div
+          class="grid-row grid-gap margin-bottom-4"
+        >
+          <h3
+            class="font-sans-md searchFormSectionLabel"
+          >
+            FHIR server
+          </h3>
+          <label
+            class="usa-label margin-top-0-important width-full"
+            data-testid="label"
+            for="fhir_server"
+          >
+            FHIR server
+          </label>
+          <div
+            class="grid-col-6"
+          >
+            <div
+              class="usa-combo-box"
+            >
+              <select
+                class="usa-select"
+                data-testid="fhir-server-select"
+                id="fhir_server"
+                name="fhir_server"
+                required=""
+              />
+            </div>
+          </div>
+        </div>
         <div
           class="grid-row grid-gap margin-bottom-4"
         >

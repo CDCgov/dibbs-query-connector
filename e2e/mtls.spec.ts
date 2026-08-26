@@ -185,17 +185,10 @@ testWithMock.describe("Mutual TLS", () => {
         }),
       ).toBeVisible();
 
-      // Click "Advanced" to show FHIR server selection
-      await page.getByRole("button", { name: "Advanced" }).click();
+      // The FHIR server select is always visible on the search form
+      await expect(page.getByLabel("FHIR server")).toBeVisible();
 
-      // Wait for advanced options to be visible
-      await expect(
-        page.getByLabel("Healthcare Organization (HCO)"),
-      ).toBeVisible();
-
-      await page
-        .getByLabel("Healthcare Organization (HCO)")
-        .selectOption(serverName);
+      await page.getByLabel("FHIR server").selectOption(serverName);
 
       // Fill out the patient lookup form
       await page.getByTestId("textInput").nth(0).fill("John"); // First name

@@ -9,10 +9,7 @@ import { runAxeAccessibilityChecks } from "./utils";
 async function generateAuditEntry(page: Page) {
   await page.goto(TEST_URL);
   await page.getByRole("button", { name: "Fill fields" }).click();
-  await page.getByRole("button", { name: "Advanced" }).click();
-  await page
-    .getByLabel("Healthcare Organization (HCO)")
-    .selectOption(DEFAULT_FHIR_SERVER);
+  await page.getByLabel("FHIR server").selectOption(DEFAULT_FHIR_SERVER);
   await page.getByRole("button", { name: "Search for patient" }).click();
   await expect(page.getByText("Loading")).toHaveCount(0, { timeout: 10000 });
 }

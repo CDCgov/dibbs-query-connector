@@ -1156,8 +1156,8 @@ export const FhirServersModal: React.FC<FhirServersModal> = ({
       <Label htmlFor="endpoint-type">Endpoint Type</Label>
       <div className="usa-hint margin-bottom-1 margin-top-05">
         Determines which resource is queried: Standard FHIR uses /Patient,
-        Immunization Gateway uses /Immunization, and Fanout uses /Task-based
-        discovery.
+        Immunization Gateway uses /Immunization and /ImmunizationRecommendation,
+        and Fanout uses /Task-based discovery.
       </div>
       <select
         className="usa-select margin-top-05"

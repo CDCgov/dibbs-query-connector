@@ -68,6 +68,31 @@ const POPULATED_RESPONSE = {
   fhirRequests: [{ method: "GET", url: "https://fhir.example.com/Patient" }],
 } as unknown as PatientRecordsResponse;
 
+const FORECAST_RESPONSE = {
+  ...POPULATED_RESPONSE,
+  ImmunizationRecommendation: [
+    {
+      resourceType: "ImmunizationRecommendation",
+      id: "ir1",
+      patient: { reference: "Patient/p1" },
+      recommendation: [
+        {
+          vaccineCode: [{ text: "MMR" }],
+          forecastStatus: { text: "Due" },
+          dateCriterion: [
+            {
+              code: {
+                coding: [{ system: "http://loinc.org", code: "30980-7" }],
+              },
+              value: "2026-09-01",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+} as unknown as PatientRecordsResponse;
+
 describe("ResultsView", () => {
   beforeAll(() => {
     const windowMock = {
@@ -284,5 +309,70 @@ describe("ResultsView", () => {
     // The accordion container is present but empty (no resource sections).
     const accordion = screen.getByTestId("accordion");
     expect(accordion).toBeEmptyDOMElement();
+  });
+  it("splits the Immunizations section into history and forecast when recommendations are present", () => {
+    renderWithUser(
+      <ResultsView
+        patientRecordsResponse={FORECAST_RESPONSE}
+        selectedQuery={TEST_QUERY}
+        goBack={() => {}}
+        goToBeginning={() => {}}
+        loading={false}
+      />,
+    );
+
+    expect(screen.getByText("Immunization history")).toBeInTheDocument();
+    expect(screen.getByText("Immunization forecast")).toBeInTheDocument();
+    expect(screen.getByText("MMR")).toBeInTheDocument();
+    expect(screen.getByText("Due")).toBeInTheDocument();
+    expect(screen.getByText("09/01/2026")).toBeInTheDocument();
+  });
+
+  it("renders the immunization table without sub-headings when there is no forecast", () => {
+    renderWithUser(
+      <ResultsView
+        patientRecordsResponse={POPULATED_RESPONSE}
+        selectedQuery={TEST_QUERY}
+        goBack={() => {}}
+        goToBeginning={() => {}}
+        loading={false}
+      />,
+    );
+
+    expect(screen.queryByText("Immunization history")).not.toBeInTheDocument();
+    expect(screen.queryByText("Immunization forecast")).not.toBeInTheDocument();
+    // The Immunization fixture's occurrence date still renders in the table.
+    expect(screen.getByText("01/01/2023")).toBeInTheDocument();
+  });
+
+  it("shows the queried FHIR server name when provided", () => {
+    renderWithUser(
+      <ResultsView
+        patientRecordsResponse={POPULATED_RESPONSE}
+        selectedQuery={TEST_QUERY}
+        goBack={() => {}}
+        goToBeginning={() => {}}
+        loading={false}
+        fhirServer="IZ Gateway: eHealthExchange"
+      />,
+    );
+
+    const serverLine = screen.getByTestId("results-fhir-server");
+    expect(serverLine).toHaveTextContent("FHIR server:");
+    expect(serverLine).toHaveTextContent("IZ Gateway: eHealthExchange");
+  });
+
+  it("omits the FHIR server line when no server name is provided", () => {
+    renderWithUser(
+      <ResultsView
+        patientRecordsResponse={POPULATED_RESPONSE}
+        selectedQuery={TEST_QUERY}
+        goBack={() => {}}
+        goToBeginning={() => {}}
+        loading={false}
+      />,
+    );
+
+    expect(screen.queryByTestId("results-fhir-server")).not.toBeInTheDocument();
   });
 });

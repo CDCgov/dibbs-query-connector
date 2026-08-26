@@ -475,6 +475,49 @@ describe("CustomQuery immunization queries", () => {
     expect(epicImmunization.params.get("patient")).toBe(PATIENT_ID);
   });
 
+  it("adds an ImmunizationRecommendation search with the same params on immunization endpoints only", () => {
+    const gatewayQuery = new CustomQuery(
+      immunizationSavedQuery,
+      PATIENT_ID,
+      "default",
+      { endpointType: "immunization", patientDemographics: DEMOGRAPHICS },
+    );
+    const immunization = gatewayQuery.getQuery("immunization");
+    const recommendation = gatewayQuery.getQuery("immunizationRecommendation");
+
+    expect(recommendation.basePath).toBe("/ImmunizationRecommendation");
+    expect(recommendation.params.toString()).toBe(
+      immunization.params.toString(),
+    );
+    // Separate instances: mutating one must not affect the other.
+    expect(recommendation.params).not.toBe(immunization.params);
+    expect(
+      gatewayQuery.compileAllPostRequests().map((r) => r.path),
+    ).not.toContain("/ImmunizationRecommendation");
+
+    // Without demographics the fallback patient param is shared too.
+    const fallback = new CustomQuery(
+      immunizationSavedQuery,
+      PATIENT_ID,
+      "epic",
+      {
+        endpointType: "immunization",
+      },
+    ).getQuery("immunizationRecommendation");
+    expect(fallback.params.get("patient")).toBe(PATIENT_ID);
+
+    // Standard and Epic servers never get the recommendation search.
+    for (const strategy of ["default", "epic"] as const) {
+      const standard = new CustomQuery(
+        immunizationSavedQuery,
+        PATIENT_ID,
+        strategy,
+        { endpointType: "standard", patientDemographics: DEMOGRAPHICS },
+      ).getQuery("immunizationRecommendation");
+      expect(standard.basePath).toBe("");
+    }
+  });
+
   it("ignores demographics on standard endpoints", () => {
     const immunization = new CustomQuery(
       immunizationSavedQuery,

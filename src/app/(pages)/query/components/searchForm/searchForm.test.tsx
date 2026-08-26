@@ -88,12 +88,11 @@ describe("SearchForm", () => {
     expect(screen.getByText("Enter patient information")).toBeVisible();
     expect(document.body).toMatchSnapshot();
 
-    const advancedOptions = await screen.findByText("Advanced");
-    await user.click(advancedOptions);
-
+    // The server select is always visible — there is no Advanced toggle.
     expect(
-      await screen.findByText("Healthcare Organization (HCO)"),
-    ).toBeVisible();
+      screen.queryByRole("button", { name: "Advanced" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "FHIR server" })).toBeVisible();
   });
 
   it("prefills form fields from query params", async () => {
@@ -248,10 +247,8 @@ describe("SearchForm", () => {
     expect(screen.getByText("Enter patient information")).toBeVisible();
     expect(document.body).toMatchSnapshot();
 
-    const advancedOptions = await screen.findByText("Advanced");
-    await user.click(advancedOptions);
     const selectedServer = screen.getByRole("combobox", {
-      name: "Healthcare Organization (HCO)",
+      name: "FHIR server",
     });
     expect(selectedServer).not.toHaveValue(badServerName);
     expect(selectedServer).toHaveValue(defaultServerName);
@@ -340,11 +337,6 @@ describe("SearchForm", () => {
         />
       </RootProviderMock>,
     );
-
-    const advancedButton = await screen.findByRole("button", {
-      name: "Advanced",
-    });
-    await user.click(advancedButton);
 
     const checkbox = await screen.findByRole("checkbox", {
       name: /enable patient match/i,
@@ -687,11 +679,8 @@ describe("SearchForm", () => {
       </RootProviderMock>,
     );
 
-    await user.click(screen.getByRole("button", { name: "Advanced" }));
     await user.selectOptions(
-      await screen.findByRole("combobox", {
-        name: "Healthcare Organization (HCO)",
-      }),
+      await screen.findByRole("combobox", { name: "FHIR server" }),
       "Server B",
     );
 

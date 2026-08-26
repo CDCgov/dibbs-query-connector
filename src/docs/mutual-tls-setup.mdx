@@ -91,9 +91,12 @@ server can be any of the three types:
 - **Standard FHIR** – probes `/Patient` and uses a direct `/Patient` search for
   patient discovery.
 - **Immunization Gateway** – probes `/Immunization`. Patient discovery still uses
-  the standard `/Patient` path, then immunization records are pulled with
-  `/Immunization?subject=Patient/{id}`. Choose this for an eHealth Exchange
-  immunization gateway (e.g. `IZGUAT`).
+  the standard `/Patient` path, then immunization history and forecast are pulled
+  with `/Immunization` and `/ImmunizationRecommendation` searches scoped by the
+  matched patient's demographics (`patient.given`, `patient.family`,
+  `patient.birthdate`), which the gateway translates into HL7v2 queries. No other
+  record sections are queried. Choose this for an eHealth Exchange immunization
+  gateway (e.g. `IZGUAT`).
 - **Fanout (Task)** – probes `/Task` and performs TEFCA-style fanout discovery by
   POSTing a `/Task` resource and polling for child tasks.
 
@@ -109,12 +112,12 @@ server can be any of the three types:
    - **DOB**: 01-05-1963
    - **Phone Number**: 555-306-8493
    - **State**: MA
-3. Click "Advanced" and select your mTLS server
+3. Select your mTLS server from the **FHIR server** dropdown
 4. Click "Search for patient"
 5. What happens next depends on the server's **Endpoint Type**:
    - **Standard FHIR / Immunization Gateway** — a direct `/Patient` search is
-     issued, then clinical records (e.g. `/Immunization`) are queried for the
-     matched patient.
+     issued, then clinical records (e.g. `/Immunization` and, for gateways,
+     `/ImmunizationRecommendation`) are queried for the matched patient.
    - **Fanout (Task)** — a `/Task` resource is POSTed, child tasks are polled to
      completion, and patient results are retrieved from the completed tasks.
 

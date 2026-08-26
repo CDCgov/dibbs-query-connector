@@ -249,38 +249,25 @@ export class CustomQuery {
     }
 
     if (medicalRecordSections && medicalRecordSections.immunizations) {
-      const formattedParams = new URLSearchParams();
-      if (this.endpointType === "immunization" && this.patientDemographics) {
-        // Immunization Gateways (e.g. eHealth Exchange's fhirproxy) translate
-        // the FHIR search into an HL7v2 QBP Z34 query, which identifies the
-        // patient by demographics ("must contain patient.identifier or
-        // name+birthDate") — a patient={id} search returns nothing. Use
-        // chained demographic params from the discovered Patient instead.
-        formattedParams.append("patient.given", this.patientDemographics.given);
-        formattedParams.append(
-          "patient.family",
-          this.patientDemographics.family,
-        );
-        formattedParams.append(
-          "patient.birthdate",
-          this.patientDemographics.birthDate,
-        );
-      } else {
-        // FHIR R4 Immunization has no "subject" search param; the patient-scoping
-        // param is "patient". Using "subject" leaves the query unscoped and the IZ
-        // Gateway rejects it ("must contain patient.identifier or name+birthDate").
-        // Epic's search expects a bare patient id, not a Patient/ reference.
-        formattedParams.append(
-          "patient",
-          this.queryStrategy === "epic" ? patientId : `Patient/${patientId}`,
-        );
-      }
-
       this.fhirResourceQueries["immunization"] = {
         basePath: `/Immunization`,
-        params: formattedParams,
+        params: this.buildImmunizationPatientParams(patientId),
         excludeFromPost: true,
       };
+
+      if (this.endpointType === "immunization") {
+        // Immunization Gateways also answer /ImmunizationRecommendation,
+        // which they translate into an HL7v2 QBP Z44 "evaluated history and
+        // forecast" query — the only way to get the forecast. Same
+        // patient-scoping params as the Immunization search; the service
+        // layer dispatches it as its own GET so a failure on one can't hide
+        // the other. Standard/Epic servers never receive it.
+        this.fhirResourceQueries["immunizationRecommendation"] = {
+          basePath: `/ImmunizationRecommendation`,
+          params: this.buildImmunizationPatientParams(patientId),
+          excludeFromPost: true,
+        };
+      }
     }
 
     if (medicalRecordSections && medicalRecordSections.serviceRequests) {
@@ -519,6 +506,41 @@ export class CustomQuery {
         return { basePath: `/Encounter`, params };
       },
     );
+  }
+
+  /**
+   * Builds the patient-scoping params shared by the Immunization and
+   * ImmunizationRecommendation searches. Returns a fresh URLSearchParams so
+   * the two queries never share (and mutate) one instance.
+   * @param patientId the discovered patient's id
+   * @returns chained patient.given / patient.family / patient.birthdate params
+   * on Immunization Gateways with demographics; otherwise a patient={id} param
+   */
+  private buildImmunizationPatientParams(patientId: string): URLSearchParams {
+    const formattedParams = new URLSearchParams();
+    if (this.endpointType === "immunization" && this.patientDemographics) {
+      // Immunization Gateways (e.g. eHealth Exchange's fhirproxy) translate
+      // the FHIR search into an HL7v2 QBP query, which identifies the
+      // patient by demographics ("must contain patient.identifier or
+      // name+birthDate") — a patient={id} search returns nothing. Use
+      // chained demographic params from the discovered Patient instead.
+      formattedParams.append("patient.given", this.patientDemographics.given);
+      formattedParams.append("patient.family", this.patientDemographics.family);
+      formattedParams.append(
+        "patient.birthdate",
+        this.patientDemographics.birthDate,
+      );
+    } else {
+      // FHIR R4 Immunization has no "subject" search param; the patient-scoping
+      // param is "patient". Using "subject" leaves the query unscoped and the IZ
+      // Gateway rejects it ("must contain patient.identifier or name+birthDate").
+      // Epic's search expects a bare patient id, not a Patient/ reference.
+      formattedParams.append(
+        "patient",
+        this.queryStrategy === "epic" ? patientId : `Patient/${patientId}`,
+      );
+    }
+    return formattedParams;
   }
 
   compilePostRequest(resource: { basePath: string; params: URLSearchParams }) {

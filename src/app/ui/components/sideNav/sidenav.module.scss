@@ -19,6 +19,14 @@
   margin-left: 1px;
 }
 
+/* USWDS's hover style (primary text on base-lightest) only reaches 4.05:1
+   for bold 16px text, short of WCAG AA's 4.5:1, for both plain and
+   .usa-current links. Its selector stacks two :not()s, so !important is the
+   only way to win without mirroring that selector here. */
+.container a.item:hover {
+  color: $brand-dark !important;
+}
+
 .subItem {
   color: $text-secondary;
   font-size: 1rem;

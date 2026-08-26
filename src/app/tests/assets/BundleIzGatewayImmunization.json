@@ -1,0 +1,357 @@
+{
+  "resourceType": "Bundle",
+  "id": "01KZP4E03KDTHKW5HV35AB6X45",
+  "meta": {
+    "profile": [
+      "CDCPHINVS#Z32"
+    ]
+  },
+  "implicitRules": "http://v2plus.hl7.org/2021Jan/message-structure/RSP_K11",
+  "identifier": {
+    "value": "NV000020260810250358"
+  },
+  "type": "searchset",
+  "timestamp": "2026-08-10T08:25:03.580-07:00",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "OperationOutcome",
+        "id": "01KZP4E03PA6GACPDE8VK73DYZ",
+        "meta": {
+          "_source": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/originalText",
+                "valueString": "MSA|AA|01KZP4DZ1FJCMC3YSXJNXM21XJ"
+              }
+            ]
+          }
+        },
+        "issue": [
+          {
+            "severity": "information",
+            "code": "informational",
+            "details": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0008",
+                  "code": "AA"
+                }
+              ]
+            }
+          }
+        ],
+        "identifier": []
+      },
+      "search": {
+        "mode": "outcome"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "OperationOutcome",
+        "id": "01KZP4E03P04B0ZV1M85052MX7",
+        "meta": {
+          "_source": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/originalText",
+                "valueString": "QAK|01KZP4DZ1FWX50G707BY3XCWD1|OK|Z34^Request Immunization History^CDCPHINVS"
+              }
+            ]
+          },
+          "tag": [
+            {
+              "system": "QueryTag",
+              "code": "01KZP4DZ1FWX50G707BY3XCWD1"
+            }
+          ]
+        },
+        "issue": [
+          {
+            "severity": "information",
+            "code": "informational",
+            "details": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0208",
+                  "code": "OK"
+                }
+              ]
+            }
+          }
+        ],
+        "identifier": []
+      },
+      "search": {
+        "mode": "outcome"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Immunization",
+        "id": "TlYwMDAwfDM5NzM1NjV8TlYwMDAwfDQxMzQ4OTM1",
+        "meta": {
+          "_source": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/originalText",
+                "valueString": "ORC|RE||41348935^NV0000"
+              }
+            ]
+          }
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "code": "NV0000"
+                }
+              ]
+            },
+            "system": "NV0000",
+            "value": "41348935"
+          },
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Order Number"
+                }
+              ]
+            },
+            "system": "NV0000",
+            "value": "41348935"
+          }
+        ],
+        "status": "completed",
+        "vaccineCode": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/sid/cvx",
+              "code": "09",
+              "display": "Td (adult), 2 Lf tetanus toxoid, preservative free, adsorbed"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/ndc",
+              "code": "00006-4133-01",
+              "display": "Td (adult), adsorbed"
+            }
+          ]
+        },
+        "patient": {
+          "reference": "Patient/TlYwMDAwfDM5NzM1NjU",
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "SR",
+                  "display": "State registry ID"
+                }
+              ]
+            },
+            "system": "NV0000",
+            "value": "3973565"
+          },
+          "display": "WENDYIZG SNHDIZGONE PRESTONSNHDONEZG"
+        },
+        "occurrenceDateTime": "2022-08-10",
+        "recorded": "2026-06-05",
+        "location": {
+          "reference": "Location/01KZP4E03RME2031263XVXNYYG",
+          "display": "IZGATEWAYART"
+        },
+        "manufacturer": {
+          "reference": "Organization/01KZP4E03RJNBJV3KG5CXPNX5P",
+          "identifier": {
+            "system": "http://hl7.org/fhir/sid/mvx",
+            "value": "MSD"
+          },
+          "display": "Merck and Co., Inc."
+        },
+        "lotNumber": "121584515",
+        "expirationDate": "2024-12-31",
+        "site": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v2-0163",
+              "code": "LD",
+              "display": "Left Deltoid"
+            }
+          ]
+        },
+        "route": {
+          "coding": [
+            {
+              "system": "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl",
+              "code": "C28161",
+              "display": "Intramuscular"
+            },
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v2-0162",
+              "code": "IM",
+              "display": "Intramuscular"
+            }
+          ]
+        },
+        "doseQuantity": {
+          "value": 0.5,
+          "unit": "milliliter",
+          "system": "http://unitsofmeasure.org",
+          "code": "mL"
+        },
+        "programEligibility": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0064",
+                "code": "V01",
+                "display": "Not VFC Eligible (insured)"
+              }
+            ]
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Immunization",
+        "id": "TlYwMDAwfDM5NzM1NjV8TlYwMDAwfDQxMzQ4OTM3",
+        "meta": {
+          "_source": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/originalText",
+                "valueString": "ORC|RE||41348937^NV0000"
+              }
+            ]
+          }
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "code": "NV0000"
+                }
+              ]
+            },
+            "system": "NV0000",
+            "value": "41348937"
+          },
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "FILL",
+                  "display": "Filler Order Number"
+                }
+              ]
+            },
+            "system": "NV0000",
+            "value": "41348937"
+          }
+        ],
+        "status": "completed",
+        "vaccineCode": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/sid/cvx",
+              "code": "150",
+              "display": "Influenza, split virus, quadrivalent, PF"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/ndc",
+              "code": "19515-0818-41",
+              "display": "Influenza Quad Inj P"
+            }
+          ]
+        },
+        "patient": {
+          "reference": "Patient/TlYwMDAwfDM5NzM1NjU",
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "SR",
+                  "display": "State registry ID"
+                }
+              ]
+            },
+            "system": "NV0000",
+            "value": "3973565"
+          },
+          "display": "WENDYIZG SNHDIZGONE PRESTONSNHDONEZG"
+        },
+        "occurrenceDateTime": "2022-08-10",
+        "recorded": "2026-06-08",
+        "location": {
+          "reference": "Location/01KZP4E03VH4EA78BZH4ND0821",
+          "display": "IZGATEWAYART"
+        },
+        "manufacturer": {
+          "reference": "Organization/01KZP4E03VWWC5S0Z1DSYWDV10",
+          "identifier": {
+            "system": "http://hl7.org/fhir/sid/mvx",
+            "value": "SEQ"
+          },
+          "display": "Seqirus"
+        },
+        "lotNumber": "1215121515",
+        "expirationDate": "2024-12-31",
+        "site": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v2-0163",
+              "code": "LD",
+              "display": "Left Deltoid"
+            }
+          ]
+        },
+        "route": {
+          "coding": [
+            {
+              "system": "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl",
+              "code": "C28161",
+              "display": "Intramuscular"
+            },
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v2-0162",
+              "code": "IM",
+              "display": "Intramuscular"
+            }
+          ]
+        },
+        "doseQuantity": {
+          "value": 0.5,
+          "unit": "milliliter",
+          "system": "http://unitsofmeasure.org",
+          "code": "mL"
+        },
+        "programEligibility": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0064",
+                "code": "V01",
+                "display": "Not VFC Eligible (insured)"
+              }
+            ]
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    }
+  ]
+}
