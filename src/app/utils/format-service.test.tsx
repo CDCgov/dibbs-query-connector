@@ -381,7 +381,7 @@ describe("formatContact", () => {
   it("should return null for unsupported contact system", () => {
     const contacts: ContactPoint[] = [
       {
-        system: "idk",
+        system: "idk" as ContactPoint["system"],
         value: "it was on the form",
       },
     ];

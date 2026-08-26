@@ -32,12 +32,11 @@ export const TEST_USER = {
 export async function getAuditEntry(
   actionTypeToCheck: string,
   oldAuditIds: string[],
-) {
+): Promise<Record<string, string>> {
   // The @auditable decorator writes audit rows asynchronously (fire-and-forget),
   // so the row may not be present the instant the action returns. Poll until the
   // matching entry appears rather than reading once and racing the write.
-  let auditEntry;
-  await waitFor(
+  return waitFor(
     async () => {
       const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
       const auditResults = newAuditRows.rows.filter((r) => {
@@ -47,10 +46,10 @@ export async function getAuditEntry(
           !oldAuditIds.includes(r.id)
         );
       });
-      auditEntry = auditResults[0]?.auditMessage;
+      const auditEntry = auditResults[0]?.auditMessage;
       expect(auditEntry).toBeDefined();
+      return auditEntry as Record<string, string>;
     },
     { timeout: 5000 },
   );
-  return auditEntry;
 }

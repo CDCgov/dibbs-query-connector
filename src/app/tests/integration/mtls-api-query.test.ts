@@ -249,8 +249,8 @@ jest.mock("@/app/backend/query-execution/custom-query", () => ({
 
 jest.mock("node-hl7-client", () => ({
   Message: jest.fn().mockImplementation(({ text: _text }) => ({
-    get: jest.fn().mockImplementation((path) => {
-      const mockData = {
+    get: jest.fn().mockImplementation((path: string) => {
+      const mockData: Record<string, string> = {
         "PID.5.2": "John",
         "PID.5.1": "Doe",
         "PID.7.1": "19900101",
@@ -355,7 +355,7 @@ describe("API Query with Mutual TLS", () => {
         callback();
       }
       return 0 as unknown as NodeJS.Timeout;
-    });
+    }) as unknown as typeof setTimeout;
 
     mockFhirClient = {
       get: jest.fn(),
