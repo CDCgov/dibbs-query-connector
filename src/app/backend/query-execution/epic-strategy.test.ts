@@ -47,7 +47,10 @@ const RXNORM_CODE = "1665005";
 const OTHER_RXNORM_CODE = "999999";
 const SNOMED_CODE = "240589008";
 
-function buildSavedQuery(): QueryTableResult {
+function buildSavedQuery(
+  options: { labCodes?: string[]; socialDeterminants?: boolean } = {},
+): QueryTableResult {
+  const labCodes = options.labCodes ?? [LOINC_CODE];
   const labsValueSet: DibbsValueSet = {
     valueSetId: "vs-labs",
     valueSetVersion: "1",
@@ -56,7 +59,11 @@ function buildSavedQuery(): QueryTableResult {
     system: "http://loinc.org",
     dibbsConceptType: "labs",
     includeValueSet: true,
-    concepts: [{ code: LOINC_CODE, display: "HIV test", include: true }],
+    concepts: labCodes.map((code) => ({
+      code,
+      display: `Lab ${code}`,
+      include: true,
+    })),
     userCreated: false,
   };
 
@@ -97,7 +104,10 @@ function buildSavedQuery(): QueryTableResult {
     queryId: "query-hiv",
     queryData,
     conditionsList: [],
-    medicalRecordSections: EMPTY_MEDICAL_RECORD_SECTIONS,
+    medicalRecordSections: {
+      ...EMPTY_MEDICAL_RECORD_SECTIONS,
+      socialDeterminants: options.socialDeterminants ?? false,
+    },
   };
 }
 
@@ -202,19 +212,87 @@ describe("patientRecordsQuery with the epic query strategy", () => {
       `patient=${PATIENT_ID}`,
     );
 
-    // None of these resources are POSTed in epic mode; Observation and
-    // DiagnosticReport still use POST _search.
-    expect(postPaths).toEqual(
-      expect.arrayContaining([
-        "/Observation/_search",
-        "/DiagnosticReport/_search",
-      ]),
+    // Observation and DiagnosticReport are GETs too, scoped by a bare patient
+    // id and filtered by the query's lab codes.
+    const observationPath = getPaths.find((p) => p.startsWith("/Observation?"));
+    expect(observationPath).toContain(
+      `patient=${PATIENT_ID}&code=${LOINC_CODE}`,
     );
-    for (const path of postPaths) {
-      expect(path).not.toMatch(
-        /MedicationRequest|MedicationStatement|Condition|Encounter/,
+    expect(observationPath).not.toContain("Patient%2F");
+    expect(getPaths.find((p) => p.startsWith("/DiagnosticReport?"))).toContain(
+      `patient=${PATIENT_ID}&code=${LOINC_CODE}`,
+    );
+
+    // Epic documents GET-only search, so nothing is POSTed in epic mode.
+    expect(postPaths).toEqual([]);
+  });
+
+  it("chunks long lab code lists across Observation and DiagnosticReport GETs", async () => {
+    const manyCodes = Array.from({ length: 120 }, (_, i) => `${10000 + i}-1`);
+    (getSavedQueryByName as jest.Mock).mockResolvedValue(
+      buildSavedQuery({ labCodes: manyCodes }),
+    );
+
+    await runQuery();
+
+    const getPaths = mockFhirClient.get.mock.calls.map((c) => c[0] as string);
+    const observationPaths = getPaths.filter((p) =>
+      p.startsWith("/Observation?"),
+    );
+    const reportPaths = getPaths.filter((p) =>
+      p.startsWith("/DiagnosticReport?"),
+    );
+    expect(observationPaths).toHaveLength(3);
+    expect(reportPaths).toHaveLength(3);
+
+    const codesSent = (paths: string[]) =>
+      paths.flatMap((p) =>
+        (new URLSearchParams(p.split("?")[1]).get("code") ?? "").split(","),
       );
-    }
+    expect(codesSent(observationPaths)).toEqual(manyCodes);
+    expect(codesSent(reportPaths)).toEqual(manyCodes);
+    expect(mockFhirClient.post).not.toHaveBeenCalled();
+  });
+
+  it("still returns DiagnosticReports when the Observation search fails", async () => {
+    const report = {
+      resourceType: "DiagnosticReport",
+      id: "dr-1",
+      status: "final",
+      code: { coding: [{ system: "http://loinc.org", code: "36643-5" }] },
+    };
+    mockFhirClient.get.mockImplementation(async (path: string) => {
+      if (path.startsWith("/Observation?")) {
+        throw new Error("ECONNRESET");
+      }
+      if (path.startsWith("/DiagnosticReport?")) {
+        return mockBundleResponse(path, {
+          resourceType: "Bundle",
+          type: "searchset",
+          entry: [{ resource: report }],
+        });
+      }
+      return mockBundleResponse(path, EMPTY_BUNDLE);
+    });
+
+    const result = await runQuery();
+
+    expect(result.DiagnosticReport?.map((r) => r.id)).toEqual(["dr-1"]);
+    expect(result.Observation).toBeUndefined();
+  });
+
+  it("issues the social history search as a GET", async () => {
+    (getSavedQueryByName as jest.Mock).mockResolvedValue(
+      buildSavedQuery({ socialDeterminants: true }),
+    );
+
+    await runQuery();
+
+    const getPaths = mockFhirClient.get.mock.calls.map((c) => c[0] as string);
+    expect(getPaths).toContain(
+      `/Observation?patient=${PATIENT_ID}&category=social-history`,
+    );
+    expect(mockFhirClient.post).not.toHaveBeenCalled();
   });
 
   it("skips the Encounter search when no Conditions match", async () => {
@@ -236,10 +314,7 @@ describe("patientRecordsQuery with the epic query strategy", () => {
       if (path.startsWith("/Condition")) {
         throw new Error("ECONNRESET");
       }
-      return mockBundleResponse(path, EMPTY_BUNDLE);
-    });
-    mockFhirClient.post.mockImplementation(async (path: string) => {
-      if (path.startsWith("/Observation")) {
+      if (path.startsWith("/Observation?")) {
         return mockBundleResponse(path, {
           resourceType: "Bundle",
           type: "searchset",
@@ -488,9 +563,15 @@ describe("patientRecordsQuery with the epic query strategy", () => {
         "/MedicationStatement/_search",
         "/Condition/_search",
         "/Encounter/_search",
+        "/Observation/_search",
+        "/DiagnosticReport/_search",
       ]),
     );
     const getPaths = mockFhirClient.get.mock.calls.map((c) => c[0] as string);
     expect(getPaths.some((p) => p.startsWith("/Condition?"))).toBe(false);
+    expect(getPaths.some((p) => p.startsWith("/Observation?"))).toBe(false);
+    expect(getPaths.some((p) => p.startsWith("/DiagnosticReport?"))).toBe(
+      false,
+    );
   });
 });

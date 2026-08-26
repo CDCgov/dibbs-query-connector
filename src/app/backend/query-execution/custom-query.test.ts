@@ -8,6 +8,7 @@ import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { Patient } from "fhir/r4";
 
 const PATIENT_ID = "patient-123";
+const LOINC_CODE = "5199-7";
 const RXNORM_CODE = "1665005";
 const SNOMED_CODE = "240589008";
 
@@ -127,6 +128,43 @@ describe("CustomQuery medication queries", () => {
     expect(customQuery.getQuery("medicationStatement").basePath).toBe("");
   });
 });
+
+function buildLabsQuery(
+  queryStrategy: "default" | "epic" = "default",
+  labCodes: string[] = [LOINC_CODE],
+  timeboxWindows?: QueryTableResult["timeboxWindows"],
+  socialDeterminants = false,
+): CustomQuery {
+  const labsValueSet: DibbsValueSet = {
+    valueSetId: "vs-labs",
+    valueSetVersion: "1",
+    valueSetName: "Test Labs",
+    author: "test",
+    system: "http://loinc.org",
+    dibbsConceptType: "labs",
+    includeValueSet: true,
+    concepts: labCodes.map((code) => ({
+      code,
+      display: `Lab ${code}`,
+      include: true,
+    })),
+    userCreated: false,
+  };
+
+  const savedQuery: QueryTableResult = {
+    queryName: "Test Labs Query",
+    queryId: "query-labs",
+    queryData: { "condition-1": { "vs-labs": labsValueSet } },
+    conditionsList: [],
+    medicalRecordSections: {
+      ...EMPTY_MEDICAL_RECORD_SECTIONS,
+      socialDeterminants,
+    },
+    timeboxWindows,
+  };
+
+  return new CustomQuery(savedQuery, PATIENT_ID, queryStrategy);
+}
 
 describe("CustomQuery epic strategy", () => {
   it("keeps default-mode query shapes unchanged", () => {
@@ -269,6 +307,92 @@ describe("CustomQuery epic strategy", () => {
     const manyIds = Array.from({ length: 60 }, (_, i) => `cond-${i}`);
     expect(customQuery.compileEpicEncounterQueries(manyIds)).toHaveLength(3);
     expect(customQuery.compileEpicEncounterQueries([])).toHaveLength(0);
+  });
+
+  it("does not compile Observation or DiagnosticReport queries into the resource dictionary", () => {
+    const customQuery = buildLabsQuery("epic");
+    expect(customQuery.getQuery("observation").basePath).toBe("");
+    expect(customQuery.getQuery("diagnosticReport").basePath).toBe("");
+    expect(customQuery.compileAllPostRequests()).toHaveLength(0);
+
+    const defaultQuery = buildLabsQuery("default");
+    expect(defaultQuery.getQuery("observation").basePath).toBe(
+      "/Observation/_search",
+    );
+    expect(defaultQuery.getQuery("diagnosticReport").basePath).toBe(
+      "/DiagnosticReport/_search",
+    );
+    expect(defaultQuery.getQuery("observation").params.get("subject")).toBe(
+      `Patient/${PATIENT_ID}`,
+    );
+  });
+
+  it("compiles GET-based Observation and DiagnosticReport queries with the lab codes", () => {
+    const customQuery = buildLabsQuery("epic", [LOINC_CODE], {
+      labs: {
+        timeWindowStart: "2024-01-01T00:00:00Z",
+        timeWindowEnd: "2024-12-31T00:00:00Z",
+      },
+    });
+    const resultQueries = customQuery.compileEpicResultQueries();
+
+    expect(resultQueries.map((q) => q.basePath)).toEqual([
+      "/Observation",
+      "/DiagnosticReport",
+    ]);
+    for (const query of resultQueries) {
+      // Epic's search expects a bare patient id, not a Patient/ reference.
+      expect(query.params.get("patient")).toBe(PATIENT_ID);
+      expect(query.params.get("subject")).toBeNull();
+      expect(query.params.get("code")).toBe(LOINC_CODE);
+      expect(query.params.getAll("date")).toEqual([
+        "ge2024-01-01",
+        "le2024-12-31",
+      ]);
+    }
+    // Each query owns its params (the default path shares one object).
+    expect(resultQueries[0].params).not.toBe(resultQueries[1].params);
+
+    expect(buildLabsQuery("epic", []).compileEpicResultQueries()).toHaveLength(
+      0,
+    );
+  });
+
+  it("chunks long lab code lists across multiple GET queries per resource", () => {
+    const manyCodes = Array.from({ length: 120 }, (_, i) => `${10000 + i}-1`);
+    const resultQueries = buildLabsQuery(
+      "epic",
+      manyCodes,
+    ).compileEpicResultQueries();
+
+    expect(resultQueries).toHaveLength(6);
+    for (const basePath of ["/Observation", "/DiagnosticReport"]) {
+      const codes = resultQueries
+        .filter((q) => q.basePath === basePath)
+        .flatMap((q) => (q.params.get("code") ?? "").split(","));
+      expect(codes).toEqual(manyCodes);
+    }
+  });
+
+  it("builds the social history query as a GET with a bare patient id", () => {
+    const socialHistory = buildLabsQuery("epic", [], undefined, true).getQuery(
+      "socialHistory",
+    );
+    expect(socialHistory.basePath).toBe("/Observation");
+    expect(socialHistory.params.get("patient")).toBe(PATIENT_ID);
+    expect(socialHistory.params.get("subject")).toBeNull();
+    expect(socialHistory.params.get("category")).toBe("social-history");
+
+    const defaultSocialHistory = buildLabsQuery(
+      "default",
+      [],
+      undefined,
+      true,
+    ).getQuery("socialHistory");
+    expect(defaultSocialHistory.basePath).toBe("/Observation/_search");
+    expect(defaultSocialHistory.params.get("subject")).toBe(
+      `Patient/${PATIENT_ID}`,
+    );
   });
 });
 
