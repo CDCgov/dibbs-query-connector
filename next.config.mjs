@@ -31,6 +31,11 @@ const nextConfig = {
   transpilePackages: ["yaml"],
   serverExternalPackages: ["@aws-sdk/client-secrets-manager"],
   output: "standalone",
+  // The /docs/files route reads the PDF/XLSX docs from src/docs at runtime, so
+  // make sure they're copied into the standalone output.
+  outputFileTracingIncludes: {
+    "/docs/files/[file]": ["./src/docs/*.pdf", "./src/docs/*.xlsx"],
+  },
   basePath: "",
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
 };

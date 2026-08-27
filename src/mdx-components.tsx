@@ -2,22 +2,42 @@ import type { MDXComponents } from "mdx/types";
 import Image, { ImageProps } from "next/image";
 import Link from "next/link";
 import { AnchorHTMLAttributes } from "react";
+import {
+  TABLE_OF_CONTENTS_SLUG,
+  docPathForFile,
+  resolveDocFile,
+  stripMdxExtension,
+} from "@/app/utils/docs-file-map";
 
 /**
  * Rewrites links so they work both on the rendered Next.js site and on GitHub:
- * - Relative `.mdx` links (e.g. `./user-guide.mdx`) become site paths (`/docs/user-guide`)
+ * - Relative doc links (e.g. `./user-guide.mdx`, `./User Guide.pdf`) become the
+ *   site paths from DOCS_FILE_MAP (`/docs/user-guide`)
  * - Absolute `https://queryconnector.dev/...` links become relative paths (`/...`)
- * @param props
+ * @param props - The anchor props from MDX.
+ * @returns A Next.js Link for doc/site links, or a plain anchor otherwise.
  */
 function MdxLink(props: AnchorHTMLAttributes<HTMLAnchorElement>) {
   const { href, ...rest } = props;
-  if (href && /^\.\/.*\.mdx(#.*)?$/.test(href)) {
+  if (href && href.startsWith("./")) {
     const [path, fragment] = href.split("#");
-    const slug = path.replace(/^\.\//, "").replace(/\.mdx$/, "");
-    const resolved = slug === "table-of-contents" ? "/docs" : `/docs/${slug}`;
-    return (
-      <Link {...rest} href={fragment ? `${resolved}#${fragment}` : resolved} />
-    );
+    const target = path.replace(/^\.\//, "");
+    const fileName = resolveDocFile(target);
+    const resolved = fileName
+      ? docPathForFile(fileName)
+      : /\.mdx$/.test(target)
+        ? `/docs/${stripMdxExtension(target)}`
+        : undefined;
+    if (resolved) {
+      const sitePath =
+        resolved === `/docs/${TABLE_OF_CONTENTS_SLUG}` ? "/docs" : resolved;
+      return (
+        <Link
+          {...rest}
+          href={fragment ? `${sitePath}#${fragment}` : sitePath}
+        />
+      );
+    }
   }
   if (href && href.startsWith("https://queryconnector.dev/")) {
     const path = href.replace("https://queryconnector.dev", "");
