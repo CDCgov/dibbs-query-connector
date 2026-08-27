@@ -26,24 +26,31 @@ The current methods that public health jurisdictions use to collect data from HC
 
 You can find more detailed documentation, guides, and tutorials here:
 
+You can find more detailed documentation, guides, and tutorials here:
+
 - For public health case investigators:
 
-  - [Query Connector User Guide](src/docs/user-guide.mdx)
+  - [Frequently Asked Questions](<./Frequently Asked Questions Guide.pdf>)
+  - [User Acceptance Testing Guide](<./User Acceptance Testing Guide.pdf>)
+  - [User Acceptance Testing Checklist](<./User Acceptance Testing Checklist.xlsx>)
+  - [User Guide](<./User Guide.pdf>)
 
 - For public health IT staff:
 
-  - [Deploying Query Connector](src/docs/deployment.mdx)
-  - [Configuring your Identity Provider](src/docs/idp-setup.mdx)
-  - [API Docs](src/docs/api.mdx)
-  - [Mutual TLS Setup](src/docs/mutual-tls-setup.mdx)
-  - [FHIR Connection Guide (Epic)](src/docs/fhir-connection-guide.mdx)
-  - [ONC audit log compliance](src/docs/audit-log.mdx)
+  - [IT Guide](<./IT Guide.pdf>)
+  - [Deploying Query Connector](<./Deployment Guide.mdx>)
+  - [Configuring your Identity Provider](<./IDP Configuration.mdx>)
+  - [API Docs](<./API Reference Documentation.mdx>)
+  - [Mutual TLS Setup](<./Mutual TLS Testing Setup Guide.mdx>)
+  - [FHIR Connection Guide (Epic)](<./FHIR Connection Guide.mdx>)
+  - [ONC audit log compliance](<./Audit Logging.mdx>)
+  - [Maintenance Guide](<./Maintenance Guide.pdf>)
 
 - For developers:
 
-  - [Local development](src/docs/development.mdx)
-  - [Contributing changes](src/docs/contributing.mdx)
-  - [Release process](src/docs/release.mdx)
+  - [Local development](<./Local Development Guide.mdx>)
+  - [Contributing changes](>./Contributing.mdx>)
+  - [Release process](<./Release Documentation.mdx>)
 
 ## Try it out!
 
