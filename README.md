@@ -28,22 +28,27 @@ You can find more detailed documentation, guides, and tutorials here:
 
 - For public health case investigators:
 
-  - [Query Connector User Guide](src/docs/user-guide.mdx)
+  - [Frequently Asked Questions](<src/docs/Frequently Asked Questions Guide.pdf>)
+  - [User Acceptance Testing Guide](<src/docs/User Acceptance Testing Guide.pdf>)
+  - [User Acceptance Testing Checklist](<src/docs/User Acceptance Testing Checklist.xlsx>)
+  - [User Guide](<src/docs/User Guide.pdf>)
 
 - For public health IT staff:
 
-  - [Deploying Query Connector](src/docs/deployment.mdx)
-  - [Configuring your Identity Provider](src/docs/idp-setup.mdx)
-  - [API Docs](src/docs/api.mdx)
-  - [Mutual TLS Setup](src/docs/mutual-tls-setup.mdx)
-  - [FHIR Connection Guide (Epic)](src/docs/fhir-connection-guide.mdx)
-  - [ONC audit log compliance](src/docs/audit-log.mdx)
+  - [IT Guide](<src/docs/IT Guide.pdf>)
+  - [Deploying Query Connector](<src/docs/Deployment Guide.mdx>)
+  - [Configuring your Identity Provider](<src/docs/IDP Configuration.mdx>)
+  - [API Docs](<src/docs/API Reference Documentation.mdx>)
+  - [Mutual TLS Setup](<src/docs/Mutual TLS Testing Setup Guide.mdx>)
+  - [FHIR Connection Guide (Epic)](<src/docs/FHIR Connection Guide.mdx>)
+  - [ONC audit log compliance](<src/docs/Audit Logging.mdx>)
+  - [Maintenance Guide](<src/docs/Maintenance Guide.pdf>)
 
 - For developers:
 
-  - [Local development](src/docs/development.mdx)
-  - [Contributing changes](src/docs/contributing.mdx)
-  - [Release process](src/docs/release.mdx)
+  - [Local development](<src/docs/Local Development Guide.mdx>)
+  - [Contributing changes](src/docs/Contributing.mdx)
+  - [Release process](<src/docs/Release Documentation.mdx>)
 
 ## Try it out!
 
@@ -63,7 +68,7 @@ npm run setup-local-env  # generates .env from .env.sample
 npm run dev              # starts Docker services + Next.js dev server
 ```
 
-The app will be available at [http://localhost:3000](http://localhost:3000). See the [local development guide](src/docs/development.mdx) for the full setup, including test commands and optional services.
+The app will be available at [http://localhost:3000](http://localhost:3000). See the [local development guide](<src/docs/Local Development Guide.mdx>) for the full setup, including test commands and optional services.
 
 ## Additional Acknowledgments
 
@@ -114,7 +119,7 @@ later.
 All comments, messages, pull requests, and other submissions received through
 CDC including this GitHub page may be subject to applicable federal law, including but not limited to the Federal Records Act, and may be archived. Learn more at [http://www.cdc.gov/other/privacy.html](http://www.cdc.gov/other/privacy.html).
 
-See the [contributing guide](src/docs/contributing.mdx) for more information.
+See the [contributing guide](src/docs/Contributing.mdx) for more information.
 
 ### Records Management Standard Notice
 
@@ -124,8 +129,8 @@ published through the [CDC web site](http://www.cdc.gov).
 
 ### Related documents
 
-- [Disclaimer](src/docs/disclaimer.mdx)
-- [Contribution Notice](src/docs/contributing.mdx)
+- [Disclaimer](src/docs/Disclaimer.mdx)
+- [Contribution Notice](src/docs/Contributing.mdx)
 
 ### Additional Standard Notices
 
