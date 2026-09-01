@@ -13,7 +13,7 @@ Query results are returned as a FHIR Bundle containing the patient's records. De
 
 - `Patient`
 - `Observation` (lab results, plus social determinants of health if enabled for the query)
-- `DiagnosticReport`
+- `DiagnosticReport` (plus the `Observation` resources its `result` element references, which carry a report's narrative, impression, or panel members)
 - `Condition`
 - `Encounter`
 - `MedicationRequest`
@@ -22,7 +22,7 @@ Query results are returned as a FHIR Bundle containing the patient's records. De
 - `ImmunizationRecommendation` (immunization forecast, from Immunization Gateway servers)
 - `ServiceRequest`
 
-Lab, condition, and medication resources are filtered to the value set codes configured in the query. `Immunization`, social determinants `Observation`, and `ServiceRequest` resources are returned when the corresponding medical record sections are enabled for the query. Servers configured with the Immunization Gateway endpoint type also return `ImmunizationRecommendation` resources alongside `Immunization`. Medication and service request queries may also return related resources (such as `Medication`, `MedicationAdministration`, `Practitioner`, and `Specimen`) via `_include`/`_revinclude` search parameters.
+Lab, condition, and medication resources are filtered to the value set codes configured in the query. `Immunization`, social determinants `Observation`, and `ServiceRequest` resources are returned when the corresponding medical record sections are enabled for the query. Servers configured with the Immunization Gateway endpoint type also return `ImmunizationRecommendation` resources alongside `Immunization`. Medication and service request queries may also return related resources (such as `Medication`, `MedicationAdministration`, `Practitioner`, and `Specimen`) via `_include`/`_revinclude` search parameters, and the `DiagnosticReport` search requests `_include=DiagnosticReport:result` so a report's referenced `Observation` resources are returned even when their codes are not in the query's value sets.
 
 ## Authentication
 

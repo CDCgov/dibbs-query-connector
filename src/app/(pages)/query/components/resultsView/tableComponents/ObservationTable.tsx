@@ -5,7 +5,10 @@ import {
   formatCodeableConcept,
   formatDate,
 } from "../../../../../utils/format-service";
-import { checkIfSomeElementWithPropertyExists } from "./utils";
+import {
+  checkIfSomeElementWithPropertyExists,
+  formatObservationValue,
+} from "./utils";
 
 /**
  * The props for the ObservationTable component.
@@ -56,7 +59,7 @@ const ObservationTable: React.FC<ObservationTableProps> = ({
                   : ""}
               </td>
             )}
-            <td>{formatValue(obs)}</td>
+            <td>{formatObservationValue(obs)}</td>
             {availableElements.referenceRange && (
               <td>{formatReferenceRange(obs)}</td>
             )}
@@ -67,22 +70,6 @@ const ObservationTable: React.FC<ObservationTableProps> = ({
   );
 };
 export default ObservationTable;
-
-/**
- * Formats the value of an Observation object for display.
- * @param obs - The Observation object.
- * @returns The value of the Observation object formatted for display.
- */
-function formatValue(obs: Observation) {
-  if (obs.valueCodeableConcept) {
-    return formatCodeableConcept(obs.valueCodeableConcept);
-  } else if (obs.valueQuantity) {
-    return [obs.valueQuantity.value, obs.valueQuantity.unit].join(" ");
-  } else if (obs.valueString) {
-    return obs.valueString;
-  }
-  return "";
-}
 
 /**
  * Formats the reference range of an Observation object for display.

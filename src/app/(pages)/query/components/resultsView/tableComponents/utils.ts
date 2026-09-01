@@ -1,3 +1,40 @@
+import { CodeableConcept, Observation } from "fhir/r4";
+import { formatCodeableConcept } from "../../../../../utils/format-service";
+
+/**
+ * Formats the value of an Observation for display, whichever value[x]
+ * variant it carries.
+ * @param obs - The Observation resource.
+ * @returns The formatted value, or an empty string when the Observation has
+ * no displayable value.
+ */
+export function formatObservationValue(obs: Observation) {
+  if (obs.valueCodeableConcept) {
+    return formatCodeableConcept(obs.valueCodeableConcept);
+  } else if (obs.valueQuantity) {
+    return [obs.valueQuantity.value, obs.valueQuantity.unit].join(" ");
+  } else if (obs.valueString) {
+    return obs.valueString;
+  }
+  return "";
+}
+
+/**
+ * Plain-text rendering of a CodeableConcept, for places where the JSX
+ * produced by formatCodeableConcept doesn't fit (a label inside a cell).
+ * @param concept - The CodeableConcept, if any.
+ * @returns The concept's text, else its first coding's display, else that
+ * coding's code, else an empty string.
+ */
+export function codeableConceptText(concept?: CodeableConcept): string {
+  return (
+    concept?.text ??
+    concept?.coding?.[0]?.display ??
+    concept?.coding?.[0]?.code ??
+    ""
+  );
+}
+
 /**
  * Helper function to not display tables in results view where there are no
  * elements in a column to display. Allows for non-lengthwise properties

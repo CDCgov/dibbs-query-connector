@@ -1,18 +1,46 @@
 @use "../../../../../ui/styles/_variables" as *;
 
-.medicationsFixedTable table{
-    table-layout: fixed;
-    word-wrap: break-word;
+.medicationsFixedTable table {
+  table-layout: fixed;
+  word-wrap: break-word;
 
-    thead tr th{
-        width: 32%;
+  thead tr th {
+    width: 32%;
 
-        &:first-child{
-            width:20%;
-        }
-
-        &:last-child{
-            width:15%;
-        }
+    &:first-child {
+      width: 20%;
     }
+
+    &:last-child {
+      width: 15%;
+    }
+  }
+}
+
+.diagnosticReportsFixedTable table {
+  table-layout: fixed;
+  word-wrap: break-word;
+
+  thead tr th {
+    width: 30%;
+
+    &:first-child {
+      width: 20%;
+    }
+
+    &:last-child {
+      width: 50%;
+    }
+  }
+}
+
+// Report narratives and impressions arrive as multi-paragraph text, so the
+// cell keeps their line breaks.
+.reportResult {
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  & + & {
+    margin-top: 0.5rem;
+  }
 }
