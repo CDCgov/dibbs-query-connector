@@ -166,6 +166,22 @@ function buildLabsQuery(
   return new CustomQuery(savedQuery, PATIENT_ID, queryStrategy);
 }
 
+describe("CustomQuery lab queries", () => {
+  it("asks default-strategy servers to include a DiagnosticReport's result Observations", () => {
+    const defaultQuery = buildLabsQuery("default");
+    const observation = defaultQuery.getQuery("observation").params;
+    const report = defaultQuery.getQuery("diagnosticReport").params;
+
+    expect(report.get("_include")).toBe("DiagnosticReport:result");
+    expect(report.get("subject")).toBe(`Patient/${PATIENT_ID}`);
+    expect(report.get("code")).toBe(observation.get("code"));
+    // The _include is specific to the report search and mustn't leak onto
+    // the Observation search, so the two searches own separate params.
+    expect(observation.get("_include")).toBeNull();
+    expect(report).not.toBe(observation);
+  });
+});
+
 describe("CustomQuery epic strategy", () => {
   it("keeps default-mode query shapes unchanged", () => {
     const customQuery = buildConditionQuery("default");

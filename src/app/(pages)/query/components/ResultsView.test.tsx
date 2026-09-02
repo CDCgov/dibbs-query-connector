@@ -1,6 +1,6 @@
 import { renderWithUser } from "@/app/tests/unit/setup";
 import ResultsView from "./ResultsView";
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import type { PatientRecordsResponse } from "../../../backend/query-execution/service";
 
 const TEST_QUERY = {
@@ -34,6 +34,16 @@ const POPULATED_RESPONSE = {
       resourceType: "Condition",
       id: "c1",
       code: { text: "Chlamydia" },
+    },
+  ],
+  DiagnosticReport: [
+    {
+      resourceType: "DiagnosticReport",
+      id: "dr1",
+      status: "final",
+      code: { text: "XR Chest 2 Views" },
+      effectiveDateTime: "2026-02-25T08:00:00Z",
+      result: [{ reference: "Observation/o1", display: "Impression" }],
     },
   ],
   MedicationRequest: [
@@ -164,6 +174,25 @@ describe("ResultsView", () => {
 
     // Rendered child-table content confirms the resources were mapped through.
     expect(screen.getByText("Hyper Unlucky")).toBeInTheDocument();
+    expect(screen.getByText("Glucose")).toBeInTheDocument();
+  });
+
+  it("shows a DiagnosticReport's referenced result Observations under the report", () => {
+    renderWithUser(
+      <ResultsView
+        patientRecordsResponse={POPULATED_RESPONSE}
+        selectedQuery={TEST_QUERY}
+        goBack={() => {}}
+        goToBeginning={() => {}}
+        loading={false}
+      />,
+    );
+
+    const reportRow = screen.getByRole("row", { name: /XR Chest 2 Views/ });
+    expect(within(reportRow).getByText("Impression")).toBeInTheDocument();
+    expect(within(reportRow).getByText("5.4 mg/dL")).toBeInTheDocument();
+    // The Observation still appears in the Observations table as well.
+    expect(screen.getAllByText("5.4 mg/dL")).toHaveLength(2);
     expect(screen.getByText("Glucose")).toBeInTheDocument();
   });
 

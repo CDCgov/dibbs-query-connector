@@ -131,7 +131,7 @@ test.describe("querying with the Query Connector", () => {
         .getByRole("table")
         .getByRole("row")
         .filter({ hasText: "Chlamydia trachomatis DNA" }),
-    ).toHaveCount(4);
+    ).toHaveCount(6);
     // Encounters
     await expect(
       page
@@ -385,19 +385,20 @@ test.describe("alternate queries with the Query Connector", () => {
         .filter({ hasText: "Vancomycin resistant enterococcus" }),
     ).toHaveCount(2);
     // The molecular results are members of the nares report rather than reports
-    // in their own right, so they stay at one row each.
+    // in their own right: one Observation row each, plus the nares report row
+    // that lists them under its Results column.
     await expect(
       page
         .getByRole("table")
         .getByRole("row")
         .filter({ hasText: "Methicillin resistance mecA gene" }),
-    ).toHaveCount(1);
+    ).toHaveCount(2);
     await expect(
       page
         .getByRole("table")
         .getByRole("row")
         .filter({ hasText: "Vancomycin resistance vanA gene" }),
-    ).toHaveCount(1);
+    ).toHaveCount(2);
 
     // June infections: the MRSA sacral-wound Condition is a single row, while
     // the carbapenem-resistant Enterobacteriaceae code drives both a Condition

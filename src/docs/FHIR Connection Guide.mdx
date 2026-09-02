@@ -192,6 +192,13 @@ that would otherwise cause queries to silently return incomplete records:
   and DiagnosticReport. With the Epic strategy, every patient record search
   is sent as a GET, with long code lists split across multiple requests to
   keep URLs short.
+- Epic stores a report's text (a radiology narrative and impression, a
+  panel's member results) as Observations referenced from
+  `DiagnosticReport.result`, and its DiagnosticReport search ignores
+  `_include`. With the Epic strategy, QC reads each referenced Observation
+  that the lab search did not already return (up to 200 per query) so the
+  report's text can be displayed alongside the report. This can include panel
+  member results whose codes are not in the query's value sets.
 
 Optional settings:
 

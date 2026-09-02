@@ -212,7 +212,10 @@ function mapQueryResponseToAccordionDataStructure(
     {
       title: "Diagnostic Reports",
       content: diagnosticReports ? (
-        <DiagnosticReportTable diagnosticReports={diagnosticReports} />
+        <DiagnosticReportTable
+          diagnosticReports={diagnosticReports}
+          observations={observations ?? []}
+        />
       ) : null,
     },
     {
