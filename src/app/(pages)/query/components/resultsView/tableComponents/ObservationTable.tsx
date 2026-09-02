@@ -9,6 +9,7 @@ import {
   checkIfSomeElementWithPropertyExists,
   formatObservationValue,
 } from "./utils";
+import styles from "./resultsTables.module.scss";
 
 /**
  * The props for the ObservationTable component.
@@ -59,7 +60,9 @@ const ObservationTable: React.FC<ObservationTableProps> = ({
                   : ""}
               </td>
             )}
-            <td>{formatObservationValue(obs)}</td>
+            <td className={styles.multilineValue}>
+              {formatObservationValue(obs)}
+            </td>
             {availableElements.referenceRange && (
               <td>{formatReferenceRange(obs)}</td>
             )}

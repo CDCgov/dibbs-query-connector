@@ -94,7 +94,9 @@ function renderResults(
     const value = observation ? formatObservationValue(observation) : "";
     if (!label && !value) return null;
     return (
-      <div key={ref.reference ?? index} className={styles.reportResult}>
+      // A report can list the same reference more than once, so the key
+      // can't be the reference alone.
+      <div key={index} className={styles.reportResult}>
         {label && <strong>{label}</strong>}
         {value && <div>{value}</div>}
       </div>

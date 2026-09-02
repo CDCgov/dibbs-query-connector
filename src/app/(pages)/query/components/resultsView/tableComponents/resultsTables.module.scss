@@ -35,10 +35,14 @@
 }
 
 // Report narratives and impressions arrive as multi-paragraph text, so the
-// cell keeps their line breaks.
-.reportResult {
+// cells that show them keep their line breaks.
+.multilineValue {
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.reportResult {
+  @extend .multilineValue;
 
   & + & {
     margin-top: 0.5rem;

@@ -37,4 +37,22 @@ describe("referencedResourceId", () => {
     expect(referencedResourceId("", "Observation")).toBeUndefined();
     expect(referencedResourceId(undefined, "Observation")).toBeUndefined();
   });
+
+  it("rejects ids outside the FHIR id charset, so the id is always a plain path segment", () => {
+    expect(
+      referencedResourceId("Observation/..", "Observation"),
+    ).toBeUndefined();
+    expect(
+      referencedResourceId("Observation/abc%2Fdef", "Observation"),
+    ).toBeUndefined();
+    expect(
+      referencedResourceId("Observation/abc?_format=json", "Observation"),
+    ).toBeUndefined();
+    expect(
+      referencedResourceId("Observation/abc/extra", "Observation"),
+    ).toBeUndefined();
+    expect(
+      referencedResourceId(`Observation/${"a".repeat(65)}`, "Observation"),
+    ).toBeUndefined();
+  });
 });
