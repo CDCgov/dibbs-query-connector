@@ -553,6 +553,205 @@ describe("patientRecordsQuery with the epic query strategy", () => {
     ]);
   });
 
+  describe("DiagnosticReport result Observations", () => {
+    const observationReads = () =>
+      mockFhirClient.get.mock.calls
+        .map((c) => c[0] as string)
+        .filter((p) => p.startsWith("/Observation/"));
+
+    const report = (id: string, references: object[]) => ({
+      resourceType: "DiagnosticReport",
+      id,
+      status: "final",
+      code: { coding: [{ system: "http://loinc.org", code: LOINC_CODE }] },
+      result: references,
+    });
+
+    const observation = (id: string, valueString: string) => ({
+      resourceType: "Observation",
+      id,
+      status: "final",
+      code: { text: "Narrative" },
+      valueString,
+    });
+
+    it("reads the result Observations the Observation search didn't return (Epic ignores _include)", async () => {
+      const chestXray = report("dr-cxr", [
+        { reference: "Observation/obs-narrative", display: "Narrative" },
+        { reference: "Observation/obs-in-search", display: "Impression" },
+        // Schemed and contained references can't be read from this server.
+        { reference: "urn:uuid:not-a-local-id" },
+        { reference: "#contained" },
+      ]);
+      mockFhirClient.get.mockImplementation(async (path: string) => {
+        if (path.startsWith("/Observation?")) {
+          return mockBundleResponse(path, {
+            resourceType: "Bundle",
+            type: "searchset",
+            entry: [{ resource: observation("obs-in-search", "Normal.") }],
+          });
+        }
+        if (path.startsWith("/DiagnosticReport?")) {
+          return mockBundleResponse(path, {
+            resourceType: "Bundle",
+            type: "searchset",
+            entry: [{ resource: chestXray }],
+          });
+        }
+        // Reads return the bare resource, not a searchset Bundle.
+        if (path === "/Observation/obs-narrative") {
+          return mockBundleResponse(
+            path,
+            observation("obs-narrative", "The lungs are clear."),
+          );
+        }
+        return mockBundleResponse(path, EMPTY_BUNDLE);
+      });
+
+      const result = await runQuery();
+
+      expect(observationReads()).toEqual(["/Observation/obs-narrative"]);
+      expect(result.DiagnosticReport?.map((r) => r.id)).toEqual(["dr-cxr"]);
+      expect(result.Observation?.map((o) => o.id).sort()).toEqual([
+        "obs-in-search",
+        "obs-narrative",
+      ]);
+      expect(
+        result.Observation?.find((o) => o.id === "obs-narrative")?.valueString,
+      ).toBe("The lungs are clear.");
+    });
+
+    it("reads each referenced Observation once across chunked DiagnosticReport searches", async () => {
+      const manyCodes = Array.from({ length: 120 }, (_, i) => `${10000 + i}-1`);
+      (getSavedQueryByName as jest.Mock).mockResolvedValue(
+        buildSavedQuery({ labCodes: manyCodes }),
+      );
+      mockFhirClient.get.mockImplementation(async (path: string) => {
+        if (path.startsWith("/DiagnosticReport?")) {
+          return mockBundleResponse(path, {
+            resourceType: "Bundle",
+            type: "searchset",
+            entry: [
+              {
+                resource: report("dr-1", [
+                  { reference: "Observation/obs-shared" },
+                ]),
+              },
+            ],
+          });
+        }
+        if (path === "/Observation/obs-shared") {
+          return mockBundleResponse(path, observation("obs-shared", "text"));
+        }
+        return mockBundleResponse(path, EMPTY_BUNDLE);
+      });
+
+      const result = await runQuery();
+
+      expect(observationReads()).toEqual(["/Observation/obs-shared"]);
+      expect(result.Observation?.map((o) => o.id)).toEqual(["obs-shared"]);
+    });
+
+    it("caps the number of result Observation reads", async () => {
+      const references = Array.from({ length: 250 }, (_, i) => ({
+        reference: `Observation/obs-${i}`,
+      }));
+      mockFhirClient.get.mockImplementation(async (path: string) => {
+        if (path.startsWith("/DiagnosticReport?")) {
+          return mockBundleResponse(path, {
+            resourceType: "Bundle",
+            type: "searchset",
+            entry: [{ resource: report("dr-big", references) }],
+          });
+        }
+        if (path.startsWith("/Observation/")) {
+          const id = path.slice("/Observation/".length);
+          return mockBundleResponse(path, observation(id, "text"));
+        }
+        return mockBundleResponse(path, EMPTY_BUNDLE);
+      });
+
+      const result = await runQuery();
+
+      expect(observationReads()).toHaveLength(200);
+      expect(result.Observation).toHaveLength(200);
+      expect(result.DiagnosticReport?.map((r) => r.id)).toEqual(["dr-big"]);
+    });
+
+    it("drops failed and non-Observation reads without losing the report", async () => {
+      mockFhirClient.get.mockImplementation(async (path: string) => {
+        if (path.startsWith("/DiagnosticReport?")) {
+          return mockBundleResponse(path, {
+            resourceType: "Bundle",
+            type: "searchset",
+            entry: [
+              {
+                resource: report("dr-1", [
+                  { reference: "Observation/obs-404" },
+                  { reference: "Observation/obs-outcome" },
+                  { reference: "Observation/obs-rejected" },
+                  { reference: "Observation/obs-ok" },
+                ]),
+              },
+            ],
+          });
+        }
+        if (path === "/Observation/obs-404") {
+          return { status: 404, url: path } as unknown as Response;
+        }
+        if (path === "/Observation/obs-outcome") {
+          return mockBundleResponse(path, {
+            resourceType: "OperationOutcome",
+            issue: [{ severity: "error", code: "forbidden" }],
+          });
+        }
+        if (path === "/Observation/obs-rejected") {
+          throw new Error("ECONNRESET");
+        }
+        if (path === "/Observation/obs-ok") {
+          return mockBundleResponse(path, observation("obs-ok", "fine"));
+        }
+        return mockBundleResponse(path, EMPTY_BUNDLE);
+      });
+
+      const result = await runQuery();
+
+      expect(result.DiagnosticReport?.map((r) => r.id)).toEqual(["dr-1"]);
+      expect(result.Observation?.map((o) => o.id)).toEqual(["obs-ok"]);
+      expect(result.OperationOutcome).toBeUndefined();
+    });
+
+    it("still reads result Observations when the Observation search failed", async () => {
+      mockFhirClient.get.mockImplementation(async (path: string) => {
+        if (path.startsWith("/Observation?")) {
+          throw new Error("ECONNRESET");
+        }
+        if (path.startsWith("/DiagnosticReport?")) {
+          return mockBundleResponse(path, {
+            resourceType: "Bundle",
+            type: "searchset",
+            entry: [
+              {
+                resource: report("dr-1", [
+                  { reference: "Observation/obs-narrative" },
+                ]),
+              },
+            ],
+          });
+        }
+        if (path === "/Observation/obs-narrative") {
+          return mockBundleResponse(path, observation("obs-narrative", "x"));
+        }
+        return mockBundleResponse(path, EMPTY_BUNDLE);
+      });
+
+      const result = await runQuery();
+
+      expect(observationReads()).toEqual(["/Observation/obs-narrative"]);
+      expect(result.Observation?.map((o) => o.id)).toEqual(["obs-narrative"]);
+    });
+  });
+
   it("keeps the default POST _search behavior for default-strategy servers", async () => {
     await runQuery("Standard Server");
 
@@ -567,6 +766,20 @@ describe("patientRecordsQuery with the epic query strategy", () => {
         "/DiagnosticReport/_search",
       ]),
     );
+    // Default-strategy servers are asked to include a report's result
+    // Observations in the same bundle instead of QC reading them.
+    const reportSearch = mockFhirClient.post.mock.calls.find(
+      (c) => c[0] === "/DiagnosticReport/_search",
+    );
+    expect((reportSearch?.[1] as URLSearchParams).get("_include")).toBe(
+      "DiagnosticReport:result",
+    );
+    const observationSearch = mockFhirClient.post.mock.calls.find(
+      (c) => c[0] === "/Observation/_search",
+    );
+    expect(
+      (observationSearch?.[1] as URLSearchParams).get("_include"),
+    ).toBeNull();
     const getPaths = mockFhirClient.get.mock.calls.map((c) => c[0] as string);
     expect(getPaths.some((p) => p.startsWith("/Condition?"))).toBe(false);
     expect(getPaths.some((p) => p.startsWith("/Observation?"))).toBe(false);
