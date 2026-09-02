@@ -1,12 +1,5 @@
 "use server";
-import {
-  Bundle,
-  FhirResource,
-  Medication,
-  OperationOutcome,
-  Patient,
-  Task,
-} from "fhir/r4";
+import { Bundle, FhirResource, OperationOutcome, Patient, Task } from "fhir/r4";
 
 import {
   isFhirResource,
@@ -28,6 +21,7 @@ import {
   referencedMedicationKey,
 } from "./medication-filter";
 import { GetPhoneQueryFormats } from "../../utils/format-service";
+import { referencedResourceId } from "../../utils/fhir-reference";
 import { auditable } from "../audit-logs/decorator";
 import type { QueryTableResult } from "../../(pages)/queryBuilding/utils";
 import type {
@@ -75,14 +69,15 @@ const TASK_POLLING = {
   RETRY_DELAY_MS: 5000,
 } as const;
 
-// Epic-mode Medication reads (see runEpicMedicationRequestChain) are capped so
-// a patient with an enormous medication history can't fan out into an
+// Epic-mode reads of referenced resources (see readEpicResourcesById) are
+// capped so a patient with an enormous history can't fan out into an
 // unbounded number of requests, and are issued in small concurrent batches to
-// avoid hammering the server. Unresolved medications are kept unfiltered by
-// the downstream code filter (fail open), so hitting the cap over-includes
-// rather than drops records.
-const EPIC_MEDICATION_READ_LIMIT = 200;
-const EPIC_MEDICATION_READ_BATCH_SIZE = 10;
+// avoid hammering the server. Hitting the cap over-includes or under-decorates
+// rather than drops records: unresolved Medications are kept unfiltered by the
+// downstream code filter (fail open), and unresolved result Observations
+// leave their DiagnosticReport without its narrative text in the UI.
+const EPIC_REFERENCE_READ_LIMIT = 200;
+const EPIC_REFERENCE_READ_BATCH_SIZE = 10;
 
 const TASK_TEMPLATE: Partial<Task> = {
   resourceType: "Task",
@@ -602,7 +597,9 @@ class QueryService {
       // referenced Medications the search didn't include (Epic ignores
       // _include) and the results are filtered to the query's codes
       // downstream. MedicationStatement isn't queried in Epic mode at all —
-      // Epic has no R4 endpoint for it.
+      // Epic has no R4 endpoint for it. DiagnosticReport searches are likewise
+      // followed by reads of the result Observations they reference, since
+      // Epic ignores _include and keeps report narratives there.
       const { basePath, params } = builtQuery.getQuery("medicationRequest");
       if (basePath !== "") {
         postPromises.push(
@@ -674,24 +671,209 @@ class QueryService {
    * as the only search method, so the query's lab codes go out as chunked
    * GETs (one Observation and one DiagnosticReport search per chunk) instead
    * of the default POST _search. Each request is independent, so one failure
-   * doesn't lose the others.
+   * doesn't lose the others. The DiagnosticReport responses are then followed
+   * up with reads of the result Observations they reference (see
+   * readEpicDiagnosticReportResultObservations).
    * @param fhirClient - client for the FHIR server being queried
    * @param builtQuery - the compiled CustomQuery
-   * @returns the Observation and DiagnosticReport responses that succeeded
+   * @returns the Observation and DiagnosticReport responses that succeeded,
+   * followed by a synthetic Bundle response carrying any result Observations
+   * the follow-up reads resolved
    */
   private static async runEpicResultQueries(
     fhirClient: FHIRClient,
     builtQuery: CustomQuery,
   ): Promise<Response[]> {
-    const results = await Promise.allSettled(
-      builtQuery
-        .compileEpicResultQueries()
-        .map(({ basePath, params }) => fhirClient.get(`${basePath}?${params}`)),
+    const specs = builtQuery.compileEpicResultQueries();
+    const settled = await Promise.allSettled(
+      specs.map(({ basePath, params }) =>
+        fhirClient.get(`${basePath}?${params}`),
+      ),
     );
-    return QueryService.collectSettledResponses(
-      results,
-      "Epic Observation/DiagnosticReport FHIR query rejected: ",
+
+    // Responses are paired with their specs by index so the DiagnosticReport
+    // searches can be told apart without parsing response URLs.
+    const observationResponses: Response[] = [];
+    const reportResponses: Response[] = [];
+    const searchResponses: Response[] = [];
+    settled.forEach((result, i) => {
+      if (result.status !== "fulfilled") {
+        console.error(
+          "Epic Observation/DiagnosticReport FHIR query rejected: ",
+          result.reason,
+        );
+        return;
+      }
+      searchResponses.push(result.value);
+      if (specs[i].basePath === "/DiagnosticReport") {
+        reportResponses.push(result.value);
+      } else {
+        observationResponses.push(result.value);
+      }
+    });
+
+    if (reportResponses.length === 0) return searchResponses;
+
+    const resultObservationResponses =
+      await QueryService.readEpicDiagnosticReportResultObservations(
+        fhirClient,
+        observationResponses,
+        reportResponses,
+      );
+    return [...searchResponses, ...resultObservationResponses];
+  }
+
+  /**
+   * Epic-mode resolution of the Observations a DiagnosticReport's `result`
+   * element references. Epic represents a report's text (a radiology
+   * narrative and impression, a panel's member results) as Observations
+   * referenced from the report rather than in the report itself, and its
+   * DiagnosticReport search ignores _include. The code-filtered Observation
+   * search won't return them either, since they aren't coded with the query's
+   * lab codes. So every referenced Observation the Observation search didn't
+   * already return is read individually, in small concurrent batches and up
+   * to a cap, and returned as one synthetic Bundle response for
+   * parseFhirSearch to merge (it dedupes any overlap by id).
+   * @param fhirClient - client for the FHIR server being queried
+   * @param observationResponses - the Epic Observation search responses
+   * @param reportResponses - the Epic DiagnosticReport search responses
+   * @returns a single synthetic Bundle response carrying the Observations the
+   * reads resolved, or no responses when there was nothing to read
+   */
+  private static async readEpicDiagnosticReportResultObservations(
+    fhirClient: FHIRClient,
+    observationResponses: Response[],
+    reportResponses: Response[],
+  ): Promise<Response[]> {
+    // Bodies are cloned because parseFhirSearch reads them again downstream.
+    const includedIds = new Set<string>();
+    for (const response of observationResponses) {
+      if (response.status !== 200) continue;
+      try {
+        const bundle = (await response.clone().json()) as Bundle;
+        bundle?.entry?.forEach((entry) => {
+          const resource = entry.resource as FhirResource | undefined;
+          if (resource?.resourceType === "Observation" && resource.id) {
+            includedIds.add(resource.id);
+          }
+        });
+      } catch (error) {
+        console.error(
+          "Failed to parse Epic Observation response for DiagnosticReport result resolution: ",
+          error,
+        );
+      }
+    }
+
+    // A Set dedupes references shared by reports returned in more than one
+    // chunked code query. Contained (#id) and schemed references are skipped
+    // by referencedResourceId for the same reasons as the Medication reads.
+    const referencedIds = new Set<string>();
+    for (const response of reportResponses) {
+      if (response.status !== 200) continue;
+      try {
+        const bundle = (await response.clone().json()) as Bundle;
+        bundle?.entry?.forEach((entry) => {
+          const resource = entry.resource as FhirResource | undefined;
+          if (resource?.resourceType !== "DiagnosticReport") return;
+          resource.result?.forEach((ref) => {
+            const id = referencedResourceId(ref.reference, "Observation");
+            if (id) referencedIds.add(id);
+          });
+        });
+      } catch (error) {
+        console.error(
+          "Failed to parse Epic DiagnosticReport response for result Observation resolution: ",
+          error,
+        );
+      }
+    }
+
+    return QueryService.readEpicResourcesById(
+      fhirClient,
+      "Observation",
+      [...referencedIds].filter((id) => !includedIds.has(id)),
     );
+  }
+
+  /**
+   * Reads resources of one type from an Epic server by id, in small
+   * concurrent batches and up to a cap, and wraps the ones that came back in
+   * a synthetic collection Bundle response for parseFhirSearch to merge. Epic
+   * ignores _include, so the resources a search should have carried along (a
+   * MedicationRequest's Medication, a DiagnosticReport's result Observations)
+   * are fetched this way instead. A rejected or non-200 read, or a 200 whose
+   * body isn't the requested type (an error payload, a misrouted resource),
+   * is logged and dropped rather than injected into query results.
+   * @param fhirClient - client for the FHIR server being queried
+   * @param resourceType - the resource type being read
+   * @param ids - the ids to read; those past the cap are skipped with a
+   * warning
+   * @returns a single synthetic Bundle response carrying the resources the
+   * reads resolved, or no responses when nothing was read
+   */
+  private static async readEpicResourcesById(
+    fhirClient: FHIRClient,
+    resourceType: FhirResource["resourceType"],
+    ids: string[],
+  ): Promise<Response[]> {
+    let idsToRead = ids;
+    if (idsToRead.length > EPIC_REFERENCE_READ_LIMIT) {
+      console.warn(
+        "Epic query strategy: %s distinct %s references exceed the read cap of %s; the excess are not resolved",
+        idsToRead.length,
+        resourceType,
+        EPIC_REFERENCE_READ_LIMIT,
+      );
+      idsToRead = idsToRead.slice(0, EPIC_REFERENCE_READ_LIMIT);
+    }
+
+    const resources: FhirResource[] = [];
+    for (const batch of chunkArray(idsToRead, EPIC_REFERENCE_READ_BATCH_SIZE)) {
+      const results = await Promise.allSettled(
+        batch.map((id) => fhirClient.get(`/${resourceType}/${id}`)),
+      );
+      const responses = QueryService.collectSettledResponses(
+        results,
+        `Epic ${resourceType} read rejected: `,
+      );
+      for (const response of responses) {
+        if (response.status !== 200) {
+          console.error(
+            "Epic %s read failed from %s with status %s",
+            resourceType,
+            response.url,
+            response.status,
+          );
+          continue;
+        }
+        try {
+          const body = (await response.json()) as FhirResource | null;
+          if (body?.resourceType === resourceType) {
+            resources.push(body);
+          }
+        } catch (error) {
+          console.error(
+            `Failed to parse Epic ${resourceType} read body: `,
+            error,
+          );
+        }
+      }
+    }
+
+    if (resources.length === 0) return [];
+
+    const bundle: Bundle = {
+      resourceType: "Bundle",
+      type: "collection",
+      entry: resources.map((resource) => ({ resource })),
+    };
+    return [
+      new Response(JSON.stringify(bundle), {
+        status: 200,
+        headers: { "content-type": "application/fhir+json" },
+      }),
+    ];
   }
 
   /**
@@ -823,67 +1005,14 @@ class QueryService {
       }
     });
 
-    let idsToRead = [...referencedMedicationIds].filter(
-      (id) => !includedMedicationIds.has(id),
+    const medicationResponses = await QueryService.readEpicResourcesById(
+      fhirClient,
+      "Medication",
+      [...referencedMedicationIds].filter(
+        (id) => !includedMedicationIds.has(id),
+      ),
     );
-    if (idsToRead.length > EPIC_MEDICATION_READ_LIMIT) {
-      console.warn(
-        "Epic query strategy: %s distinct Medication references exceed the read cap of %s; the excess are kept unfiltered rather than resolved",
-        idsToRead.length,
-        EPIC_MEDICATION_READ_LIMIT,
-      );
-      idsToRead = idsToRead.slice(0, EPIC_MEDICATION_READ_LIMIT);
-    }
-
-    const medications: Medication[] = [];
-    for (const batch of chunkArray(
-      idsToRead,
-      EPIC_MEDICATION_READ_BATCH_SIZE,
-    )) {
-      const results = await Promise.allSettled(
-        batch.map((id) => fhirClient.get(`/Medication/${id}`)),
-      );
-      const responses = QueryService.collectSettledResponses(
-        results,
-        "Epic Medication read rejected: ",
-      );
-      for (const response of responses) {
-        if (response.status !== 200) {
-          console.error(
-            "Epic Medication read failed from %s with status %s",
-            response.url,
-            response.status,
-          );
-          continue;
-        }
-        try {
-          const body = (await response.json()) as FhirResource | null;
-          // Only genuine Medication bodies are surfaced; anything else a
-          // server returns with a 200 (an error payload, a misrouted
-          // resource) is dropped rather than injected into query results.
-          if (body?.resourceType === "Medication") {
-            medications.push(body);
-          }
-        } catch (error) {
-          console.error("Failed to parse Epic Medication read body: ", error);
-        }
-      }
-    }
-
-    if (medications.length === 0) return [searchResponse];
-
-    const medicationBundle: Bundle = {
-      resourceType: "Bundle",
-      type: "collection",
-      entry: medications.map((medication) => ({ resource: medication })),
-    };
-    return [
-      searchResponse,
-      new Response(JSON.stringify(medicationBundle), {
-        status: 200,
-        headers: { "content-type": "application/fhir+json" },
-      }),
-    ];
+    return [searchResponse, ...medicationResponses];
   }
 
   /**

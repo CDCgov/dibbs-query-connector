@@ -307,9 +307,18 @@ export class CustomQuery {
         params: formattedParams,
       };
 
+      // A report's narrative, impression, or panel members live in the
+      // Observations its `result` element references, which the code-filtered
+      // Observation search above won't return. Spec-compliant servers include
+      // them in the same bundle via _include. (Epic ignores _include, so the
+      // Epic path reads them individually instead; see
+      // QueryService.runEpicResultQueries.) The params are copied so the
+      // _include doesn't leak onto the Observation search.
+      const reportParams = new URLSearchParams(formattedParams);
+      reportParams.append("_include", "DiagnosticReport:result");
       this.fhirResourceQueries["diagnosticReport"] = {
         basePath: `/DiagnosticReport/_search`,
-        params: formattedParams,
+        params: reportParams,
       };
     }
     // In Epic mode, Observation and DiagnosticReport queries aren't compiled
