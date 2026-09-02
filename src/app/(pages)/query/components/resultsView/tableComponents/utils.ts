@@ -14,7 +14,9 @@ export function formatObservationValue(obs: Observation) {
   } else if (obs.valueQuantity) {
     return [obs.valueQuantity.value, obs.valueQuantity.unit].join(" ");
   } else if (obs.valueString) {
-    return obs.valueString;
+    // Epic pads narrative text with leading and trailing line breaks, which
+    // would otherwise render as blank lines in a pre-wrap cell.
+    return obs.valueString.trim();
   }
   return "";
 }

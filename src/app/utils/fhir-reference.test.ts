@@ -51,8 +51,14 @@ describe("referencedResourceId", () => {
     expect(
       referencedResourceId("Observation/abc/extra", "Observation"),
     ).toBeUndefined();
-    expect(
-      referencedResourceId(`Observation/${"a".repeat(65)}`, "Observation"),
-    ).toBeUndefined();
+  });
+
+  it("accepts Epic ids, which exceed the spec's 64-character limit", () => {
+    const epicId =
+      "eyPMWgv2u2RUfsV4p1lLKuUtqyPs2-QNi2zKvbTsFYtRByc6B.cSi1iVU5V2HOpX23";
+    expect(epicId.length).toBeGreaterThan(64);
+    expect(referencedResourceId(`Observation/${epicId}`, "Observation")).toBe(
+      epicId,
+    );
   });
 });

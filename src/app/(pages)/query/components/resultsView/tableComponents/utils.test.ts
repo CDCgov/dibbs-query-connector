@@ -27,6 +27,15 @@ describe("formatObservationValue", () => {
     ).toBe("Lungs are clear.");
   });
 
+  it("trims padding around a string value but keeps interior line breaks", () => {
+    expect(
+      formatObservationValue({
+        ...base,
+        valueString: " \r\nNo findings.\r\n\r\nRefer to cardiology.\r\n\r\n",
+      }),
+    ).toBe("No findings.\r\n\r\nRefer to cardiology.");
+  });
+
   it("formats a codeable concept value", () => {
     // formatCodeableConcept renders JSX, so just confirm a value came back.
     expect(
