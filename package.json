@@ -23,12 +23,12 @@
     "test:playwright:ui": "bash ./setup-scripts/e2e_tests_local.sh"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.1113.0",
+    "@aws-sdk/client-secrets-manager": "^3.1124.0",
     "@axe-core/playwright": "^4.13.0",
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
-    "@next/mdx": "^16.3.3",
-    "@scalar/nextjs-api-reference": "^0.11.14",
+    "@next/mdx": "^16.3.4",
+    "@scalar/nextjs-api-reference": "^0.11.17",
     "@trussworks/react-uswds": "^12.0.0",
     "@types/mdx": "^2.0.14",
     "@uswds/uswds": "^3.14.0",
@@ -38,7 +38,7 @@
     "date-fns": "^4.4.0",
     "fhirpath": "^5.1.1",
     "jose": "^5.2.2",
-    "next": "^16.3.3",
+    "next": "^16.3.4",
     "next-auth": "^5.0.0-beta.32",
     "next-nprogress-bar": "^2.4.4",
     "node-hl7-client": "^4.1.1",
@@ -52,7 +52,7 @@
     "react-toastify": "^11.1.0",
     "request-mocking-protocol": "^0.6.0",
     "sharp": "^0.35.3",
-    "undici": "^8.10.0"
+    "undici": "^8.10.1"
   },
   "overrides": {
     "fast-xml-parser": "^5.5.6",
@@ -61,14 +61,14 @@
     }
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.6",
+    "@eslint/eslintrc": "^3.3.7",
     "@eslint/js": "^10.0.1",
-    "@next/eslint-plugin-next": "^16.3.3",
+    "@next/eslint-plugin-next": "^16.3.4",
     "@playwright/test": "^1.62.1",
     "@smithy/util-stream": "^4.8.2",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^7.0.1",
-    "@testing-library/react": "^16.3.2",
+    "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.5",
     "@types/base-64": "^1.0.2",
     "@types/fhir": "^0.0.44",
@@ -78,17 +78,17 @@
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.5",
     "@types/react-highlight-words": "^0.20.1",
-    "@typescript-eslint/eslint-plugin": "^8.68.0",
-    "@typescript-eslint/parser": "^8.68.0",
+    "@typescript-eslint/eslint-plugin": "^8.69.0",
+    "@typescript-eslint/parser": "^8.69.0",
     "dotenv": "^17.4.2",
     "dotenv-cli": "^11.0.0",
     "eslint": "^10.8.1",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-jsdoc": "^64.2.1",
+    "eslint-plugin-jsdoc": "^64.3.4",
     "eslint-plugin-unused-imports": "^4.4.1",
     "focus-trap-react": "^11.0.6",
-    "jest": "^30.4.2",
-    "jest-environment-jsdom": "^30.4.1",
+    "jest": "^30.5.1",
+    "jest-environment-jsdom": "^30.5.1",
     "jest-extended": "^7.0.0",
     "jest-fixed-jsdom": "^0.0.11",
     "postcss": "^8",
@@ -98,6 +98,6 @@
     "supertest": "^7.2.2",
     "testcontainers": "^12.1.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.68.0"
+    "typescript-eslint": "^8.69.0"
   }
 }
