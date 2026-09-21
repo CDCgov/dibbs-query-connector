@@ -36,6 +36,22 @@ export function stripErsdVersionSuffix(id: string): string {
 }
 
 /**
+ * Returns true if the given eRSD resource id (with or without its
+ * `-YYYYMMDD` version suffix) is an OID, which is the only kind of id VSAC
+ * can resolve. The eRSD also carries resources VSAC doesn't know about:
+ * umbrella groupings we don't map to a concept type (e.g. `eltc-3.2.0`,
+ * `artc-3.2.0`) and APHL-authored provisional value sets (e.g.
+ * `hantavirus-provisional-codes-PROVISIONAL`). Requesting any of those from
+ * VSAC returns a 404, which fails the whole seed.
+ * @param id Resource id from an eRSD bundle entry.
+ * @returns Whether the id can be looked up in VSAC.
+ */
+export function isVsacOid(id: string | undefined): boolean {
+  if (!id) return false;
+  return /^\d+(\.\d+)+$/.test(stripErsdVersionSuffix(id));
+}
+
+/**
  * Translates a VSAC FHIR bundle to our internal ValueSet struct
  * @param fhirValueset - The FHIR ValueSet response from VSAC
  * @param ersdConceptType - The associated clinical concept type from ERSD
