@@ -206,12 +206,7 @@ export type BuildStep = "selection" | "condition" | "valueset";
 
 /* Mode that all pages can be in; used to set page data in context */
 export type PageType =
-  | "/"
-  | "queryBuilding"
-  | "fhir-servers"
-  | "userManagement"
-  | BuildStep
-  | Mode;
+  "/" | "queryBuilding" | "fhir-servers" | "userManagement" | BuildStep | Mode;
 
 export const metadata = {
   title: "Query Connector",
@@ -221,13 +216,7 @@ export const metadata = {
 export const DEFAULT_ERSD_VERSION = "3";
 
 export type ErsdConceptType =
-  | "iztc"
-  | "ostc"
-  | "lotc"
-  | "lrtc"
-  | "mrtc"
-  | "dxtc"
-  | "sdtc";
+  "iztc" | "ostc" | "lotc" | "lrtc" | "mrtc" | "dxtc" | "sdtc";
 
 // Key order matters: when a value set is referenced by more than one umbrella,
 // the later key wins. `iztc` (immunizations, added in eRSD 3.2.0) overlaps
