@@ -7,6 +7,7 @@ import { BundleEntry, ValueSet as FhirValueSet } from "fhir/r4";
 import { insertConceptSql, insertValuesetToConceptSql } from "./seedSqlStructs";
 import {
   isUmbrellaErsdId,
+  isVsacOid,
   stripErsdVersionSuffix,
   stripProtocolAndTLDFromSystemUrl,
   translateVSACToInternalValueSet,
@@ -62,6 +63,29 @@ describe("stripErsdVersionSuffix", () => {
 
   it("does not strip a non-8-digit trailing number", () => {
     expect(stripErsdVersionSuffix("oid-1234")).toBe("oid-1234");
+  });
+});
+
+describe("isVsacOid", () => {
+  it("matches bare and date-versioned OIDs", () => {
+    expect(isVsacOid("2.16.840.1.113762.1.4.1146.560")).toBe(true);
+    expect(isVsacOid("2.16.840.1.113762.1.4.1146.560-20240619")).toBe(true);
+  });
+
+  it("rejects umbrella ids, including ones we don't map to a concept type", () => {
+    expect(isVsacOid("dxtc")).toBe(false);
+    expect(isVsacOid("dxtc-3.2.0")).toBe(false);
+    expect(isVsacOid("eltc-3.2.0")).toBe(false);
+    expect(isVsacOid("artc-3.2.0")).toBe(false);
+  });
+
+  it("rejects provisional value set ids", () => {
+    expect(isVsacOid("hantavirus-provisional-codes-PROVISIONAL")).toBe(false);
+  });
+
+  it("returns false for undefined or empty ids", () => {
+    expect(isVsacOid(undefined)).toBe(false);
+    expect(isVsacOid("")).toBe(false);
   });
 });
 
@@ -197,6 +221,39 @@ describe("indexErsdByOid", () => {
     expect(oidToErsdType.get("oid-C")).toBe("mrtc");
     expect(oidToErsdType.get("oid-D")).toBe("mrtc");
     expect(oidToErsdType.size).toBe(4);
+  });
+
+  it("types immunization-only value sets as iztc without overriding mrtc", () => {
+    const entries: BundleEntry<FhirValueSet>[] = [
+      {
+        resource: {
+          resourceType: "ValueSet",
+          id: "mrtc-3.2.0",
+          status: "active",
+          compose: {
+            include: [{ valueSet: ["http://example.org/ValueSet/oid-shared"] }],
+          },
+        },
+      },
+      {
+        resource: {
+          resourceType: "ValueSet",
+          id: "iztc-3.2.0",
+          status: "active",
+          compose: {
+            include: [
+              { valueSet: ["http://example.org/ValueSet/oid-shared"] },
+              { valueSet: ["http://example.org/ValueSet/oid-iz-only"] },
+            ],
+          },
+        },
+      },
+    ];
+
+    const { oidToErsdType } = indexErsdByOid(entries);
+
+    expect(oidToErsdType.get("oid-shared")).toBe("mrtc");
+    expect(oidToErsdType.get("oid-iz-only")).toBe("iztc");
   });
 
   it("collects only non-umbrella resources into nonUmbrellaValueSets", () => {
