@@ -27,6 +27,7 @@ import {
   generateValuesetConceptJoinSqlPromises,
   indexErsdByOid,
   isUmbrellaErsdId,
+  isVsacOid,
   stripErsdVersionSuffix,
   stripProtocolAndTLDFromSystemUrl,
 } from "./utils";
@@ -469,25 +470,40 @@ export async function indexErsdResponseByOid() {
   const { nonUmbrellaValueSets, oidToErsdType } = indexErsdByOid(valuesets);
   // Build up a mapping of OIDs to eRSD clinical types
 
-  let conditionExtractor: Array<ersdCondition> = [];
-  nonUmbrellaValueSets.reduce((acc: Array<ersdCondition>, vs: ValueSet) => {
-    const conditionSchemes = vs.useContext?.filter(
-      (context) =>
-        !(context.valueCodeableConcept?.coding || [])[0].system?.includes(
-          "us-ph-usage-context",
-        ),
+  // Only OID-identified value sets exist in VSAC. Anything else left over
+  // (umbrella groupings we don't map to a concept type, APHL-authored
+  // provisional value sets) would 404 there and fail the whole seed, so we
+  // leave it out of both the fetch list and the condition linkages.
+  const skippedIds = nonUmbrellaValueSets
+    .map((vs) => vs.id)
+    .filter((id) => !isVsacOid(id));
+  if (skippedIds.length > 0) {
+    console.warn(
+      `Skipping ${skippedIds.length} eRSD value set(s) that can't be fetched from VSAC: ${skippedIds.join(", ")}`,
     );
-    (conditionSchemes || []).forEach((usc) => {
-      const ersdCond: ersdCondition = {
-        code: (usc.valueCodeableConcept?.coding || [])[0].code || "",
-        system: (usc.valueCodeableConcept?.coding || [])[0].system || "",
-        text: usc.valueCodeableConcept?.text || "",
-        valueset_id: stripErsdVersionSuffix(vs.id || ""),
-      };
-      conditionExtractor.push(ersdCond);
-    });
-    return conditionExtractor;
-  }, conditionExtractor);
+  }
+
+  let conditionExtractor: Array<ersdCondition> = [];
+  nonUmbrellaValueSets
+    .filter((vs) => isVsacOid(vs.id))
+    .reduce((acc: Array<ersdCondition>, vs: ValueSet) => {
+      const conditionSchemes = vs.useContext?.filter(
+        (context) =>
+          !(context.valueCodeableConcept?.coding || [])[0].system?.includes(
+            "us-ph-usage-context",
+          ),
+      );
+      (conditionSchemes || []).forEach((usc) => {
+        const ersdCond: ersdCondition = {
+          code: (usc.valueCodeableConcept?.coding || [])[0].code || "",
+          system: (usc.valueCodeableConcept?.coding || [])[0].system || "",
+          text: usc.valueCodeableConcept?.text || "",
+          valueset_id: stripErsdVersionSuffix(vs.id || ""),
+        };
+        conditionExtractor.push(ersdCond);
+      });
+      return conditionExtractor;
+    }, conditionExtractor);
 
   // Take out the umbrella value sets from the ones we try to insert, then
   // strip the `-YYYYMMDD` version suffix that eRSD v3 appends to non-umbrella
@@ -495,7 +511,7 @@ export async function indexErsdResponseByOid() {
   // static seed's `WHERE oid = $1` lookups).
   let oids = valuesets
     ?.map((vs) => vs.resource?.id)
-    .filter((oid) => !isUmbrellaErsdId(oid))
+    .filter((oid) => !isUmbrellaErsdId(oid) && isVsacOid(oid))
     .map((oid) => (oid ? stripErsdVersionSuffix(oid) : oid));
   return {
     oids: oids,

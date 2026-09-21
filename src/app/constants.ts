@@ -216,11 +216,16 @@ export const metadata = {
 export const DEFAULT_ERSD_VERSION = "3";
 
 export type ErsdConceptType =
-  "ostc" | "lotc" | "lrtc" | "mrtc" | "dxtc" | "sdtc";
+  "iztc" | "ostc" | "lotc" | "lrtc" | "mrtc" | "dxtc" | "sdtc";
 
+// Key order matters: when a value set is referenced by more than one umbrella,
+// the later key wins. `iztc` (immunizations, added in eRSD 3.2.0) overlaps
+// heavily with `mrtc`, so it goes first to keep those value sets typed as
+// `mrtc` and only pick up the CVX vaccine sets that no other umbrella covers.
 export const ersdToDibbsConceptMap: {
   [k in ErsdConceptType]: DibbsConceptType;
 } = {
+  iztc: "medications",
   ostc: "labs",
   lotc: "labs",
   lrtc: "labs",
