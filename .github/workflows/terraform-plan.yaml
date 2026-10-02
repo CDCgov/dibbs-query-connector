@@ -66,8 +66,12 @@ jobs:
           set -euo pipefail
           # Plan against what is live so the diff only shows the PR's changes.
           # On a brand new environment there is no state yet; fall back to main.
-          image=$(terraform output -raw image 2>/dev/null || echo "ghcr.io/cdcgov/dibbs-query-connector/query-connector:main")
-          seeder=$(terraform output -raw seeder_image 2>/dev/null || echo "ghcr.io/cdcgov/dibbs-query-connector/aidbox-seeder:main")
+          outputs=$(terraform output -json 2>/dev/null || echo '{}')
+          image=$(echo "$outputs" | jq -r '.image.value // empty')
+          seeder=$(echo "$outputs" | jq -r '.seeder_image.value // empty')
+          : "${image:=ghcr.io/cdcgov/dibbs-query-connector/query-connector:main}"
+          : "${seeder:=ghcr.io/cdcgov/dibbs-query-connector/aidbox-seeder:main}"
+          echo "Planning with image=$image seeder=$seeder"
           echo "TF_VAR_image=$image" >> "$GITHUB_ENV"
           echo "TF_VAR_seeder_image=$seeder" >> "$GITHUB_ENV"
 
