@@ -37,7 +37,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        root: [bootstrap, demo]
+        root: [bootstrap, azure]
     defaults:
       run:
         working-directory: terraform/${{ matrix.root }}

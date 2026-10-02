@@ -1,4 +1,4 @@
-# Query Connector demo deployment (Azure Container Apps)
+# Query Connector deployment (Azure Container Apps)
 
 This directory defines the single deployed instance of Query Connector,
 https://connector.dibbs.tools. It is applied automatically by the `CD` GitHub
@@ -10,7 +10,7 @@ same workflow just built and pushed to GHCR.
 | Path | Applied by | Purpose |
 | --- | --- | --- |
 | `terraform/bootstrap` | A subscription Owner, once, locally | Resource group `dibbs-qc`, the `dibbs-qc-github` managed identity GitHub assumes through OIDC, and its role assignments |
-| `terraform/demo` | `CD` workflow (and locally for debugging) | VNet peered to the dibbs.tools hub, Container Apps environment, the `query-connector` and `aidbox` container apps, and the `aidbox-seeder` job |
+| `terraform/azure` | `CD` workflow (and locally for debugging) | VNet peered to the dibbs.tools hub, Container Apps environment, the `query-connector` and `aidbox` container apps, and the `aidbox-seeder` job |
 
 Shared platform resources are **not** managed here. They live in
 [skylight-hq/dibbs-tf-envs](https://github.com/skylight-hq/dibbs-tf-envs):
@@ -104,7 +104,7 @@ Then:
 - **Plan locally** (read-only, needs `az login`):
 
   ```bash
-  cd terraform/demo
+  cd terraform/azure
   terraform init
   terraform plan \
     -var image="$(terraform output -raw image)" \

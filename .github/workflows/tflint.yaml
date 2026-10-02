@@ -19,7 +19,11 @@ jobs:
       matrix:
         dirs:
           - terraform/bootstrap
-          - terraform/demo
+          - terraform/azure
+          - terraform/aws/implementation/ecs
+          - terraform/aws/implementation/setup
+          - terraform/aws/modules/oidc
+          - terraform/aws/modules/tfstate
 
     steps:
       - uses: actions/checkout@v4

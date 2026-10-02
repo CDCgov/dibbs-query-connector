@@ -1,0 +1,13 @@
+/*
+* Terraform variables file, copy this file to <ENVIRONMENT>.tfvars ( dev.tfvars, prod.tfvars ) and fill in the values you require.
+* Remove the comments and replace the values with the desired values for your environment.
+* This tfvars file is used to configure the environment for the Terraform implementation.
+* required:
+* - owner: The owner of the environment
+* - project: The name of the project
+* - region: The region to launch the AWS resources in
+*/
+
+owner   = "John"
+project = "JurassicPark"
+region  = "us-east-1"

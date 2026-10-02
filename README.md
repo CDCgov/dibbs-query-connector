@@ -51,7 +51,7 @@ You can find more detailed documentation, guides, and tutorials here:
 
 ## Try it out!
 
-A demo instance of DIBBs Query Connector runs at [https://connector.dibbs.tools](https://connector.dibbs.tools). It is deployed automatically from the `main` branch on every merge, so it always reflects the latest code. Versioned releases are published to GHCR for downstream deployments (see the [release process](<src/docs/Release Documentation.mdx>)), and the deployment itself is defined in [`terraform/demo`](terraform/demo/README.md).
+A demo instance of DIBBs Query Connector runs at [https://connector.dibbs.tools](https://connector.dibbs.tools). It is deployed automatically from the `main` branch on every merge, so it always reflects the latest code. Versioned releases are published to GHCR for downstream deployments (see the [release process](<src/docs/Release Documentation.mdx>)), and the deployment itself is defined in [`terraform/azure`](terraform/azure/README.md).
 
 ## Getting started
 

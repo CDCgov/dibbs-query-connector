@@ -90,6 +90,7 @@ tmp_remote_image_*
 **/.terraform/*
 terraform.tfvars
 *.tfplan
+*.plan
 tfplan
 plan.log
 

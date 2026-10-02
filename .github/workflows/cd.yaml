@@ -2,7 +2,7 @@ name: CD
 
 # Builds the Query Connector and Aidbox seeder images on every push to `main`,
 # pushes them to GHCR, and deploys the exact digests that were just built to
-# connector.dibbs.tools by applying terraform/demo.
+# connector.dibbs.tools by applying terraform/azure.
 #
 # When the push bumps `app_version.yml` the images also get vX.Y.Z / vX.Y / vX /
 # latest tags; the `Release` workflow then tags the commit and publishes the
@@ -191,7 +191,7 @@ jobs:
       TF_VAR_seeder_image: ${{ needs.build.outputs.seeder_image || needs.resolve.outputs.seeder_image }}
     defaults:
       run:
-        working-directory: terraform/demo
+        working-directory: terraform/azure
     steps:
       - name: Check Out Changes
         uses: actions/checkout@v4

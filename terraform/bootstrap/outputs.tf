@@ -1,5 +1,5 @@
 output "resource_group_name" {
-  description = "Resource group for terraform/demo."
+  description = "Resource group for terraform/azure."
   value       = azurerm_resource_group.qc.name
 }
 

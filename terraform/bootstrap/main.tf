@@ -3,7 +3,7 @@
 # Creates the resource group, the user-assigned managed identity that GitHub
 # Actions assumes through OIDC, and the role assignments that identity needs.
 # Applied locally by a subscription Owner; everything else is applied by CD
-# from terraform/demo.
+# from terraform/azure.
 
 locals {
   state_container_scope = "${data.azurerm_storage_account.state.id}/blobServices/default/containers/ce-tfstate"
