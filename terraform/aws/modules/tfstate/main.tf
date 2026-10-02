@@ -1,5 +1,6 @@
 # trivy:ignore:AVD-AWS-0089
 resource "aws_s3_bucket" "tfstate" {
+  # tflint-ignore: aws_s3_bucket_name # the name is valid once var.identifier is filled in
   bucket = "${var.project}-tfstate-${var.owner}-${var.identifier}"
 
   force_destroy = true
