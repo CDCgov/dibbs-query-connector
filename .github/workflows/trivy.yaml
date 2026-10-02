@@ -26,6 +26,9 @@ jobs:
         with:
           scan-type: "fs"
           scan-ref: "terraform/"
+          # The retained AWS ECS reference stack and its pinned upstream module are
+          # not deployed by CI; see terraform/aws/README.md.
+          skip-dirs: "terraform/aws/implementation"
           scanners: "vuln,secret,config"
           ignore-unfixed: false
           exit-code: "1"

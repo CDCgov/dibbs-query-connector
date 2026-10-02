@@ -61,7 +61,7 @@ jobs:
         run: terraform validate
 
       - name: Use the currently deployed images
-        if: matrix.root == 'demo'
+        if: matrix.root == 'azure'
         run: |
           set -euo pipefail
           # Plan against what is live so the diff only shows the PR's changes.
