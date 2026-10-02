@@ -59,21 +59,21 @@ release's version following the pattern of MAJOR.MINOR.PATCH.
    in the files; the workflow prepends it when tagging. Keep both files in sync
    with the same version number.
 4. Get review and merge to `main`.
-5. The `Release` workflow runs automatically on the merge commit:
+5. The `CD` workflow runs on the merge commit. It builds the Query Connector
+   Docker image for `linux/amd64`, pushes it to GHCR with the `main`,
+   `vX.Y.Z`, `vX.Y`, `vX`, and `latest` tags, and deploys that exact image
+   digest to https://connector.dibbs.tools.
+6. Once `CD` succeeds, the `Release` workflow:
    - tags the merge commit as `vX.Y.Z`
-   - builds the Query Connector Docker image for `linux/amd64`
-   - pushes `vX.Y.Z`, `vX.Y`, `vX`, and `latest` tags to GHCR
    - publishes a GitHub Release named `vX.Y.Z` with auto-generated notes
    - posts the release link to Slack (if configured)
 
 On GHCR, the `vX.Y` and `vX` tags float to the latest release within that line;
 the `vX.Y.Z` tag is immutable.
 
-The `Release` workflow does **not** deploy. The dev environment
-(https://queryconnector.dev) tracks the `main` image tag, which is built and
-pushed by the `CD` workflow on every merge to `main` (see below), so dev is
-already up to date by the time a release is cut. Versioned (`vX.Y.Z`) images
-are published to GHCR for downstream consumers to deploy intentionally.
+Because `Release` only runs after a successful `CD` run, a release is never
+published for an image that failed to build or deploy. Versioned (`vX.Y.Z`)
+images are published to GHCR for downstream consumers to deploy intentionally.
 
 ### Hotfix
 
@@ -84,15 +84,23 @@ merge.
 
 Pushes to `main` that do **not** bump the `version` field are handled by the
 `CD` workflow, which builds and pushes the Docker image tagged with `main`
-only. No git tag or GitHub Release is created. The `CD` workflow then triggers
-the Terraform deploy workflow, which redeploys the `main` image to the dev
-environment. This is the normal dev build and deploy flow.
+only and deploys it to https://connector.dibbs.tools. No git tag or GitHub
+Release is created. This is the normal build and deploy flow.
+
+## Redeploying a specific version
+
+Run the `CD` workflow manually (Actions, CD, "Run workflow") with the
+`version` input set to an existing GHCR tag such as `v1.2.3` or `main`. The
+workflow skips the build and deploys that tag's image digest. See
+`terraform/demo/README.md` for how the deployment is structured.
 
 ## Verification
 
 After merging a release PR, confirm:
 
-- [ ] **Actions tab**: the `Release` workflow run on the merge commit is green.
+- [ ] **Actions tab**: the `CD` run on the merge commit is green and the
+      `Release` run it triggered is green.
+- [ ] **Demo**: https://connector.dibbs.tools serves the new version.
 - [ ] **Tags**: `git fetch --tags && git tag -l "vX.Y.Z"` shows the new tag.
 - [ ] **GitHub Releases**: `vX.Y.Z` is published (not draft) with PR-list notes.
 - [ ] **GHCR**: `query-connector` has `vX.Y.Z`, `vX.Y`, `vX`, and `latest` tags
@@ -102,9 +110,13 @@ After merging a release PR, confirm:
 
 ## Failure modes
 
-- **Tag `vX.Y.Z` already exists at a different commit**: the workflow fails
-  loudly during the `detect-release` job. Bump to the next available version
-  in a new PR.
+- **Tag `vX.Y.Z` already exists at a different commit**: the `Release`
+  workflow fails loudly at the tagging step. Bump to the next available
+  version in a new PR.
+- **`CD` failed (build or deploy)**: no tag or release is created. Fix
+  forward on `main`; the release is published when `CD` next succeeds on a
+  commit whose version differs from its parent, so a follow-up fix commit will
+  not retroactively publish the release. Re-run the failed `CD` run instead.
 - **Partial failure (tag and image created, release step failed)**: re-run
   the workflow from the Actions tab. The collision check treats a same-SHA tag
   as a no-op, and the GitHub Release creation falls back to fetching an existing

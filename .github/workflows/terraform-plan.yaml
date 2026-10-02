@@ -1,0 +1,112 @@
+name: Terraform Plan
+
+# Plans both Terraform roots for pull requests that touch them and posts each
+# plan as a PR comment. Uses the read-only `pull_request` federated credential
+# of the deploy identity, so it only runs for branches in this repository
+# (forks cannot obtain the OIDC token).
+
+on:
+  pull_request:
+    paths:
+      - "terraform/**"
+      - ".github/workflows/cd.yaml"
+      - ".github/workflows/terraform-plan.yaml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+env:
+  ARM_USE_OIDC: "true"
+  ARM_USE_AZUREAD: "true"
+  ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "false"
+
+jobs:
+  plan:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        root: [bootstrap, demo]
+    defaults:
+      run:
+        working-directory: terraform/${{ matrix.root }}
+    steps:
+      - name: Check Out Changes
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.5
+          terraform_wrapper: false
+
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive -diff
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Use the currently deployed images
+        if: matrix.root == 'demo'
+        run: |
+          set -euo pipefail
+          # Plan against what is live so the diff only shows the PR's changes.
+          # On a brand new environment there is no state yet; fall back to main.
+          image=$(terraform output -raw image 2>/dev/null || echo "ghcr.io/cdcgov/dibbs-query-connector/query-connector:main")
+          seeder=$(terraform output -raw seeder_image 2>/dev/null || echo "ghcr.io/cdcgov/dibbs-query-connector/aidbox-seeder:main")
+          echo "TF_VAR_image=$image" >> "$GITHUB_ENV"
+          echo "TF_VAR_seeder_image=$seeder" >> "$GITHUB_ENV"
+
+      - name: Terraform plan
+        id: plan
+        run: |
+          set -o pipefail
+          terraform plan -lock=false -no-color -out=tfplan 2>&1 | tee plan.log
+          echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Comment plan on the pull request
+        if: always() && steps.plan.outcome != 'skipped'
+        uses: actions/github-script@v7
+        env:
+          ROOT: ${{ matrix.root }}
+          EXIT_CODE: ${{ steps.plan.outputs.exit_code }}
+        with:
+          script: |
+            const fs = require('fs');
+            const root = process.env.ROOT;
+            const marker = `<!-- terraform-plan:${root} -->`;
+            let log = fs.readFileSync(`terraform/${root}/plan.log`, 'utf8');
+            const limit = 60000;
+            if (log.length > limit) {
+              log = log.slice(log.length - limit);
+              log = `(truncated; showing the last ${limit} characters)\n` + log;
+            }
+            const status = process.env.EXIT_CODE === '0' ? 'succeeded' : `failed (exit ${process.env.EXIT_CODE})`;
+            const body = `${marker}\n### Terraform plan: \`terraform/${root}\` ${status}\n\n<details><summary>Show plan</summary>\n\n\`\`\`\n${log}\n\`\`\`\n\n</details>`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, per_page: 100,
+            });
+            const existing = comments.find(c => c.body && c.body.startsWith(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner: context.repo.owner, repo: context.repo.repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body });
+            }
+
+      - name: Fail if the plan failed
+        if: steps.plan.outputs.exit_code != '0'
+        run: exit 1

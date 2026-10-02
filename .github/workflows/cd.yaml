@@ -1,31 +1,42 @@
 name: CD
 
-# Dev build workflow. Triggers on every push to `main` (including merge
-# groups) and on manual dispatch. Builds the Query Connector Docker image
-# and pushes it to GHCR tagged with `main`.
+# Builds the Query Connector and Aidbox seeder images on every push to `main`,
+# pushes them to GHCR, and deploys the exact digests that were just built to
+# connector.dibbs.tools by applying terraform/demo.
 #
-# When the push is a release (i.e. `app_version.yml` was bumped — handled
-# by the `release.yml` workflow), this workflow skips the build to avoid
-# duplicate image pushes.
+# When the push bumps `app_version.yml` the images also get vX.Y.Z / vX.Y / vX /
+# latest tags; the `Release` workflow then tags the commit and publishes the
+# GitHub Release once this workflow succeeds.
+#
+# Manual runs can redeploy an existing GHCR tag (e.g. `v1.2.3`) without
+# rebuilding by setting the `version` input.
 
 on:
-  merge_group:
-    types:
-      - checks_requested
   push:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Existing GHCR tag to deploy (e.g. v1.2.3 or main). Leave empty to build the selected ref and deploy it."
+        required: false
+        default: ""
+        type: string
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+permissions:
+  contents: read
+
+env:
+  REGISTRY: ghcr.io
 
 jobs:
   detect-release:
     runs-on: ubuntu-latest
     outputs:
       is_release: ${{ steps.detect.outputs.is_release }}
+      version: ${{ steps.detect.outputs.version }}
+      minor: ${{ steps.detect.outputs.minor }}
+      major: ${{ steps.detect.outputs.major }}
     steps:
       - name: Check Out Changes
         uses: actions/checkout@v4
@@ -45,14 +56,16 @@ jobs:
         run: python3 .github/scripts/detect_version_bump.py
 
   build:
+    name: Build and push images
     needs: detect-release
-    if: needs.detect-release.outputs.is_release != 'true'
-    name: Build Query Connector Image
+    if: inputs.version == ''
     runs-on: ubuntu-latest
     permissions:
-      contents: "read"
-      id-token: "write"
-      packages: "write"
+      contents: read
+      packages: write
+    outputs:
+      app_image: ${{ steps.refs.outputs.app_image }}
+      seeder_image: ${{ steps.refs.outputs.seeder_image }}
     steps:
       - name: Check Out Changes
         uses: actions/checkout@v4
@@ -63,28 +76,165 @@ jobs:
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: lowercase repo name to use in following step
-        env:
-          REPO: ${{ github.repository }}
-        run: |
-          echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+      - name: Lowercase repository name
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
+      - name: Image metadata (query-connector)
+        id: meta_app
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ env.REPO }}/query-connector
+          images: ${{ env.REGISTRY }}/${{ env.REPO }}/query-connector
           tags: |
-            type=raw,value=main
+            type=raw,value=main,enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=${{ needs.detect-release.outputs.version }},enable=${{ needs.detect-release.outputs.is_release == 'true' }}
+            type=raw,value=${{ needs.detect-release.outputs.minor }},enable=${{ needs.detect-release.outputs.is_release == 'true' }}
+            type=raw,value=${{ needs.detect-release.outputs.major }},enable=${{ needs.detect-release.outputs.is_release == 'true' }}
+            type=raw,value=latest,enable=${{ needs.detect-release.outputs.is_release == 'true' }}
+            type=sha,prefix=sha-,format=long
 
-      - name: Build and push
+      - name: Build and push query-connector
+        id: build_app
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta_app.outputs.tags }}
+          labels: ${{ steps.meta_app.outputs.labels }}
+          no-cache: ${{ needs.detect-release.outputs.is_release == 'true' }}
+
+      - name: Image metadata (aidbox-seeder)
+        id: meta_seeder
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.REPO }}/aidbox-seeder
+          tags: |
+            type=raw,value=main,enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=${{ needs.detect-release.outputs.version }},enable=${{ needs.detect-release.outputs.is_release == 'true' }}
+            type=raw,value=latest,enable=${{ needs.detect-release.outputs.is_release == 'true' }}
+            type=sha,prefix=sha-,format=long
+
+      - name: Build and push aidbox-seeder
+        id: build_seeder
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.aidbox-seeder
+          push: true
+          tags: ${{ steps.meta_seeder.outputs.tags }}
+          labels: ${{ steps.meta_seeder.outputs.labels }}
+
+      - name: Record image digests
+        id: refs
+        run: |
+          echo "app_image=${REGISTRY}/${REPO}/query-connector@${{ steps.build_app.outputs.digest }}" >> "$GITHUB_OUTPUT"
+          echo "seeder_image=${REGISTRY}/${REPO}/aidbox-seeder@${{ steps.build_seeder.outputs.digest }}" >> "$GITHUB_OUTPUT"
+
+  resolve:
+    name: Resolve existing tag
+    if: inputs.version != ''
+    runs-on: ubuntu-latest
+    outputs:
+      app_image: ${{ steps.refs.outputs.app_image }}
+      seeder_image: ${{ steps.refs.outputs.seeder_image }}
+    steps:
+      - name: Lowercase repository name
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+
+      - name: Resolve digests for ${{ inputs.version }}
+        id: refs
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          digest_for() {
+            docker buildx imagetools inspect "$1" --format '{{json .Manifest.Digest}}' | tr -d '"'
+          }
+          app="${REGISTRY}/${REPO}/query-connector"
+          seeder="${REGISTRY}/${REPO}/aidbox-seeder"
+          app_digest=$(digest_for "${app}:${VERSION}")
+          # The seeder image only exists for tags built after it was introduced;
+          # fall back to `main` for older release tags.
+          if ! seeder_digest=$(digest_for "${seeder}:${VERSION}" 2>/dev/null); then
+            echo "::warning::No aidbox-seeder image tagged ${VERSION}; using main."
+            seeder_digest=$(digest_for "${seeder}:main")
+          fi
+          echo "app_image=${app}@${app_digest}" >> "$GITHUB_OUTPUT"
+          echo "seeder_image=${seeder}@${seeder_digest}" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    name: Deploy to connector.dibbs.tools
+    needs: [build, resolve]
+    if: always() && (needs.build.result == 'success' || needs.resolve.result == 'success')
+    runs-on: ubuntu-latest
+    environment:
+      name: demo
+      url: https://connector.dibbs.tools
+    concurrency:
+      group: deploy-demo
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      ARM_USE_OIDC: "true"
+      ARM_USE_AZUREAD: "true"
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      TF_IN_AUTOMATION: "true"
+      TF_INPUT: "false"
+      TF_VAR_image: ${{ needs.build.outputs.app_image || needs.resolve.outputs.app_image }}
+      TF_VAR_seeder_image: ${{ needs.build.outputs.seeder_image || needs.resolve.outputs.seeder_image }}
+    defaults:
+      run:
+        working-directory: terraform/demo
+    steps:
+      - name: Check Out Changes
+        uses: actions/checkout@v4
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.5
+          terraform_wrapper: false
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform plan
+        run: terraform plan -out=tfplan
+
+      - name: Terraform apply
+        run: terraform apply tfplan
+
+      - name: Wait for the new revision to serve traffic
+        env:
+          RESOURCE_GROUP: dibbs-qc
+        run: |
+          set -euo pipefail
+          az extension add --name containerapp --upgrade --only-show-errors
+          expected="$TF_VAR_image"
+          for i in $(seq 1 30); do
+            active=$(az containerapp show -g "$RESOURCE_GROUP" -n query-connector \
+              --query "properties.template.containers[0].image" -o tsv)
+            status=$(curl -s -o /dev/null -m 10 -w '%{http_code}' https://connector.dibbs.tools/api || true)
+            echo "attempt $i: image=$active health=$status"
+            if [ "$active" = "$expected" ] && [ "$status" = "200" ]; then
+              echo "Deployed $expected"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::connector.dibbs.tools did not become healthy on $expected"
+          exit 1

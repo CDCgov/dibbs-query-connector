@@ -3,7 +3,6 @@
 [![codecov](https://codecov.io/gh/CDCgov/dibbs-query-connector/branch/main/graph/badge.svg)](https://codecov.io/gh/CDCgov/dibbs-query-connector)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![Test github badge](https://img.shields.io/github/actions/workflow/status/CDCgov/dibbs-query-connector/ci.yaml)](https://github.com/CDCgov/dibbs-query-connector/actions/workflows/ci.yaml)
-[![Dev site](https://img.shields.io/website?url=https%3A%2F%2Fqueryconnector.dev&label=queryconnector.dev)](https://queryconnector.dev)
 [![Demo site](https://img.shields.io/website?url=https%3A%2F%2Fconnector.dibbs.tools&label=connector.dibbs.tools)](https://connector.dibbs.tools)
 
 ![Query Connector Screenshot](./public/query-connector-screenshot.png)
@@ -52,9 +51,7 @@ You can find more detailed documentation, guides, and tutorials here:
 
 ## Try it out!
 
-Access to the demo instance of the latest official release of DIBBs Query Connector is available at [https://connector.dibbs.tools](https://connector.dibbs.tools).
-
-Access to the dev instance of the main branch of DIBBs Query Connector is available at [https://queryconnector.dev](https://queryconnector.dev).
+A demo instance of DIBBs Query Connector runs at [https://connector.dibbs.tools](https://connector.dibbs.tools). It is deployed automatically from the `main` branch on every merge, so it always reflects the latest code. Versioned releases are published to GHCR for downstream deployments (see the [release process](<src/docs/Release Documentation.mdx>)), and the deployment itself is defined in [`terraform/demo`](terraform/demo/README.md).
 
 ## Getting started
 
