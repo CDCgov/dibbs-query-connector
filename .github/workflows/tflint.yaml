@@ -20,6 +20,7 @@ jobs:
         dirs:
           - terraform/bootstrap
           - terraform/azure
+          - terraform/aws/redirect
           - terraform/aws/implementation/ecs
           - terraform/aws/implementation/setup
           - terraform/aws/modules/oidc
