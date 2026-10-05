@@ -44,8 +44,10 @@ resource "aws_cloudfront_function" "redirect" {
   code    = templatefile("${path.module}/redirect.js", { target_url = var.target_url })
 }
 
-# A WAF in front of a distribution that only ever returns a fixed redirect
-# would add cost without protecting anything.
+# This distribution only ever returns a fixed redirect, so a WAF would add
+# cost without protecting anything, and access logs (which need their own S3
+# bucket) would record nothing worth keeping.
+#trivy:ignore:AVD-AWS-0010
 #trivy:ignore:AVD-AWS-0011
 resource "aws_cloudfront_distribution" "this" {
   enabled         = true
