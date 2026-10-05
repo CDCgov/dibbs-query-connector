@@ -106,3 +106,4 @@ certificates
 .tool-versions
 keys/
 *.tsbuildinfo
+next-env.d.ts
