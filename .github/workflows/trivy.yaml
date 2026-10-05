@@ -25,7 +25,10 @@ jobs:
         uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         with:
           scan-type: "fs"
-          scan-ref: "terraform/modules/"
+          scan-ref: "terraform/"
+          # The retained AWS ECS reference stack and its pinned upstream module are
+          # not deployed by CI; see terraform/aws/README.md.
+          skip-dirs: "terraform/aws/implementation"
           scanners: "vuln,secret,config"
           ignore-unfixed: false
           exit-code: "1"

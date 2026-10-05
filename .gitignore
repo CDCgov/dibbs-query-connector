@@ -88,10 +88,11 @@ tmp_remote_image_*
 
 # Local .terraform directories
 **/.terraform/*
-.terraform/modules/ecs
-terraform/implementation/ecs/.terraform/*
-.terraform.lock.hcl
 terraform.tfvars
+*.tfplan
+*.plan
+tfplan
+plan.log
 
 node_modules
 .next/
