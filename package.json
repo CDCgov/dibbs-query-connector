@@ -58,6 +58,9 @@
     "fast-xml-parser": "^5.5.6",
     "next": {
       "postcss": "^8.5.10"
+    },
+    "@lhncbc/ucum-lhc": {
+      "csv-parse": "$csv-parse"
     }
   },
   "devDependencies": {

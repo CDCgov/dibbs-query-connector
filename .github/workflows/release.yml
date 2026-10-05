@@ -1,36 +1,35 @@
 name: Release
 
-# Triggered on every push to `main`. Detects whether the merge commit bumps
-# the `version` field in `app_version.yml`. If yes, tags the merge commit,
-# builds the Query Connector Docker image, pushes it to GHCR with
-# vX.Y.Z / vX.Y / vX / latest tags, publishes a GitHub Release with
-# auto-generated PR notes, and posts the link to Slack.
+# Runs after a successful `CD` run on `main`. If that push bumped the `version`
+# field in `app_version.yml`, tags the commit as vX.Y.Z, publishes a GitHub
+# Release with auto-generated notes, and posts the link to Slack.
 #
-# The full release happens in a single workflow run; we do not rely on the
-# tag-push trigger (GITHUB_TOKEN-created tags do not fan out to other
-# workflows).
+# The images for the release (vX.Y.Z / vX.Y / vX / latest) were already built,
+# pushed and deployed by `CD`, so a release is only ever published for an image
+# that built and deployed successfully.
 
 on:
-  push:
+  workflow_run:
+    workflows: [CD]
+    types: [completed]
     branches: [main]
 
 jobs:
-  detect-release:
+  release:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
 
-    outputs:
-      is_release: ${{ steps.detect.outputs.is_release }}
-      version: ${{ steps.detect.outputs.version }}
-      minor: ${{ steps.detect.outputs.minor }}
-      major: ${{ steps.detect.outputs.major }}
+    env:
+      RELEASE_SHA: ${{ github.event.workflow_run.head_sha }}
 
     steps:
-      - name: Checkout
+      - name: Checkout the commit CD deployed
         uses: actions/checkout@v4
         with:
+          ref: ${{ env.RELEASE_SHA }}
           fetch-depth: 2
 
       - name: Set up Python
@@ -45,102 +44,39 @@ jobs:
         id: detect
         run: python3 .github/scripts/detect_version_bump.py
 
-      - name: Tag merge commit (idempotent)
+      - name: Tag release commit (idempotent)
         if: steps.detect.outputs.is_release == 'true'
         env:
           VERSION: ${{ steps.detect.outputs.version }}
         run: |
           set -euo pipefail
           # Resolve the existing tag (if any) to the COMMIT it points at so we
-          # can compare against GITHUB_SHA. For an annotated tag the plain ref
-          # resolves to the tag-object SHA, so dereference with ^{} to get the
-          # commit; fall back to the plain ref for lightweight tags. An empty
-          # result means the tag does not exist yet.
+          # can compare against the deployed SHA. For an annotated tag the plain
+          # ref resolves to the tag-object SHA, so dereference with ^{} to get
+          # the commit; fall back to the plain ref for lightweight tags. An
+          # empty result means the tag does not exist yet.
           REMOTE_SHA=$(git ls-remote origin "refs/tags/${VERSION}^{}" | awk '{print $1}')
           if [ -z "$REMOTE_SHA" ]; then
             REMOTE_SHA=$(git ls-remote origin "refs/tags/${VERSION}" | awk '{print $1}')
           fi
           if [ -z "$REMOTE_SHA" ]; then
-            echo "Creating tag ${VERSION} at ${GITHUB_SHA}"
+            echo "Creating tag ${VERSION} at ${RELEASE_SHA}"
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git tag -a "${VERSION}" -m "Release ${VERSION}" "${GITHUB_SHA}"
+            git tag -a "${VERSION}" -m "Release ${VERSION}" "${RELEASE_SHA}"
             git push origin "${VERSION}"
-          elif [ "$REMOTE_SHA" = "$GITHUB_SHA" ]; then
-            echo "Tag ${VERSION} already exists at ${GITHUB_SHA}; continuing (re-run)."
+          elif [ "$REMOTE_SHA" = "$RELEASE_SHA" ]; then
+            echo "Tag ${VERSION} already exists at ${RELEASE_SHA}; continuing (re-run)."
           else
-            echo "::error::Tag ${VERSION} already exists at ${REMOTE_SHA}, not ${GITHUB_SHA}. Refusing to overwrite."
+            echo "::error::Tag ${VERSION} already exists at ${REMOTE_SHA}, not ${RELEASE_SHA}. Refusing to overwrite."
             exit 1
           fi
 
-  build:
-    needs: detect-release
-    if: needs.detect-release.outputs.is_release == 'true'
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      id-token: write
-      packages: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: lowercase repo name
-        env:
-          REPO: ${{ github.repository }}
-        run: |
-          echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
-
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ env.REPO }}/query-connector
-          tags: |
-            type=raw,value=${{ needs.detect-release.outputs.version }}
-            type=raw,value=${{ needs.detect-release.outputs.minor }}
-            type=raw,value=${{ needs.detect-release.outputs.major }}
-            type=raw,value=latest
-
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          no-cache: true
-
-  release:
-    needs: [detect-release, build]
-    if: needs.detect-release.outputs.is_release == 'true'
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Create or fetch GitHub Release
+        if: steps.detect.outputs.is_release == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ needs.detect-release.outputs.version }}
+          VERSION: ${{ steps.detect.outputs.version }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
@@ -154,7 +90,7 @@ jobs:
             -d @- "https://api.github.com/repos/${REPO}/releases" <<EOF
           {
             "tag_name": "${VERSION}",
-            "target_commitish": "main",
+            "target_commitish": "${RELEASE_SHA}",
             "name": "${VERSION}",
             "generate_release_notes": true,
             "draft": false
@@ -174,15 +110,16 @@ jobs:
           echo "RELEASE_URL=$html_url" >> "$GITHUB_ENV"
 
       - name: Post release to Slack
+        if: steps.detect.outputs.is_release == 'true'
         continue-on-error: true
         uses: slackapi/slack-github-action@v2
         with:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
           payload: |
-            text: ":package: A new release has been created: <${{ env.RELEASE_URL }}|${{ needs.detect-release.outputs.version }}>"
+            text: ":package: A new release has been created: <${{ env.RELEASE_URL }}|${{ steps.detect.outputs.version }}>"
             blocks:
               - type: "section"
                 text:
                   type: "mrkdwn"
-                  text: ":package: A new release has been created: <${{ env.RELEASE_URL }}|${{ needs.detect-release.outputs.version }}>"
+                  text: ":package: A new release has been created: <${{ env.RELEASE_URL }}|${{ steps.detect.outputs.version }}>"

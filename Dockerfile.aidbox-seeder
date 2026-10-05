@@ -7,8 +7,10 @@ RUN apk add --no-cache curl postgresql-client bash jq
 COPY ./setup-scripts/seed_aidbox.sh /seed_aidbox.sh
 RUN chmod +x /seed_aidbox.sh
 
-# Create data directory
+# Bake the fixture into the image so the seeder can run without a bind mount
+# (docker-compose still mounts the working-tree copy over it).
 RUN mkdir /data
+COPY ./src/app/tests/assets/GoldenSickPatient.json /data/GoldenSickPatient.json
 
 ENTRYPOINT ["/bin/bash", "-c"]
 CMD ["/seed_aidbox.sh $AIDBOX_BASE_URL $APP_HOSTNAME"]

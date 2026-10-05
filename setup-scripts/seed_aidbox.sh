@@ -1,16 +1,21 @@
 #!/bin/bash
 set -o pipefail
 
-# Environment variables set by docker-compose
-BASE_URL=$1
-APP_HOSTNAME=$2
-NETWORK_URL=http://aidbox:8080
-AIDBOX_CLIENT_SECRET="L6AGe_5V2O"
-DB_ADDRESS="db"
-DB_PORT="5432"
-DB_USERNAME="postgres"
-DB_PASSWORD="pw"
-DB_NAME="tefca_db"
+# BASE_URL is the Aidbox URL stored in the app's fhir_servers row (what Query
+# Connector calls); APP_HOSTNAME is the app's public URL (Aidbox fetches its
+# JWKS from there). Both come from docker-compose or the deploy environment.
+BASE_URL=${1:-$AIDBOX_BASE_URL}
+APP_HOSTNAME=${2:-$APP_HOSTNAME}
+
+# Everything below defaults to the docker-compose values. Deployed
+# environments override them through environment variables.
+NETWORK_URL="${AIDBOX_NETWORK_URL:-http://aidbox:8080}"
+AIDBOX_CLIENT_SECRET="${AIDBOX_CLIENT_SECRET:-L6AGe_5V2O}"
+DB_ADDRESS="${DB_ADDRESS:-db}"
+DB_PORT="${DB_PORT:-5432}"
+DB_USERNAME="${DB_USERNAME:-postgres}"
+DB_PASSWORD="${DB_PASSWORD:-pw}"
+DB_NAME="${DB_NAME:-tefca_db}"
 
 # All curl invocations time-bound: --max-time caps each request so the seeder
 # can never hang silently in CI when aidbox is slow to respond.
