@@ -41,7 +41,7 @@ done
 
 echo -e "\nAidbox seeder finished!"
 
-npx dotenv -e ./.env.e2e -- npx playwright test --reporter=list
+npx dotenv run -q -f ./.env.e2e -- npx playwright test --reporter=list
 E2E_EXIT_CODE=$?
 
 # uncomment these and the corresponding block in the ci.yaml to get the CI logs

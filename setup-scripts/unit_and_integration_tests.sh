@@ -38,7 +38,7 @@ echo LOCAL_DB_CLIENT_TIMEOUT="10000" >> .env.integration
 echo ERSD_API_KEY="blah" >> .env.integration
 echo UMLS_API_KEY="bleh" >> .env.integration
 
-BASE_CMD="npx dotenv -e .env.integration -- jest"
+BASE_CMD="npx dotenv run -q -f .env.integration -- jest"
 
 # running our integration tests
 if [ "$JUST_INTEGRATION" = "true" ]; then 
