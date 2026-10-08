@@ -1,8 +1,16 @@
 "use server";
 
-import { ErsdConceptType, MISSING_API_KEY_LITERAL } from "@/app/constants";
+import {
+  ErsdConceptType,
+  INVALID_API_KEY_LITERAL,
+  MISSING_API_KEY_LITERAL,
+} from "@/app/constants";
 import { OperationOutcome, Parameters, ValueSet } from "fhir/r4";
-import { getVSACValueSet, OidData } from "@/app/backend/code-systems/service";
+import {
+  ErsdOrVsacResponse,
+  getVSACValueSet,
+  OidData,
+} from "@/app/backend/code-systems/service";
 import { randomUUID } from "crypto";
 import {
   ConditionStruct,
@@ -43,6 +51,31 @@ const VSAC_BATCH_DELAY_MS = 1000;
  */
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Whether a VSAC response is getVSACValueSet's OperationOutcome for a 401,
+ * meaning VSAC rejected the UMLS API key.
+ * @param response A response from getVSACValueSet.
+ * @returns True if VSAC rejected the API key.
+ */
+function isVsacAuthFailure(response: ErsdOrVsacResponse): boolean {
+  return (
+    response?.resourceType === "OperationOutcome" &&
+    (response as OperationOutcome).issue?.[0]?.code === "security"
+  );
+}
+
+/**
+ * Builds the error thrown when VSAC rejects the UMLS API key. Retrying won't
+ * help, so seeding stops on the first one.
+ * @returns The error, with a cause the UI uses to link to the key docs.
+ */
+function invalidUmlsKeyError(): Error {
+  return new Error(
+    "VSAC rejected the UMLS API key. Please check that it is valid and not expired, and refer to the documentation below on how to get a new one",
+    { cause: INVALID_API_KEY_LITERAL },
+  );
 }
 
 /**
@@ -129,6 +162,7 @@ class SeedingService {
       );
 
       const vsacErrors: { oid: string; diagnostics: string }[] = [];
+      let authFailed = false;
       let valueSetsToInsert = (
         await generateBatchVsacPromises(oidsToFetch)
       ).map((r) => {
@@ -146,6 +180,9 @@ class SeedingService {
         // silently filtered out below. Track these so we can fail the seed
         // instead of committing an empty DB.
         if ((vs as { resourceType?: string })?.resourceType !== "ValueSet") {
+          if (isVsacAuthFailure(vs)) {
+            authFailed = true;
+          }
           const diagnostics =
             (vs as OperationOutcome).issue?.[0]?.diagnostics ??
             "unknown VSAC error";
@@ -171,6 +208,9 @@ class SeedingService {
         return internalValueSet;
       });
 
+      if (authFailed) {
+        throw invalidUmlsKeyError();
+      }
       if (vsacErrors.length > 0) {
         const sample = vsacErrors
           .slice(0, 3)
@@ -310,7 +350,7 @@ class SeedingService {
    * single network blip abort the entire seed. A non-200 from VSAC (which
    * getVSACValueSet resolves to an OperationOutcome rather than throwing) is
    * retried the same way, falling back to the prior best-effort struct on the
-   * final attempt. Non-transport failures (e.g. a missing API key) are re-thrown
+   * final attempt. A missing or rejected (401) API key is thrown
    * immediately since retrying won't help.
    * @param cString The "code*system*text" representation of the condition.
    * @returns The assembled ConditionStruct ready for DB insertion.
@@ -324,6 +364,9 @@ class SeedingService {
     for (let attempt = 0; attempt <= VSAC_MAX_FETCH_RETRIES; attempt++) {
       try {
         const vsacCondition = await getVSACValueSet(c[0], "condition", c[1]);
+        if (isVsacAuthFailure(vsacCondition)) {
+          throw invalidUmlsKeyError();
+        }
 
         // getVSACValueSet doesn't throw on a non-200 from VSAC; it resolves to
         // an OperationOutcome instead. A 5xx/429 is usually a transient blip on
@@ -355,9 +398,13 @@ class SeedingService {
           category: "",
         };
       } catch (e) {
-        // A missing API key (or any non-transport failure) won't be fixed by
-        // retrying, so surface it immediately.
-        if (e instanceof Error && e.cause === MISSING_API_KEY_LITERAL) {
+        // A missing or rejected API key won't be fixed by retrying, so
+        // surface it immediately.
+        if (
+          e instanceof Error &&
+          (e.cause === MISSING_API_KEY_LITERAL ||
+            e.cause === INVALID_API_KEY_LITERAL)
+        ) {
           throw e;
         }
         lastError = e;

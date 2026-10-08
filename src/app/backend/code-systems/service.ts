@@ -116,20 +116,26 @@ export async function getVSACValueSet(
     const data = (await response.json()) as Bundle;
     return data;
   } else {
-    const diagnosticIssue = await response.json().then((r) => {
-      try {
-        return r?.issue[0]?.diagnostics;
-      } catch {
-        return r;
-      }
-    });
+    // VSAC sends some errors, like the 401 for a bad API key, with an empty
+    // body, so don't assume the body is JSON.
+    const body = await response.text();
+    let detail = body || response.statusText;
+    try {
+      detail = JSON.parse(body)?.issue?.[0]?.diagnostics ?? detail;
+    } catch {
+      // Not JSON; keep the raw body or status text.
+    }
     return {
       resourceType: "OperationOutcome",
       issue: [
         {
           severity: "error",
-          code: "processing",
-          diagnostics: `${response.status}: ${diagnosticIssue}`,
+          // "security" lets callers tell a rejected API key apart from other
+          // failures and stop instead of retrying.
+          code: response.status === 401 ? "security" : "processing",
+          diagnostics: detail
+            ? `${response.status}: ${detail}`
+            : `${response.status}`,
         },
       ],
     } as OperationOutcome;
