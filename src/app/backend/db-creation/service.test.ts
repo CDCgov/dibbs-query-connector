@@ -8,7 +8,10 @@ import {
 } from "./utils";
 import { fetchConditionWithRetry } from "./service";
 import { getVSACValueSet } from "@/app/backend/code-systems/service";
-import { MISSING_API_KEY_LITERAL } from "@/app/constants";
+import {
+  INVALID_API_KEY_LITERAL,
+  MISSING_API_KEY_LITERAL,
+} from "@/app/constants";
 
 jest.mock("@/app/backend/code-systems/service", () => ({
   getVSACValueSet: jest.fn(),
@@ -169,6 +172,25 @@ describe("fetchConditionWithRetry", () => {
     await expect(fetchConditionWithRetry(CONDITION)).rejects.toThrow(
       "UMLS API Key not set",
     );
+    expect(mockGetVSACValueSet).toHaveBeenCalledTimes(1);
+  });
+
+  it("throws immediately without retrying when VSAC rejects the API key", async () => {
+    mockGetVSACValueSet.mockResolvedValue({
+      resourceType: "OperationOutcome",
+      issue: [
+        {
+          severity: "error",
+          code: "security",
+          diagnostics: "401: Unauthorized",
+        },
+      ],
+    });
+
+    await expect(fetchConditionWithRetry(CONDITION)).rejects.toMatchObject({
+      message: expect.stringContaining("VSAC rejected the UMLS API key"),
+      cause: INVALID_API_KEY_LITERAL,
+    });
     expect(mockGetVSACValueSet).toHaveBeenCalledTimes(1);
   });
 

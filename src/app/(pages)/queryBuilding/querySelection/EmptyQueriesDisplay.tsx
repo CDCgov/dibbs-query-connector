@@ -6,7 +6,10 @@ import WorkSpaceSetUpView from "./WorkspaceSetUp";
 import { createDibbsDB } from "@/app/backend/db-creation/service";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import Link from "next/link";
-import { MISSING_API_KEY_LITERAL } from "@/app/constants";
+import {
+  INVALID_API_KEY_LITERAL,
+  MISSING_API_KEY_LITERAL,
+} from "@/app/constants";
 
 type EmptyQueryProps = {
   dbSeeded: boolean;
@@ -43,7 +46,10 @@ export const EmptyQueriesDisplay: React.FC<EmptyQueryProps> = ({
         let body: string | React.ReactNode =
           `Please try again or contact us for more help: ${message}`;
 
-        if (cause === MISSING_API_KEY_LITERAL) {
+        if (
+          cause === MISSING_API_KEY_LITERAL ||
+          cause === INVALID_API_KEY_LITERAL
+        ) {
           const docLink = (
             <Link href="/docs/development#obtaining-api-and-license-keys">
               API key documentation
