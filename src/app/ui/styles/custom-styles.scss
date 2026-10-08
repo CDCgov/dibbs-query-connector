@@ -336,6 +336,10 @@ iframe:focus,
   .Toastify__progress-bar--success {
     background-color: color("success-lighter");
   }
+
+  .usa-alert {
+    width: 100%;
+  }
 }
 
 .Toastify__toast-body {
@@ -347,7 +351,6 @@ iframe:focus,
   }
 
   .usa-alert__body::before {
-    mask-size: 1.5rem 1.5rem !important;
     top: unset !important;
   }
 
