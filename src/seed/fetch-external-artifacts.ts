@@ -1,36 +1,38 @@
 import { Bundle, OperationOutcome, Parameters, ValueSet } from "fhir/r4";
-import { encode } from "base-64";
-import { writeFile } from "fs/promises";
+import base64 from "base-64";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
-import { generateBatchVsacPromises } from "@/app/backend/db-creation/lib";
 import { ConditionStruct } from "@/app/backend/db-creation/seedSqlStructs";
 import { ErsdConceptType, MISSING_API_KEY_LITERAL } from "@/constants";
-import { sleep } from "@/app/backend/db-creation/service";
-import { translateVSACToInternalValueSet } from "./process-data";
+import {
+  indexErsdByOid,
+  isUmbrellaErsdId,
+  isVsacOid,
+  stripErsdVersionSuffix,
+  translateVSACToInternalValueSet,
+} from "./process-data";
+import {
+  VSAC_MAX_FETCH_RETRIES,
+  VSAC_RETRY_BASE_DELAY_MS,
+  ErsdPayload,
+  VSAC_FETCH_BATCH_SIZE,
+  VSAC_BATCH_DELAY_MS,
+  ErsdCondition,
+} from "./constants";
 
-// Number of retry attempts for a single VSAC condition lookup that fails with a
-// transient transport error (e.g. undici "fetch failed" from a connection reset
-// or timeout). Total attempts = retries + 1.
-const VSAC_MAX_FETCH_RETRIES = 3;
-// Base delay for exponential backoff between condition-lookup retries.
-const VSAC_RETRY_BASE_DELAY_MS = 1000;
-// Courtesy pause between batches of condition lookups so we don't overwhelm VSAC.
-const VSAC_BATCH_DELAY_MS = 1000;
+/**
+ * Sleeps for the given number of milliseconds.
+ * @param ms Milliseconds to wait.
+ * @returns A promise that resolves once the delay elapses.
+ */
+export async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
-export type ErsdOrVsacResponse = Bundle | Parameters | OperationOutcome;
-
-type ersdCondition = {
-  code: string;
-  system: string;
-  text: string;
-  valueset_id: string;
-};
-
-export type OidData = {
-  oids: Array<string>;
-  oidToErsdType: Map<string, string>;
-  conditions: Array<ersdCondition>;
-};
+function isSuccessfulFetch(
+  response: OperationOutcome | Bundle,
+): response is Bundle {
+  return (response as Bundle).resourceType === "Bundle";
+}
 
 /**
  * Fetches the eRSD Specification from the eRSD API. This function requires an API key
@@ -40,7 +42,7 @@ export type OidData = {
  */
 export async function getERSD(
   eRSDVersion: number = 3,
-): Promise<ErsdOrVsacResponse> {
+): Promise<Bundle | OperationOutcome> {
   // Only allow specific, known-safe version numbers
   const allowedVersions = [1, 2, 3];
   if (!allowedVersions.includes(Number(eRSDVersion))) {
@@ -86,6 +88,16 @@ export async function getERSD(
   }
 }
 
+export async function fetchAndProcessErsdResources() {
+  const ersdResponse = await getERSD();
+
+  if (isSuccessfulFetch(ersdResponse)) {
+    return ersdResponse;
+  }
+
+  throw Error(ersdResponse.issue[0].diagnostics);
+}
+
 /**
  * Fetches the VSAC Value Sets and supporting code systems information for a given OID
  * as a FHIR bundle. This function requires a UMLS API Key which must be obtained as a
@@ -101,7 +113,7 @@ export async function getVSACValueSet(
   oid: string,
   searchStructType: string = "valueset",
   codeSystem?: string,
-): Promise<ErsdOrVsacResponse> {
+): Promise<Bundle | OperationOutcome> {
   const username: string = "apikey";
   const umlsKey = process.env.UMLS_API_KEY;
 
@@ -121,7 +133,7 @@ export async function getVSACValueSet(
   const response = await fetch(vsacUrl, {
     method: "get",
     headers: new Headers({
-      Authorization: "Basic " + encode(username + ":" + umlsKey),
+      Authorization: "Basic " + base64.encode(username + ":" + umlsKey),
       "Content-Type": "application/fhir+json",
     }),
   });
@@ -181,15 +193,16 @@ export async function fetchConditionWithRetry(
       // tolerate-and-continue behavior rather than aborting the whole seed on
       // a persistently failing condition lookup.
       if (
-        vsacCondition.resourceType === "OperationOutcome" &&
+        !isSuccessfulFetch(vsacCondition) &&
         attempt < VSAC_MAX_FETCH_RETRIES
       ) {
         const diagnostics =
           vsacCondition.issue?.[0]?.diagnostics ?? "unknown VSAC error";
+
         throw new Error(`VSAC returned an error response: ${diagnostics}`);
       }
 
-      const params = vsacCondition as Parameters;
+      const params = vsacCondition as unknown as Parameters;
       const versionHolder = (params.parameter || []).find(
         (p) => p.name === "version",
       );
@@ -230,9 +243,32 @@ export async function fetchConditionWithRetry(
   );
 }
 
+/**
+ * helper function to generate VSAC promises
+ *
+ * @param oidsToFetch - OIDs from the eRSD to query from VSAC
+ * @returns Promises to resolve that will give you the requested VSAC valuesets
+ */
+export async function generateBatchVsacPromises(oidsToFetch: string[]) {
+  const valueSetPromises = Promise.allSettled(
+    oidsToFetch.map(async (oid) => {
+      // First, we'll pull the value set from VSAC and map it to our representation
+      const vs = await getVSACValueSet(oid);
+      return { vs: vs, oid: oid };
+    }),
+  );
+
+  return valueSetPromises;
+}
+
+/**
+ *
+ * @param oidData
+ * @param batchSize
+ */
 export async function seedBatchValueSetsFromVsac(
-  oidData: OidData,
-  batchSize = 100,
+  oidData: ErsdPayload,
+  batchSize = VSAC_FETCH_BATCH_SIZE,
 ) {
   const umlsKey = process.env.UMLS_API_KEY;
   if (!umlsKey) {
@@ -283,7 +319,7 @@ export async function seedBatchValueSetsFromVsac(
           return;
         }
 
-        const eRSDType: ErsdConceptType = oidData.oidToErsdType.get(
+        const eRSDType: ErsdConceptType = oidData.oidToErsdResourceMap.get(
           oid,
         ) as ErsdConceptType;
         const internalValueSet = translateVSACToInternalValueSet(
@@ -364,4 +400,77 @@ export async function seedBatchValueSetsFromVsac(
       await sleep(VSAC_BATCH_DELAY_MS);
     }
   }
+}
+
+/**
+ * Performs eRSD querying and parsing to generate OIDs and extract clinical
+ * concepts from the eRSD for eventual database insertion.
+ * First, a call is made to the eRSD, which is filtered
+ * for valuesets. These valusets are used to create a mapping between OID and
+ * clinical service code, as well as to actually compile the list of OIDs of all
+ * valuesets in the pull-down. Then, these two entities are bundled together
+ * as a data structure for future scripting.
+ * @returns An OidData object containing the OIDs extracted as well as the
+ * clinical service type associated with each.
+ */
+export async function createErsdPayload() {
+  const ersd = await fetchAndProcessErsdResources();
+
+  const ersdValuesets = ersd["entry"]?.filter(
+    (e) =>
+      (e.resource as { resourceType?: string })?.resourceType === "ValueSet",
+  );
+
+  const { nonUmbrellaValueSets, oidToErsdResourceMap } =
+    indexErsdByOid(ersdValuesets);
+
+  // Only OID-identified value sets exist in VSAC. Anything else left over
+  // (umbrella groupings we don't map to a concept type, APHL-authored
+  // provisional value sets) would 404 there and fail the whole seed, so we
+  // leave it out of both the fetch list and the condition linkages.
+  const skippedIds = nonUmbrellaValueSets
+    .map((vs) => vs.id)
+    .filter((id) => !isVsacOid(id));
+  if (skippedIds.length > 0) {
+    console.warn(
+      `Skipping ${skippedIds.length} eRSD value set(s) that can't be fetched from VSAC: ${skippedIds.join(", ")}`,
+    );
+  }
+
+  let conditionExtractor: Array<ErsdCondition> = [];
+  nonUmbrellaValueSets
+    .filter((vs) => isVsacOid(vs.id))
+    .reduce((acc: Array<ErsdCondition>, vs: ValueSet) => {
+      const conditionSchemes = vs.useContext?.filter(
+        (context) =>
+          !(context.valueCodeableConcept?.coding || [])[0].system?.includes(
+            "us-ph-usage-context",
+          ),
+      );
+      (conditionSchemes || []).forEach((usc) => {
+        const ersdCond: ErsdCondition = {
+          code: (usc.valueCodeableConcept?.coding || [])[0].code || "",
+          system: (usc.valueCodeableConcept?.coding || [])[0].system || "",
+          text: usc.valueCodeableConcept?.text || "",
+          valueset_id: stripErsdVersionSuffix(vs.id || ""),
+        };
+        conditionExtractor.push(ersdCond);
+      });
+      return conditionExtractor;
+    }, conditionExtractor);
+
+  // Take out the umbrella value sets from the ones we try to insert, then
+  // strip the `-YYYYMMDD` version suffix that eRSD v3 appends to non-umbrella
+  // ids so we send bare OIDs to VSAC and key the DB on bare OIDs (matches the
+  // static seed's `WHERE oid = $1` lookups).
+  let oids = ersdValuesets
+    ?.map((vs) => vs.resource?.id)
+    .filter((oid) => !isUmbrellaErsdId(oid) && isVsacOid(oid))
+    .map((oid) => (oid ? stripErsdVersionSuffix(oid) : oid));
+
+  return {
+    oids: oids,
+    oidToErsdResourceMap: oidToErsdResourceMap,
+    conditions: conditionExtractor,
+  } as ErsdPayload;
 }

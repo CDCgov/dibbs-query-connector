@@ -26,25 +26,6 @@ import {
 } from "./utils";
 import { readJsonFromRelativePath } from "./service";
 import { stripProtocolAndTLDFromSystemUrl } from "@/seed/process-data";
-import { getVSACValueSet } from "@/seed/fetch-external-artifacts";
-
-/**
- * helper function to generate VSAC promises
- *
- * @param oidsToFetch - OIDs from the eRSD to query from VSAC
- * @returns Promises to resolve that will give you the requested VSAC valuesets
- */
-export async function generateBatchVsacPromises(oidsToFetch: string[]) {
-  const valueSetPromises = Promise.allSettled(
-    oidsToFetch.map(async (oid) => {
-      // First, we'll pull the value set from VSAC and map it to our representation
-      const vs = await getVSACValueSet(oid);
-      return { vs: vs, oid: oid };
-    }),
-  );
-
-  return valueSetPromises;
-}
 
 /**
  * Function call to insert a new ValueSet into the database.
