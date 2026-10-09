@@ -1,7 +1,6 @@
 "use server";
 
-import { OperationOutcome, Parameters, ValueSet } from "fhir/r4";
-import { getVSACValueSet, OidData } from "@/app/backend/code-systems/service";
+import { OperationOutcome, ValueSet } from "fhir/r4";
 import { randomUUID } from "crypto";
 import {
   ConditionStruct,
@@ -13,8 +12,6 @@ import {
 import {
   checkDBForData,
   checkValueSetInsertion,
-  generateBatchVsacPromises,
-  indexErsdResponseByOid,
   insertDBStructArray,
   insertSeedDbStructs,
   insertValueSet,
@@ -22,28 +19,17 @@ import {
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { DbClient } from "../db/service";
 import { auditable } from "../audit-logs/decorator";
-import { translateVSACToInternalValueSet } from "./utils";
 import path from "path";
 import { readFileSync } from "fs";
 import { MISSING_API_KEY_LITERAL, ErsdConceptType } from "@/constants";
-
-// Number of retry attempts for a single VSAC condition lookup that fails with a
-// transient transport error (e.g. undici "fetch failed" from a connection reset
-// or timeout). Total attempts = retries + 1.
-const VSAC_MAX_FETCH_RETRIES = 3;
-// Base delay for exponential backoff between condition-lookup retries.
-const VSAC_RETRY_BASE_DELAY_MS = 1000;
-// Courtesy pause between batches of condition lookups so we don't overwhelm VSAC.
-const VSAC_BATCH_DELAY_MS = 1000;
-
-/**
- * Sleeps for the given number of milliseconds.
- * @param ms Milliseconds to wait.
- * @returns A promise that resolves once the delay elapses.
- */
-export async function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+import {
+  createErsdPayload,
+  fetchConditionWithRetry,
+  generateBatchVsacPromises,
+  sleep,
+} from "@/seed/fetch-external-artifacts";
+import { translateVSACToInternalValueSet } from "@/seed/process-data";
+import { ErsdPayload, VSAC_BATCH_DELAY_MS } from "@/seed/constants";
 
 /**
  * Helper utility to resolve the path of a JSON asset file across environments.
@@ -88,7 +74,7 @@ class SeedingService {
    * against the VSAC retrieval to make sure everything was inserted successfully.
    * As a courtesy, we sleep between batches to not overload the VSAC API and to synch
    * up with our DB Config Pool's connection thread timeout setting.
-   * @param oidData A data structure of IDs to lookup and clinical service mappings for
+   * @param ersdPayload A data structure of IDs to lookup and clinical service mappings for
    * each such ID.
    * @param batchSize The number of asynchronous calls to fire at once. Default is 100.
    * @param dbClient - The client to be used to allow seeding to be transactional. We
@@ -96,7 +82,7 @@ class SeedingService {
    * pool because of the cross-relationships in the seeding data.
    */
   static async seedBatchValueSetsFromVsac(
-    oidData: OidData,
+    ersdPayload: ErsdPayload,
     dbClient: DbClient,
     batchSize = 100,
   ) {
@@ -117,15 +103,15 @@ class SeedingService {
 
     console.log(
       "Attempting fetches and inserts for",
-      oidData.oids?.length,
+      ersdPayload.oids?.length,
       "value sets.",
     );
 
-    while (startIdx < oidData.oids.length) {
+    while (startIdx < ersdPayload.oids.length) {
       console.log("Batching IDs", startIdx, "to", lastIdx);
-      const oidsToFetch = oidData.oids.slice(
+      const oidsToFetch = ersdPayload.oids.slice(
         startIdx,
-        Math.min(lastIdx, oidData.oids.length),
+        Math.min(lastIdx, ersdPayload.oids.length),
       );
 
       const vsacErrors: { oid: string; diagnostics: string }[] = [];
@@ -154,7 +140,7 @@ class SeedingService {
           return;
         }
 
-        const eRSDType: ErsdConceptType = oidData.oidToErsdType.get(
+        const eRSDType: ErsdConceptType = ersdPayload.oidToErsdResourceMap.get(
           oid,
         ) as ErsdConceptType;
         const internalValueSet = translateVSACToInternalValueSet(
@@ -236,7 +222,7 @@ class SeedingService {
     // condition mappings directly from value sets
     console.log("Inserting eRSD condition data");
     const conditionSet = new Set<string>();
-    oidData.conditions.forEach((c) => {
+    ersdPayload.conditions.forEach((c) => {
       const repString = c.code + "*" + c.system + "*" + c.text;
       conditionSet.add(repString);
     });
@@ -261,7 +247,7 @@ class SeedingService {
       console.log("Fetching condition versions", startIdx, "to", endIdx);
       const batch = conditionStrings.slice(startIdx, endIdx);
       const batchResults = await Promise.all(
-        batch.map((cString) => SeedingService.fetchConditionWithRetry(cString)),
+        batch.map((cString) => fetchConditionWithRetry(cString)),
       );
       conditionStructs.push(...batchResults);
 
@@ -278,7 +264,7 @@ class SeedingService {
     // For this part, we do want the full list of conditions we obtained
     // from the value sets
     console.log("Inserting condition-to-valueset mappings");
-    let ctvStructs = oidData.conditions.map((c) => {
+    let ctvStructs = ersdPayload.conditions.map((c) => {
       const version = oidsToVersion.get(c.valueset_id);
       if (retiredOids.has(c.valueset_id) || !version) {
         return {
@@ -300,88 +286,6 @@ class SeedingService {
     ctvStructs = ctvStructs.filter((ctvs) => ctvs.id !== "NONE");
     await insertDBStructArray(ctvStructs, "condition_to_valueset", dbClient);
   }
-
-  /**
-   * Fetches version metadata for a single eRSD condition from VSAC, retrying on
-   * transient network failures. Condition lookups go out in a burst while seeding,
-   * and on a constrained egress path (e.g. ECS behind a NAT gateway) the underlying
-   * fetch can reject with a transport-level "fetch failed" error (connection reset,
-   * timeout, TLS). We retry those with exponential backoff rather than letting a
-   * single network blip abort the entire seed. A non-200 from VSAC (which
-   * getVSACValueSet resolves to an OperationOutcome rather than throwing) is
-   * retried the same way, falling back to the prior best-effort struct on the
-   * final attempt. Non-transport failures (e.g. a missing API key) are re-thrown
-   * immediately since retrying won't help.
-   * @param cString The "code*system*text" representation of the condition.
-   * @returns The assembled ConditionStruct ready for DB insertion.
-   */
-  static async fetchConditionWithRetry(
-    cString: string,
-  ): Promise<ConditionStruct> {
-    const c = cString.split("*");
-    let lastError: unknown;
-
-    for (let attempt = 0; attempt <= VSAC_MAX_FETCH_RETRIES; attempt++) {
-      try {
-        const vsacCondition = await getVSACValueSet(c[0], "condition", c[1]);
-
-        // getVSACValueSet doesn't throw on a non-200 from VSAC; it resolves to
-        // an OperationOutcome instead. A 5xx/429 is usually a transient blip on
-        // the same constrained egress path, so retry it like a transport
-        // failure. On the final attempt we fall through and build the struct
-        // from whatever we got (an empty version), preserving the prior
-        // tolerate-and-continue behavior rather than aborting the whole seed on
-        // a persistently failing condition lookup.
-        if (
-          vsacCondition.resourceType === "OperationOutcome" &&
-          attempt < VSAC_MAX_FETCH_RETRIES
-        ) {
-          const diagnostics =
-            vsacCondition.issue?.[0]?.diagnostics ?? "unknown VSAC error";
-          throw new Error(`VSAC returned an error response: ${diagnostics}`);
-        }
-
-        const params = vsacCondition as Parameters;
-        const versionHolder = (params.parameter || []).find(
-          (p) => p.name === "version",
-        );
-        const versionArray = (versionHolder?.valueString || "").split("/");
-        const version = versionArray[versionArray.length - 1];
-        return {
-          id: c[0],
-          system: c[1],
-          name: c[2],
-          version: version,
-          category: "",
-        };
-      } catch (e) {
-        // A missing API key (or any non-transport failure) won't be fixed by
-        // retrying, so surface it immediately.
-        if (e instanceof Error && e.cause === MISSING_API_KEY_LITERAL) {
-          throw e;
-        }
-        lastError = e;
-        if (attempt < VSAC_MAX_FETCH_RETRIES) {
-          const backoffMs = VSAC_RETRY_BASE_DELAY_MS * Math.pow(2, attempt);
-          console.warn(
-            `VSAC condition lookup for ${c[0]} failed ` +
-              `(attempt ${attempt + 1}/${VSAC_MAX_FETCH_RETRIES + 1}): ` +
-              `${e instanceof Error ? e.message : String(e)}. ` +
-              `Retrying in ${backoffMs}ms.`,
-          );
-          await sleep(backoffMs);
-        }
-      }
-    }
-
-    throw new Error(
-      `VSAC condition lookup for ${c[0]} failed after ` +
-        `${VSAC_MAX_FETCH_RETRIES + 1} attempts: ` +
-        `${lastError instanceof Error ? lastError.message : String(lastError)}`,
-      { cause: lastError },
-    );
-  }
-
   /**
    * Helper function that execute the category data updates for inserted conditions.
    * @param dbClient - The client to be used to allow seeding to be transactional. We
@@ -411,12 +315,12 @@ class SeedingService {
       await dbClient.connect();
       await dbClient.query("BEGIN");
       try {
-        const ersdOidData = await indexErsdResponseByOid();
+        const ersdPayload = await createErsdPayload();
 
-        if (ersdOidData) {
+        if (ersdPayload) {
           console.log("Seeding valuesets and relationships from VSAC");
           await SeedingService.seedBatchValueSetsFromVsac(
-            ersdOidData,
+            ersdPayload,
             dbClient,
           );
         } else {
@@ -482,6 +386,3 @@ class SeedingService {
 }
 
 export const createDibbsDB = SeedingService.createDibbsDB;
-
-// Exported so the condition-lookup retry/backoff behavior can be unit tested.
-export const fetchConditionWithRetry = SeedingService.fetchConditionWithRetry;

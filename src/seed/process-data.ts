@@ -102,7 +102,8 @@ export function translateVSACToInternalValueSet(
  * nonUmbrellaEntries: map of valuesets to conditions as dictated by the eRSD
  */
 export function indexErsdByOid(valuesets: BundleEntry[] | undefined) {
-  const oidToErsdType = new Map<string, string>();
+  const oidToErsdResourceMap = new Map<string, string>();
+
   Object.keys(ersdToDibbsConceptMap).forEach((k) => {
     const umbrellaValueSet = valuesets?.find((vs) => {
       const id = vs.resource?.id;
@@ -122,7 +123,7 @@ export function indexErsdByOid(valuesets: BundleEntry[] | undefined) {
         const noVersion = vsUrl.split("|")[0];
         const vsArray = noVersion.split("/");
         const oid = vsArray[vsArray.length - 1];
-        oidToErsdType.set(oid, k);
+        oidToErsdResourceMap.set(oid, k);
       }
     }
   });
@@ -141,7 +142,7 @@ export function indexErsdByOid(valuesets: BundleEntry[] | undefined) {
   );
 
   return {
-    oidToErsdType: oidToErsdType,
+    oidToErsdResourceMap: oidToErsdResourceMap,
     nonUmbrellaValueSets: nonUmbrellaValueSets,
   };
 }
