@@ -1,6 +1,5 @@
 "use server";
 
-import { OperationOutcome, ValueSet } from "fhir/r4";
 import { randomUUID } from "crypto";
 import {
   ConditionStruct,
@@ -16,20 +15,17 @@ import {
   insertSeedDbStructs,
   insertValueSet,
 } from "./lib";
-import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { DbClient } from "../db/service";
-import { auditable } from "../audit-logs/decorator";
 import path from "path";
 import { readFileSync } from "fs";
-import { MISSING_API_KEY_LITERAL, ErsdConceptType } from "@/constants";
 import {
   fetchErsdPayload,
   fetchConditionWithRetry,
-  generateBatchVsacPromises,
   sleep,
+  fetchValueSetsFromVsac,
 } from "@/seed/fetch-external-artifacts";
 import { translateVSACToInternalValueSet } from "@/seed/process-data";
-import { ErsdPayload, VSAC_BATCH_DELAY_MS } from "@/seed/constants";
+import { ErsdPayload, VSAC_BATCH_DELAY_MS, VSAC_FETCH_BATCH_SIZE } from "@/seed/constants";
 
 /**
  * Helper utility to resolve the path of a JSON asset file across environments.
@@ -84,98 +80,9 @@ class SeedingService {
   static async seedBatchValueSetsFromVsac(
     ersdPayload: ErsdPayload,
     dbClient: DbClient,
-    batchSize = 100,
+    batchSize = VSAC_FETCH_BATCH_SIZE,
   ) {
-    const umlsKey = process.env.UMLS_API_KEY;
-    if (!umlsKey) {
-      throw Error(
-        "UMLS API Key not set. Please refer to the documentation below on how to get your UMLS API key before continuing",
-        {
-          cause: MISSING_API_KEY_LITERAL,
-        },
-      );
-    }
-    let startIdx = 0;
-    let lastIdx = startIdx + batchSize;
-
-    const oidsToVersion: Map<String, String> = new Map<String, String>();
-    const retiredOids: Set<String> = new Set<String>();
-
-    console.log(
-      "Attempting fetches and inserts for",
-      ersdPayload.oids?.length,
-      "value sets.",
-    );
-
-    while (startIdx < ersdPayload.oids.length) {
-      console.log("Batching IDs", startIdx, "to", lastIdx);
-      const oidsToFetch = ersdPayload.oids.slice(
-        startIdx,
-        Math.min(lastIdx, ersdPayload.oids.length),
-      );
-
-      const vsacErrors: { oid: string; diagnostics: string }[] = [];
-      let valueSetsToInsert = (
-        await generateBatchVsacPromises(oidsToFetch)
-      ).map((r) => {
-        if (r.status === "rejected") {
-          console.error("Valueset fetch rejected: ", r.reason);
-          return;
-        }
-
-        const { vs, oid } = r.value;
-
-        // VSAC returns an OperationOutcome on any non-200 (auth failure,
-        // not-found, etc.). Without this guard, the error response gets
-        // translated into a DibbsValueSet with `concepts: undefined`, which
-        // is indistinguishable from a legitimately retired valueset and gets
-        // silently filtered out below. Track these so we can fail the seed
-        // instead of committing an empty DB.
-        if ((vs as { resourceType?: string })?.resourceType !== "ValueSet") {
-          const diagnostics =
-            (vs as OperationOutcome).issue?.[0]?.diagnostics ??
-            "unknown VSAC error";
-          console.error(`VSAC fetch failed for OID ${oid}: ${diagnostics}`);
-          vsacErrors.push({ oid, diagnostics });
-          return;
-        }
-
-        const eRSDType: ErsdConceptType = ersdPayload.oidToErsdResourceMap.get(
-          oid,
-        ) as ErsdConceptType;
-        const internalValueSet = translateVSACToInternalValueSet(
-          vs as unknown as ValueSet,
-          eRSDType,
-        );
-
-        oidsToVersion.set(oid, internalValueSet.valueSetVersion);
-
-        // Found a retired OID, store it so we don't insert condition mappings on it
-        if (internalValueSet.concepts === undefined) {
-          retiredOids.add(internalValueSet.valueSetExternalId || "");
-        }
-        return internalValueSet;
-      });
-
-      if (vsacErrors.length > 0) {
-        const sample = vsacErrors
-          .slice(0, 3)
-          .map((e) => `${e.oid} (${e.diagnostics})`)
-          .join("; ");
-        throw new Error(
-          `VSAC returned errors for ${vsacErrors.length}/${oidsToFetch.length} OID(s) in this batch. ` +
-            `Verify UMLS_API_KEY is valid and not expired. Sample: ${sample}`,
-        );
-      }
-
-      // Next, in case we hit a value set that has a `retired` status and
-      // a deprecated concept listing, we'll need to filter for only those
-      // with defined Concepts
-      valueSetsToInsert = valueSetsToInsert.filter(
-        (vsp): vsp is DibbsValueSet => {
-          return vsp?.concepts !== undefined;
-        },
-      );
+    const valuesetsToInsert = fetchValueSetsFromVsac(ersdPayload, batchSize)
 
       const MAX_RETRIES = 3;
       for (const vs of valueSetsToInsert) {
