@@ -2,6 +2,7 @@ import { Concept } from "@/app/models/entities/concepts";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { ErsdConceptType, ersdToDibbsConceptMap } from "@/constants";
 import { BundleEntry, ValueSet as FhirValueSet, ValueSet } from "fhir/r4";
+import { ErsdCondition, ErsdPayload } from "./constants";
 
 /**
  * Helper function to clean URL info from code system data
@@ -95,17 +96,23 @@ export function translateVSACToInternalValueSet(
 }
 
 /**
- * Mapping function that takes eRSD input and indexes values by OID, as well as
- * parsing out condotion <> valueset linkages from the ingestion input
- * @param valuesets - raw valuesets from the eRSD.
- * @returns oidToErsdType: A map of OID <> eRSD concept types
- * nonUmbrellaEntries: map of valuesets to conditions as dictated by the eRSD
- */
-export function indexErsdByOid(valuesets: BundleEntry[] | undefined) {
+ * Mapping function that takes eRSD input to create an ErsdPayload,
+ * indexing values by OID and extracting the nested conditions.
+ *
+ * These values are used later to fetch the relevant resources from the VSAC API
+ * using the indexed OIDs.
+ *
+ * @param ersdValuesets - raw valuesets from the eRSD.
+ * @returns ErsdPayload: A payload object containing
+ *  - a unique set of OIDs from all the resources
+ *  - conditions extracted from the eRSD
+ *  - a mapping between the OIDs <> eRSD resources for future scripting use.
+ * */
+export function createErsdPayload(ersdValuesets: BundleEntry[] | undefined) {
   const oidToErsdResourceMap = new Map<string, string>();
 
   Object.keys(ersdToDibbsConceptMap).forEach((k) => {
-    const umbrellaValueSet = valuesets?.find((vs) => {
+    const umbrellaValueSet = ersdValuesets?.find((vs) => {
       const id = vs.resource?.id;
       return id === k || id?.startsWith(k + "-");
     });
@@ -132,7 +139,7 @@ export function indexErsdByOid(valuesets: BundleEntry[] | undefined) {
   // the value codeable concept of each resource's base level
   // We can filter out public health informatics contexts to get only the meaningful
   // conditions
-  const nonUmbrellaEntries = valuesets?.filter(
+  const nonUmbrellaEntries = ersdValuesets?.filter(
     (vs) => !isUmbrellaErsdId(vs.resource?.id),
   ) as BundleEntry[];
   const nonUmbrellaValueSets: Array<ValueSet> = (nonUmbrellaEntries || []).map(
@@ -141,8 +148,52 @@ export function indexErsdByOid(valuesets: BundleEntry[] | undefined) {
     },
   );
 
+  // Only OID-identified value sets exist in VSAC. Anything else left over
+  // (umbrella groupings we don't map to a concept type, APHL-authored
+  // provisional value sets) would 404 there and fail the whole seed, so we
+  // leave it out of both the fetch list and the condition linkages.
+  const skippedIds = nonUmbrellaValueSets
+    .map((vs) => vs.id)
+    .filter((id) => !isVsacOid(id));
+  if (skippedIds.length > 0) {
+    console.warn(
+      `Skipping ${skippedIds.length} eRSD value set(s) that can't be fetched from VSAC: ${skippedIds.join(", ")}`,
+    );
+  }
+
+  const conditions = nonUmbrellaValueSets
+    .filter((vs) => isVsacOid(vs.id))
+    .reduce((acc: Array<ErsdCondition>, vs: ValueSet) => {
+      const conditionSchemes = vs.useContext?.filter(
+        (context) =>
+          !(context.valueCodeableConcept?.coding || [])[0].system?.includes(
+            "us-ph-usage-context",
+          ),
+      );
+      (conditionSchemes || []).forEach((usc) => {
+        const ersdCond: ErsdCondition = {
+          code: (usc.valueCodeableConcept?.coding || [])[0].code || "",
+          system: (usc.valueCodeableConcept?.coding || [])[0].system || "",
+          text: usc.valueCodeableConcept?.text || "",
+          valueset_id: stripErsdVersionSuffix(vs.id || ""),
+        };
+        acc.push(ersdCond);
+      });
+      return acc;
+    }, []);
+
+  // Take out the umbrella value sets from the ones we try to insert, then
+  // strip the `-YYYYMMDD` version suffix that eRSD v3 appends to non-umbrella
+  // ids so we send bare OIDs to VSAC and key the DB on bare OIDs (matches the
+  // static seed's `WHERE oid = $1` lookups).
+  let oids = ersdValuesets
+    ?.map((vs) => vs.resource?.id)
+    .filter((oid) => !isUmbrellaErsdId(oid) && isVsacOid(oid))
+    .map((oid) => (oid ? stripErsdVersionSuffix(oid) : oid));
+
   return {
+    oids: oids,
+    conditions: conditions,
     oidToErsdResourceMap: oidToErsdResourceMap,
-    nonUmbrellaValueSets: nonUmbrellaValueSets,
-  };
+  } as ErsdPayload;
 }

@@ -6,7 +6,6 @@ import * as path from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log("📡 Fetching ERSD resources");
 const ersd = await fetchAndProcessErsdResources();
 
 writeErsdData(ersd, `${__dirname}/artifacts`);
