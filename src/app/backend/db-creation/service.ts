@@ -1,6 +1,5 @@
 "use server";
 
-import { ErsdConceptType, MISSING_API_KEY_LITERAL } from "@/app/constants";
 import { OperationOutcome, Parameters, ValueSet } from "fhir/r4";
 import { getVSACValueSet, OidData } from "@/app/backend/code-systems/service";
 import { randomUUID } from "crypto";
@@ -26,6 +25,7 @@ import { auditable } from "../audit-logs/decorator";
 import { translateVSACToInternalValueSet } from "./utils";
 import path from "path";
 import { readFileSync } from "fs";
+import { MISSING_API_KEY_LITERAL, ErsdConceptType } from "@/constants";
 
 // Number of retry attempts for a single VSAC condition lookup that fails with a
 // transient transport error (e.g. undici "fetch failed" from a connection reset
@@ -41,7 +41,7 @@ const VSAC_BATCH_DELAY_MS = 1000;
  * @param ms Milliseconds to wait.
  * @returns A promise that resolves once the delay elapses.
  */
-function sleep(ms: number): Promise<void> {
+export async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
