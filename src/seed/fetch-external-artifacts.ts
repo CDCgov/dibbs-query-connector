@@ -4,10 +4,7 @@ import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { ConditionStruct } from "@/app/backend/db-creation/seedSqlStructs";
 import { ErsdConceptType, MISSING_API_KEY_LITERAL } from "@/constants";
 import {
-  indexErsdByOid,
-  isUmbrellaErsdId,
-  isVsacOid,
-  stripErsdVersionSuffix,
+  createErsdPayload,
   translateVSACToInternalValueSet,
 } from "./process-data";
 import {
@@ -16,7 +13,6 @@ import {
   ErsdPayload,
   VSAC_FETCH_BATCH_SIZE,
   VSAC_BATCH_DELAY_MS,
-  ErsdCondition,
 } from "./constants";
 
 /**
@@ -88,7 +84,12 @@ export async function getERSD(
   }
 }
 
+/**
+ * Function to fetch the
+ * @returns
+ */
 export async function fetchAndProcessErsdResources() {
+  console.log("📡 Fetching ERSD resources");
   const ersdResponse = await getERSD();
 
   if (isSuccessfulFetch(ersdResponse)) {
@@ -410,10 +411,9 @@ export async function seedBatchValueSetsFromVsac(
  * clinical service code, as well as to actually compile the list of OIDs of all
  * valuesets in the pull-down. Then, these two entities are bundled together
  * as a data structure for future scripting.
- * @returns An OidData object containing the OIDs extracted as well as the
- * clinical service type associated with each.
+ * @returns An ErsdPayload object containing extracted data for future processing
  */
-export async function createErsdPayload() {
+export async function fetchErsdPayload() {
   const ersd = await fetchAndProcessErsdResources();
 
   const ersdValuesets = ersd["entry"]?.filter(
@@ -421,56 +421,5 @@ export async function createErsdPayload() {
       (e.resource as { resourceType?: string })?.resourceType === "ValueSet",
   );
 
-  const { nonUmbrellaValueSets, oidToErsdResourceMap } =
-    indexErsdByOid(ersdValuesets);
-
-  // Only OID-identified value sets exist in VSAC. Anything else left over
-  // (umbrella groupings we don't map to a concept type, APHL-authored
-  // provisional value sets) would 404 there and fail the whole seed, so we
-  // leave it out of both the fetch list and the condition linkages.
-  const skippedIds = nonUmbrellaValueSets
-    .map((vs) => vs.id)
-    .filter((id) => !isVsacOid(id));
-  if (skippedIds.length > 0) {
-    console.warn(
-      `Skipping ${skippedIds.length} eRSD value set(s) that can't be fetched from VSAC: ${skippedIds.join(", ")}`,
-    );
-  }
-
-  let conditionExtractor: Array<ErsdCondition> = [];
-  nonUmbrellaValueSets
-    .filter((vs) => isVsacOid(vs.id))
-    .reduce((acc: Array<ErsdCondition>, vs: ValueSet) => {
-      const conditionSchemes = vs.useContext?.filter(
-        (context) =>
-          !(context.valueCodeableConcept?.coding || [])[0].system?.includes(
-            "us-ph-usage-context",
-          ),
-      );
-      (conditionSchemes || []).forEach((usc) => {
-        const ersdCond: ErsdCondition = {
-          code: (usc.valueCodeableConcept?.coding || [])[0].code || "",
-          system: (usc.valueCodeableConcept?.coding || [])[0].system || "",
-          text: usc.valueCodeableConcept?.text || "",
-          valueset_id: stripErsdVersionSuffix(vs.id || ""),
-        };
-        conditionExtractor.push(ersdCond);
-      });
-      return conditionExtractor;
-    }, conditionExtractor);
-
-  // Take out the umbrella value sets from the ones we try to insert, then
-  // strip the `-YYYYMMDD` version suffix that eRSD v3 appends to non-umbrella
-  // ids so we send bare OIDs to VSAC and key the DB on bare OIDs (matches the
-  // static seed's `WHERE oid = $1` lookups).
-  let oids = ersdValuesets
-    ?.map((vs) => vs.resource?.id)
-    .filter((oid) => !isUmbrellaErsdId(oid) && isVsacOid(oid))
-    .map((oid) => (oid ? stripErsdVersionSuffix(oid) : oid));
-
-  return {
-    oids: oids,
-    oidToErsdResourceMap: oidToErsdResourceMap,
-    conditions: conditionExtractor,
-  } as ErsdPayload;
+  return createErsdPayload(ersdValuesets);
 }

@@ -23,7 +23,7 @@ import path from "path";
 import { readFileSync } from "fs";
 import { MISSING_API_KEY_LITERAL, ErsdConceptType } from "@/constants";
 import {
-  createErsdPayload,
+  fetchErsdPayload,
   fetchConditionWithRetry,
   generateBatchVsacPromises,
   sleep,
@@ -315,7 +315,7 @@ class SeedingService {
       await dbClient.connect();
       await dbClient.query("BEGIN");
       try {
-        const ersdPayload = await createErsdPayload();
+        const ersdPayload = await fetchErsdPayload();
 
         if (ersdPayload) {
           console.log("Seeding valuesets and relationships from VSAC");
