@@ -83,9 +83,18 @@ Then:
    CREATE ROLE qc_aidbox LOGIN PASSWORD '<query-connector-aidbox-db-password>';
    GRANT qc_aidbox TO <server admin login>;
    ALTER DATABASE qc_aidbox OWNER TO qc_aidbox;
+   -- Azure creates each database's public schema owned by azure_pg_admin, so
+   -- owning the database isn't enough for Aidbox to create its tables. This
+   -- must run inside qc_aidbox, not the postgres database.
+   \c qc_aidbox
+   ALTER SCHEMA public OWNER TO qc_aidbox;
    -- Aidbox creates its extensions at startup. If it fails with a permission
    -- error on CREATE EXTENSION, also run: GRANT azure_pg_admin TO qc_aidbox;
    ```
+
+   If this step is missed, the `aidbox` container app restarts in a loop
+   with `ERROR: permission denied for schema public`, and the `aidbox-seeder`
+   job fails after polling `/health` for about 18 minutes.
 
 4. Merge to `main` (or run `CD` manually). The first apply creates the
    Container Apps environment, which takes about ten minutes.
