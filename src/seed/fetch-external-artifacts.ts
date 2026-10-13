@@ -303,8 +303,13 @@ export async function batchFetchVsacValuesets(oidsToFetch: string[]): Promise<{
           !isFhirValueset(item.vs),
       )
       .map((i) => {
+        const details = i.vs.issue[0].details;
+        const errorDisplay = details?._text
+          ? details.text
+          : JSON.stringify(details);
+
         console.error(
-          `VSAC fetch with OID ${i.oid} resolved with OperationOutcome issue ${i.vs.issue}`,
+          `VSAC fetch with OID ${i.oid} resolved with OperationOutcome issue ${errorDisplay}`,
         );
 
         return { error: i.vs, oid: i.oid };
@@ -317,16 +322,19 @@ export async function batchFetchVsacValuesets(oidsToFetch: string[]): Promise<{
 
 /**
  * Given the eRSD payload condition information, fetch all the relevant VSAC valuesets
- * needed to populate the rest of the database.
+ * needed to populate the rest of the database. Default configured with retries and backoff
+ * to guard against API flakiness.
  *
  * @param ersdPayload - the eRSD payload to inform which valuesets needing fetching
  * @param batchSize - batch size to not overwhelm the VSAC API - 100 by default
+ * @param maxRetries - Retry attempts to not overwhelm the VSAC API - 3 by default
  * @returns Bundle<Resource>[] of successful VSAC valuesets
  * @throws Error if any of the promises fail to resolve / resolve with OperationOutcome
  */
 export async function fetchValueSetsFromVsac(
   ersdPayload: ErsdPayload,
   batchSize: number,
+  maxRetries = VSAC_MAX_FETCH_RETRIES,
 ) {
   const umlsKey = process.env.UMLS_API_KEY;
   if (!umlsKey) {
@@ -340,44 +348,39 @@ export async function fetchValueSetsFromVsac(
   let startIdx = 0;
   let lastIdx = startIdx + batchSize;
   let batch = 1;
+  let attempt = 0;
+  let vsacValuesets: VsacResult[] = [];
 
-  console.log(
+  console.info(
     `Attempting fetch for ${ersdPayload.oids?.length} VSAC value sets.`,
   );
+  while (startIdx < ersdPayload.oids.length && attempt < maxRetries) {
+    const boundedLastIdx = Math.min(lastIdx, ersdPayload.oids.length);
 
-  let vsacValuesets: VsacResult[] = [];
-  let attempt = 0;
-  while (
-    startIdx < ersdPayload.oids.length &&
-    attempt < VSAC_MAX_FETCH_RETRIES
-  ) {
-    console.log(
-      `Attempt ${attempt + 1} for batch ${batch}: IDs ${startIdx} to ${lastIdx}`,
+    console.info(
+      `Attempt ${attempt + 1} for batch ${batch}: IDs ${startIdx} to ${boundedLastIdx}`,
     );
-    const oidsToFetch = ersdPayload.oids.slice(
-      startIdx,
-      Math.min(lastIdx, ersdPayload.oids.length),
-    );
+    const oidsToFetch = ersdPayload.oids.slice(startIdx, boundedLastIdx);
 
     let batchValuesets = await batchFetchVsacValuesets(oidsToFetch);
     const { vsacResults, errors } = batchValuesets;
 
     if (errors.length > 0) {
-      if (attempt < VSAC_MAX_FETCH_RETRIES) {
-        const backoffMs = VSAC_RETRY_BASE_DELAY_MS * Math.pow(2, attempt);
-        console.warn(
-          `VSAC condition lookup for OID batch starting with ${oidsToFetch[0]} and ending with ${oidsToFetch[oidsToFetch.length - 1]} failed ` +
-            `(attempt ${attempt + 1}/${VSAC_MAX_FETCH_RETRIES + 1}): ` +
-            `Retrying in ${backoffMs}ms.`,
-        );
-        attempt += 1;
-        await sleep(backoffMs);
-        continue;
-      } else {
+      if (attempt > maxRetries) {
         throw new Error(
           `VSAC fetch returned errors in batch ${batch}. Verify UMLS_API_KEY is valid and not expired.`,
         );
       }
+
+      const backoffMs = VSAC_RETRY_BASE_DELAY_MS * Math.pow(2, attempt);
+      console.warn(
+        `VSAC condition lookup for OID batch starting with ${oidsToFetch[0]} and ending with ${oidsToFetch[oidsToFetch.length - 1]} failed ` +
+          `(attempt ${attempt + 1}/${maxRetries + 1}): ` +
+          `Retrying in ${backoffMs}ms.`,
+      );
+      attempt += 1;
+      await sleep(backoffMs);
+      continue;
     }
 
     vsacValuesets.push(...vsacResults);
