@@ -1,7 +1,7 @@
 import { Concept } from "@/app/models/entities/concepts";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { ErsdConceptType, ersdToDibbsConceptMap } from "@/constants";
-import { BundleEntry, ValueSet as FhirValueSet, ValueSet } from "fhir/r4";
+import { BundleEntry, ValueSet as FhirValueSet } from "fhir/r4";
 import { ErsdCondition, ErsdPayload } from "./constants";
 
 /**
@@ -122,7 +122,7 @@ export function createErsdPayload(ersdValuesets: BundleEntry[] | undefined) {
     // a single `include[0]`; v3 emits one `include` entry per ref, so we
     // walk every entry's `valueSet` array.
     const includes =
-      (umbrellaValueSet?.resource as ValueSet)?.compose?.include || [];
+      (umbrellaValueSet?.resource as FhirValueSet)?.compose?.include || [];
     for (const inc of includes) {
       for (const vsUrl of inc.valueSet || []) {
         // eRSD v3 includes a `|version` suffix on the canonical URL
@@ -142,11 +142,11 @@ export function createErsdPayload(ersdValuesets: BundleEntry[] | undefined) {
   const nonUmbrellaEntries = ersdValuesets?.filter(
     (vs) => !isUmbrellaErsdId(vs.resource?.id),
   ) as BundleEntry[];
-  const nonUmbrellaValueSets: Array<ValueSet> = (nonUmbrellaEntries || []).map(
-    (vs) => {
-      return (vs.resource as ValueSet) || ({} as ValueSet);
-    },
-  );
+  const nonUmbrellaValueSets: Array<FhirValueSet> = (
+    nonUmbrellaEntries || []
+  ).map((vs) => {
+    return (vs.resource as FhirValueSet) || ({} as FhirValueSet);
+  });
 
   // Only OID-identified value sets exist in VSAC. Anything else left over
   // (umbrella groupings we don't map to a concept type, APHL-authored
@@ -163,7 +163,7 @@ export function createErsdPayload(ersdValuesets: BundleEntry[] | undefined) {
 
   const conditions = nonUmbrellaValueSets
     .filter((vs) => isVsacOid(vs.id))
-    .reduce((acc: Array<ErsdCondition>, vs: ValueSet) => {
+    .reduce((acc: Array<ErsdCondition>, vs: FhirValueSet) => {
       const conditionSchemes = vs.useContext?.filter(
         (context) =>
           !(context.valueCodeableConcept?.coding || [])[0].system?.includes(

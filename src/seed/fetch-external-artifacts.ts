@@ -1,6 +1,5 @@
 import { Bundle, OperationOutcome, Parameters, ValueSet } from "fhir/r4";
 import base64 from "base-64";
-import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { ConditionStruct } from "@/app/backend/db-creation/seedSqlStructs";
 import { ErsdConceptType, MISSING_API_KEY_LITERAL } from "@/constants";
 import {
@@ -12,7 +11,6 @@ import {
   VSAC_RETRY_BASE_DELAY_MS,
   ErsdPayload,
   VSAC_FETCH_BATCH_SIZE,
-  VSAC_BATCH_DELAY_MS,
 } from "./constants";
 
 /**
@@ -24,9 +22,9 @@ export async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function isSuccessfulFetch(
-  response: OperationOutcome | Bundle,
-): response is Bundle {
+type FhirFetchResult = OperationOutcome | Bundle | ValueSet;
+
+function isSuccessfulFetch(response: FhirFetchResult): response is Bundle {
   return (response as Bundle).resourceType === "Bundle";
 }
 
@@ -245,6 +243,19 @@ export async function fetchConditionWithRetry(
   );
 }
 
+type VsacResult = {
+  vs: ValueSet;
+  oid: string;
+};
+
+type VsacErrorResult = {
+  error: OperationOutcome | PromiseRejectedResult;
+  oid: string;
+};
+
+function isFhirValueset(response: FhirFetchResult): response is ValueSet {
+  return (response as ValueSet).resourceType === "ValueSet";
+}
 /**
  * Helper function to generate batch VSAC fetches, filtering out failed promises
  * and logging appropriate warnings
@@ -252,58 +263,70 @@ export async function fetchConditionWithRetry(
  * @param oidsToFetch - OIDs from the eRSD to query from VSAC
  * @returns Resolved valuesets
  */
-export async function batchFetchVsacValuesets(oidsToFetch: string[]) {
+export async function batchFetchVsacValuesets(oidsToFetch: string[]): Promise<{
+  vsacResults: VsacResult[];
+  errors: VsacErrorResult[];
+}> {
   const valuesetPromises = oidsToFetch.map(async (oid) => {
     const vs = await getVSACValueset(oid);
     return { vs: vs, oid: oid };
   });
+  const resolvedPromises: { vs: FhirFetchResult; oid: string }[] = [];
+  let errors: VsacErrorResult[] = [];
 
-  const resolvedPromises = (await Promise.allSettled(valuesetPromises))
-    .filter((v) => v.status === "fulfilled")
-    .map((v) => v.value);
+  const settledPromises = await Promise.allSettled(valuesetPromises);
 
-  const unsuccessfulFetches = resolvedPromises.filter(
-    (v) => !isSuccessfulFetch(v.vs),
+  settledPromises.forEach((r, i) => {
+    if (r.status === "fulfilled") {
+      resolvedPromises.push(r.value);
+    } else {
+      const erroringOid = oidsToFetch[i];
+      console.error(`VSAC promise with OID ${erroringOid} failed to resolve`);
+      errors.push({
+        error: r.reason,
+        // preserve the OID associated with the rejected promise for future bookkeeping
+        oid: erroringOid,
+      });
+    }
+  });
+
+  const valuesets = resolvedPromises.filter(
+    (item): item is { vs: ValueSet; oid: string } => isFhirValueset(item.vs),
   );
 
-  if (
-    resolvedPromises.length !== oidsToFetch.length ||
-    unsuccessfulFetches.length > 0
-  ) {
-    console.warn(
-      "Some fetches to VSAC didn't resolve or resolved with an error",
-    );
+  if (valuesets.length !== resolvedPromises.length) {
+    console.warn("Some fetches to VSAC resolved with an error");
 
-    // TODO error handle this properly
+    const unsuccessfulFetches = resolvedPromises
+      .filter(
+        (item): item is { vs: OperationOutcome; oid: string } =>
+          !isFhirValueset(item.vs),
+      )
+      .map((i) => {
+        console.error(
+          `VSAC fetch with OID ${i.oid} resolved with OperationOutcome issue ${i.vs.issue}`,
+        );
 
-    // VSAC returns an OperationOutcome on any non-200 (auth failure,
-    // not-found, etc.). Without this guard, the error response gets
-    // translated into a DibbsValueSet with `concepts: undefined`, which
-    // is indistinguishable from a legitimately retired valueset and gets
-    // silently filtered out below. Track these so we can fail the seed
-    // instead of committing an empty DB.
-    // if ((vs as { resourceType?: string })?.resourceType !== "ValueSet") {
-    //   const diagnostics =
-    //     (vs as OperationOutcome).issue?.[0]?.diagnostics ??
-    //     "unknown VSAC error";
-    //   console.error(`VSAC fetch failed for OID ${oid}: ${diagnostics}`);
-    //   vsacErrors.push({ oid, diagnostics });
-    //   return;
-    // }
-    return [];
+        return { error: i.vs, oid: i.oid };
+      });
+    errors.push(...unsuccessfulFetches);
   }
 
-  return resolvedPromises.filter((v) => isSuccessfulFetch(v.vs));
+  return { vsacResults: valuesets, errors: errors };
 }
 
 /**
+ * Given the eRSD payload condition information, fetch all the relevant VSAC valuesets
+ * needed to populate the rest of the database.
  *
- * @param ersdPayload
- * @param batchSize
+ * @param ersdPayload - the eRSD payload to inform which valuesets needing fetching
+ * @param batchSize - batch size to not overwhelm the VSAC API - 100 by default
+ * @returns Bundle<Resource>[] of successful VSAC valuesets
+ * @throws Error if any of the promises fail to resolve / resolve with OperationOutcome
  */
-export async function fetchValueSetsFromVsac(
+async function fetchValuesetsFromVsac(
   ersdPayload: ErsdPayload,
-  batchSize = VSAC_FETCH_BATCH_SIZE,
+  batchSize: number,
 ) {
   const umlsKey = process.env.UMLS_API_KEY;
   if (!umlsKey) {
@@ -316,68 +339,73 @@ export async function fetchValueSetsFromVsac(
   }
   let startIdx = 0;
   let lastIdx = startIdx + batchSize;
-
-  const oidsToVersion: Map<String, String> = new Map<String, String>();
-  const retiredOids: Set<String> = new Set<String>();
+  let batch = 1;
 
   console.log(
-    "Attempting fetches for",
-    ersdPayload.oids?.length,
-    "value sets.",
+    `Attempting fetch for ${ersdPayload.oids?.length} VSAC value sets.`,
   );
-  let vsacValuesets: Bundle[] = [];
 
+  let vsacValuesets: VsacResult[] = [];
   while (startIdx < ersdPayload.oids.length) {
-    console.log("Batching IDs", startIdx, "to", lastIdx);
+    console.log(`Attempting batch ${batch}: IDs ${startIdx} to ${lastIdx}`);
     const oidsToFetch = ersdPayload.oids.slice(
       startIdx,
       Math.min(lastIdx, ersdPayload.oids.length),
     );
 
-    const vsacErrors: { oid: string; diagnostics: string }[] = [];
     let batchValuesets = await batchFetchVsacValuesets(oidsToFetch);
+    const { vsacResults, errors } = batchValuesets;
 
-    const transformedValuesets = batchValuesets.map((r) => {
-      const { vs, oid } = r;
-
-      const eRSDType: ErsdConceptType = ersdPayload.oidToErsdResourceMap.get(
-        oid,
-      ) as ErsdConceptType;
-      const internalValueSet = translateVSACToInternalValueSet(
-        vs as unknown as ValueSet,
-        eRSDType,
-      );
-
-      oidsToVersion.set(oid, internalValueSet.valueSetVersion);
-
-      // Found a retired OID, store it so we don't insert condition mappings on it
-      if (internalValueSet.concepts === undefined) {
-        retiredOids.add(internalValueSet.valueSetExternalId || "");
-      }
-      return internalValueSet;
-    });
-
-    if (vsacErrors.length > 0) {
-      const sample = vsacErrors
-        .slice(0, 3)
-        .map((e) => `${e.oid} (${e.diagnostics})`)
-        .join("; ");
+    if (errors.length > 0) {
       throw new Error(
-        `VSAC returned errors for ${vsacErrors.length}/${oidsToFetch.length} OID(s) in this batch. ` +
-          `Verify UMLS_API_KEY is valid and not expired. Sample: ${sample}`,
+        `VSAC fetch returned errors in batch ${batch}. Verify UMLS_API_KEY is valid and not expired.`,
       );
     }
 
-    // Next, in case we hit a value set that has a `retired` status and
-    // a deprecated concept listing, we'll need to filter for only those
-    // with defined Concepts
-
-    vsacValuesets.push(batchValuesets.map((b) => b.vs));
+    vsacValuesets.push(...vsacResults);
     startIdx += batchSize;
     lastIdx += batchSize;
+    batch += 1;
   }
 
   return vsacValuesets;
+}
+
+/**
+ * Function to fetch valuesets from VSAC and map them to internal valueset representation
+ * @param ersdPayload - the eRSD payload to inform which valuesets needing fetching
+ * @param batchSize - batch size to not overwhelm the VSAC API - 100 by default
+ * @returns DibbsValueset[] - an array of DibbsValueset objects
+ */
+export async function fetchDibbsValuesets(
+  ersdPayload: ErsdPayload,
+  batchSize = VSAC_FETCH_BATCH_SIZE,
+) {
+  const vsacValuesets = await fetchValuesetsFromVsac(ersdPayload, batchSize);
+  const oidsToVersion: Map<String, String> = new Map<String, String>();
+  const retiredOids: Set<String> = new Set<String>();
+
+  const internalValuesets = vsacValuesets.map((v) => {
+    const eRSDType: ErsdConceptType = ersdPayload.oidToErsdResourceMap.get(
+      v.oid,
+    ) as ErsdConceptType;
+
+    const internalValueset = translateVSACToInternalValueSet(v.vs, eRSDType);
+
+    oidsToVersion.set(v.oid, internalValueset.valueSetVersion);
+
+    // Found a retired OID, store it so we don't insert condition mappings on it
+    if (internalValueset.concepts === undefined) {
+      retiredOids.add(internalValueset.valueSetExternalId || "");
+    }
+    return internalValueset;
+  });
+
+  return {
+    valuesets: internalValuesets,
+    oidsToVersion: oidsToVersion,
+    retiredOids: retiredOids,
+  };
 }
 
 /**

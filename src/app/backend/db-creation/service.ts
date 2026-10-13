@@ -22,10 +22,14 @@ import {
   fetchErsdPayload,
   fetchConditionWithRetry,
   sleep,
-  fetchValueSetsFromVsac,
+  fetchDibbsValuesets,
 } from "@/seed/fetch-external-artifacts";
-import { translateVSACToInternalValueSet } from "@/seed/process-data";
-import { ErsdPayload, VSAC_BATCH_DELAY_MS, VSAC_FETCH_BATCH_SIZE } from "@/seed/constants";
+import {
+  ErsdPayload,
+  VSAC_BATCH_DELAY_MS,
+  VSAC_FETCH_BATCH_SIZE,
+} from "@/seed/constants";
+import { auditable } from "../audit-logs/decorator";
 
 /**
  * Helper utility to resolve the path of a JSON asset file across environments.
@@ -82,46 +86,43 @@ class SeedingService {
     dbClient: DbClient,
     batchSize = VSAC_FETCH_BATCH_SIZE,
   ) {
-    const valuesetsToInsert = fetchValueSetsFromVsac(ersdPayload, batchSize)
+    const { valuesets, oidsToVersion, retiredOids } = await fetchDibbsValuesets(
+      ersdPayload,
+      batchSize,
+    );
+    const MAX_RETRIES = 3;
+    for (const vs of valuesets) {
+      if (vs) {
+        await insertValueSet(vs, dbClient);
 
-      const MAX_RETRIES = 3;
-      for (const vs of valueSetsToInsert) {
-        if (vs) {
-          await insertValueSet(vs, dbClient);
-
-          let missingData = await checkValueSetInsertion(vs, dbClient);
-          // Note: We don't actually have functions for inserting concepts,
-          // so if anything is missing just try re-inserting the whole VS.
-          // This ensures that all reference data and FKs are also updated.
-          let retries = 0;
-          while (
-            (missingData.missingValueSet ||
-              missingData.missingConcepts.length > 0 ||
-              missingData.missingMappings.length > 0) &&
-            retries < MAX_RETRIES
-          ) {
-            retries++;
-            console.log(
-              `Resolving missing values or errors for valueset ${vs.valueSetId} (attempt ${retries}/${MAX_RETRIES})`,
-            );
-            await insertValueSet(vs, dbClient);
-            missingData = await checkValueSetInsertion(vs, dbClient);
-          }
-          if (
-            missingData.missingValueSet ||
+        let missingData = await checkValueSetInsertion(vs, dbClient);
+        // Note: We don't actually have functions for inserting concepts,
+        // so if anything is missing just try re-inserting the whole VS.
+        // This ensures that all reference data and FKs are also updated.
+        let retries = 0;
+        while (
+          (missingData.missingValueSet ||
             missingData.missingConcepts.length > 0 ||
-            missingData.missingMappings.length > 0
-          ) {
-            throw new Error(
-              `Failed to fully insert valueset ${vs.valueSetId} after ${MAX_RETRIES} retries`,
-            );
-          }
+            missingData.missingMappings.length > 0) &&
+          retries < MAX_RETRIES
+        ) {
+          retries++;
+          console.log(
+            `Resolving missing values or errors for valueset ${vs.valueSetId} (attempt ${retries}/${MAX_RETRIES})`,
+          );
+          await insertValueSet(vs, dbClient);
+          missingData = await checkValueSetInsertion(vs, dbClient);
+        }
+        if (
+          missingData.missingValueSet ||
+          missingData.missingConcepts.length > 0 ||
+          missingData.missingMappings.length > 0
+        ) {
+          throw new Error(
+            `Failed to fully insert valueset ${vs.valueSetId} after ${MAX_RETRIES} retries`,
+          );
         }
       }
-      // Finally, we verify that the insert was performed correctly
-
-      startIdx += batchSize;
-      lastIdx += batchSize;
     }
 
     // Once all the value sets are inserted, we need to do conditions
