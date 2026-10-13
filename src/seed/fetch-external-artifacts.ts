@@ -243,7 +243,7 @@ export async function fetchConditionWithRetry(
   );
 }
 
-type VsacResult = {
+export type VsacResult = {
   vs: ValueSet;
   oid: string;
 };
@@ -324,7 +324,7 @@ export async function batchFetchVsacValuesets(oidsToFetch: string[]): Promise<{
  * @returns Bundle<Resource>[] of successful VSAC valuesets
  * @throws Error if any of the promises fail to resolve / resolve with OperationOutcome
  */
-async function fetchValuesetsFromVsac(
+export async function fetchValueSetsFromVsac(
   ersdPayload: ErsdPayload,
   batchSize: number,
 ) {
@@ -346,8 +346,14 @@ async function fetchValuesetsFromVsac(
   );
 
   let vsacValuesets: VsacResult[] = [];
-  while (startIdx < ersdPayload.oids.length) {
-    console.log(`Attempting batch ${batch}: IDs ${startIdx} to ${lastIdx}`);
+  let attempt = 0;
+  while (
+    startIdx < ersdPayload.oids.length &&
+    attempt < VSAC_MAX_FETCH_RETRIES
+  ) {
+    console.log(
+      `Attempt ${attempt + 1} for batch ${batch}: IDs ${startIdx} to ${lastIdx}`,
+    );
     const oidsToFetch = ersdPayload.oids.slice(
       startIdx,
       Math.min(lastIdx, ersdPayload.oids.length),
@@ -357,15 +363,28 @@ async function fetchValuesetsFromVsac(
     const { vsacResults, errors } = batchValuesets;
 
     if (errors.length > 0) {
-      throw new Error(
-        `VSAC fetch returned errors in batch ${batch}. Verify UMLS_API_KEY is valid and not expired.`,
-      );
+      if (attempt < VSAC_MAX_FETCH_RETRIES) {
+        const backoffMs = VSAC_RETRY_BASE_DELAY_MS * Math.pow(2, attempt);
+        console.warn(
+          `VSAC condition lookup for OID batch starting with ${oidsToFetch[0]} and ending with ${oidsToFetch[oidsToFetch.length - 1]} failed ` +
+            `(attempt ${attempt + 1}/${VSAC_MAX_FETCH_RETRIES + 1}): ` +
+            `Retrying in ${backoffMs}ms.`,
+        );
+        attempt += 1;
+        await sleep(backoffMs);
+        continue;
+      } else {
+        throw new Error(
+          `VSAC fetch returned errors in batch ${batch}. Verify UMLS_API_KEY is valid and not expired.`,
+        );
+      }
     }
 
     vsacValuesets.push(...vsacResults);
     startIdx += batchSize;
     lastIdx += batchSize;
     batch += 1;
+    attempt = 0;
   }
 
   return vsacValuesets;
@@ -377,32 +396,32 @@ async function fetchValuesetsFromVsac(
  * @param batchSize - batch size to not overwhelm the VSAC API - 100 by default
  * @returns DibbsValueset[] - an array of DibbsValueset objects
  */
-export async function fetchDibbsValuesets(
+export async function fetchDibbsValueSets(
   ersdPayload: ErsdPayload,
   batchSize = VSAC_FETCH_BATCH_SIZE,
 ) {
-  const vsacValuesets = await fetchValuesetsFromVsac(ersdPayload, batchSize);
+  const vsacValueSets = await fetchValueSetsFromVsac(ersdPayload, batchSize);
   const oidsToVersion: Map<String, String> = new Map<String, String>();
   const retiredOids: Set<String> = new Set<String>();
 
-  const internalValuesets = vsacValuesets.map((v) => {
+  const internalValueSets = vsacValueSets.map((v) => {
     const eRSDType: ErsdConceptType = ersdPayload.oidToErsdResourceMap.get(
       v.oid,
     ) as ErsdConceptType;
 
-    const internalValueset = translateVSACToInternalValueSet(v.vs, eRSDType);
+    const internalValueSet = translateVSACToInternalValueSet(v.vs, eRSDType);
 
-    oidsToVersion.set(v.oid, internalValueset.valueSetVersion);
+    oidsToVersion.set(v.oid, internalValueSet.valueSetVersion);
 
     // Found a retired OID, store it so we don't insert condition mappings on it
-    if (internalValueset.concepts === undefined) {
-      retiredOids.add(internalValueset.valueSetExternalId || "");
+    if (internalValueSet.concepts === undefined) {
+      retiredOids.add(internalValueSet.valueSetExternalId || "");
     }
-    return internalValueset;
+    return internalValueSet;
   });
 
   return {
-    valuesets: internalValuesets,
+    valuesets: internalValueSets,
     oidsToVersion: oidsToVersion,
     retiredOids: retiredOids,
   };
