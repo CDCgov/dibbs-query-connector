@@ -22,7 +22,7 @@ import {
   fetchErsdPayload,
   fetchConditionWithRetry,
   sleep,
-  fetchDibbsValuesets,
+  fetchDibbsValueSets,
 } from "@/seed/fetch-external-artifacts";
 import {
   ErsdPayload,
@@ -86,7 +86,7 @@ class SeedingService {
     dbClient: DbClient,
     batchSize = VSAC_FETCH_BATCH_SIZE,
   ) {
-    const { valuesets, oidsToVersion, retiredOids } = await fetchDibbsValuesets(
+    const { valuesets, oidsToVersion, retiredOids } = await fetchDibbsValueSets(
       ersdPayload,
       batchSize,
     );
