@@ -476,7 +476,6 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     }
   }
 
-  @superAdminRequired
   static async prepareFhirClient(serverName: string) {
     const configs =
       await FhirServerConfigServiceInternal.getFhirServerConfigs();
