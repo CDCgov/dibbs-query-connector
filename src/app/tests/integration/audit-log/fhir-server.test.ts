@@ -29,7 +29,7 @@ const auditCompletionSpy = jest.spyOn(
 
 describe("fhir server", () => {
   beforeAll(() => {
-    suppressConsoleLogs();
+    // suppressConsoleLogs();
   });
   it("fhir server addition / deletion / update", async () => {
     const TEST_FHIR_SERVER = {

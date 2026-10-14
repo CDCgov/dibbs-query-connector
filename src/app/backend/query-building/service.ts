@@ -105,6 +105,7 @@ class QueryBuildingService {
    */
   @transaction
   @auditable
+  @adminRequired
   static async deleteQueryById(queryId: string) {
     return deleteQueryByIdHelp(queryId, dbService);
   }
