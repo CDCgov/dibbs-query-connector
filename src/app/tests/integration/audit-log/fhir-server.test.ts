@@ -13,6 +13,7 @@ import {
   deleteFhirServer,
 } from "@/app/backend/fhir-servers/service";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
+import { suppressConsoleLogs } from "../fixtures";
 
 jest.mock("@/app/backend/audit-logs/lib", () => {
   return {
