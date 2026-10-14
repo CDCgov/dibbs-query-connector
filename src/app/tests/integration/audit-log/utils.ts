@@ -1,4 +1,5 @@
 import dbService from "@/app/backend/db/service";
+import { UserRole } from "@/app/models/entities/users";
 import { waitFor } from "@testing-library/dom";
 
 export const GET_ALL_AUDIT_ROWS = "SELECT * FROM audit_logs;";
@@ -26,6 +27,7 @@ export const TEST_USER = {
     email: "bowser.jr@koopa.evil",
     firstName: "Bowser",
     lastName: "Jr.",
+    qcRole: UserRole.SUPER_ADMIN,
   },
 };
 
