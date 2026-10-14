@@ -7,7 +7,6 @@ import {
   waitForAuditSuccess,
 } from "./utils";
 import * as AuditableDecorators from "@/app/backend/audit-logs/lib";
-import { suppressConsoleLogs } from "../fixtures";
 import {
   insertFhirServer,
   updateFhirServer,
