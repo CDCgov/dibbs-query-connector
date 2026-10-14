@@ -3,7 +3,7 @@ import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { auditable } from "@/app/backend/audit-logs/decorator";
 import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 import dbService from "../db/service";
-import { transaction } from "../db/decorators";
+import { superAdminRequired, transaction } from "../db/decorators";
 import { FHIR_SERVER_INSERT_QUERY } from "../db/util";
 import {
   AuthMethodType,
@@ -63,7 +63,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param forceRefresh - Whether to flush the config cache
    * @returns The configuration for the FHIR server.
    */
-  // @superAdminRequired
+  @superAdminRequired
   static async getFhirServerConfigs(forceRefresh = false) {
     const cacheExpired =
       Date.now() - FhirServerConfigService.cacheFetchedAt >

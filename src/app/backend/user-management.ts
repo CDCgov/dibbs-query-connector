@@ -197,6 +197,7 @@ class UserManagementService extends UserManagementServiceInternal {
    * @param updated_role - The role from the JWT token.
    * @returns The newly added user or an empty result if already exists.
    */
+  @superAdminRequired
   @auditable
   static async updateUserDetails(
     userId: string,
