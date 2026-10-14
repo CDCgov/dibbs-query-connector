@@ -97,6 +97,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
+  @superAdminRequired
   static async updateFhirServerConnectionStatus(
     name: string,
     wasSuccessful: boolean,
@@ -151,6 +152,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    */
   @transaction
   @auditable
+  @superAdminRequired
   static async updateFhirServer(updateDetails: {
     id: string;
     name: string;
@@ -290,6 +292,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @returns An object indicating success or failure with optional error message
    */
   @transaction
+  @superAdminRequired
   static async updateFhirServerAccessToken(
     id: string,
     accessToken: string,
@@ -349,6 +352,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
 
   @transaction
   @auditable
+  @superAdminRequired
   static async insertFhirServer(
     name: string,
     hostname: string,
@@ -438,6 +442,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    */
   @transaction
   @auditable
+  @superAdminRequired
   static async deleteFhirServer(id: string) {
     const deleteQuery = `
     DELETE FROM fhir_servers 
@@ -471,6 +476,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     }
   }
 
+  @superAdminRequired
   static async prepareFhirClient(serverName: string) {
     const configs =
       await FhirServerConfigServiceInternal.getFhirServerConfigs();
