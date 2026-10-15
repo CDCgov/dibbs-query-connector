@@ -5,9 +5,12 @@ import type {
   ConditionsMap,
   MedicalRecordSections,
   NestedQuery,
-  QueryTableResult,
 } from "@/app/(pages)/queryBuilding/utils";
-import { adminRequired, transaction } from "../db/decorators";
+import {
+  adminRequired,
+  authenticationRequired,
+  transaction,
+} from "../db/decorators";
 import {
   deleteQueryByIdHelp,
   getSavedQueryByIdHelp,
@@ -15,13 +18,13 @@ import {
 } from "./lib";
 import dbService from "../db/service";
 import { getAllGroupQueries } from "../usergroup-management";
-import { getUserRole } from "../user-management";
-import { User, UserRole } from "@/app/models/entities/users";
+import { getUserRole } from "../auth/user-provisioning";
+import { UserRole } from "@/app/models/entities/users";
+import type { User } from "@/app/models/entities/users";
 import { CustomUserQuery, QuerySummary } from "@/app/models/entities/query";
 import { getLoggedInUser, isAuthDisabledServerCheck } from "@/app/utils/auth";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { auditable } from "../audit-logs/decorator";
-import { linkTimeboxRangesToQuery } from "../query-timefiltering";
 import { getValueSetsByConditionIdsSql } from "../db-creation/seedSqlStructs";
 
 class QueryBuildingService {
@@ -58,44 +61,9 @@ class QueryBuildingService {
    * @param queryId - Query ID to grab data from the db with
    * @returns The query name, data, and conditions list from the query table
    */
+  @adminRequired
   static async getSavedQueryById(queryId: string) {
     return getSavedQueryByIdHelp(queryId, dbService);
-  }
-
-  /**
-   * Executes a search for a CustomQuery against the query-loaded Postgres
-   * Database, using the saved name associated with the query as the unique
-   * identifier by which to load the result.
-   * @param name The name given to a stored query in the DB.
-   * @returns One or more rows from the DB matching the requested saved query,
-   * or an error if no results can be found.
-   */
-  static async getSavedQueryByName(name: string) {
-    const values = [name];
-
-    const getQuerybyNameSQL = `
-    select q.query_name, q.id, q.query_data, q.conditions_list, q.medical_record_sections
-    from query q 
-    where q.query_name = $1;
-  `;
-
-    try {
-      const result = await dbService.query(getQuerybyNameSQL, values);
-      if (result.rows.length === 0) {
-        console.error("No results found for query named:", name);
-        return undefined;
-      }
-
-      const foundQuery = result.rows[0];
-      const timeboxInfo = await linkTimeboxRangesToQuery(foundQuery.id);
-      // followup to get timeboxing information
-
-      foundQuery.timeboxWindows = timeboxInfo;
-      return foundQuery as unknown as QueryTableResult;
-    } catch (error) {
-      console.error("Error retrieving query:", error);
-      throw error;
-    }
   }
 
   /**
@@ -103,6 +71,7 @@ class QueryBuildingService {
    * @param queryId - The unique identifier of the query to delete.
    * @returns A success or error response indicating the result.
    */
+  @adminRequired
   @transaction
   @auditable
   static async deleteQueryById(queryId: string) {
@@ -121,6 +90,7 @@ class QueryBuildingService {
    * - valuesets: An array of ValueSet objects.
    * - concepts: An array of Concept objects.
    */
+  @adminRequired
   static async getCustomQueries(): Promise<CustomUserQuery[]> {
     const query = `
     SELECT
@@ -229,6 +199,7 @@ class QueryBuildingService {
    * assigned to a user group they belong to, resolved in a single SQL query.
    * @returns An array of QuerySummary objects sorted by query name
    */
+  @authenticationRequired
   static async getSavedQuerySummaries(): Promise<QuerySummary[]> {
     let unrestricted = true;
     let username = "";
@@ -263,6 +234,7 @@ class QueryBuildingService {
    * the given user is a member of
    * @returns an array of CustomUserQuery objects
    */
+  @adminRequired
   static async getQueriesForUser(currentUser: User) {
     if (!!currentUser && currentUser.userGroupMemberships) {
       const assignedQueries = await Promise.all(
@@ -283,6 +255,7 @@ class QueryBuildingService {
    * @returns One or more rows from the DB matching the requested saved query,
    * or an error if no results can be found.
    */
+  @adminRequired
   static async getValueSetsAndConceptsByConditionIDs(ids: string[]) {
     try {
       if (ids.length === 0) {
@@ -318,6 +291,7 @@ class QueryBuildingService {
    * order to make a call to the DB with the necessary ID(s) to get the valuesets
    * on subsequent pages.
    */
+  @adminRequired
   static async getConditionsData() {
     const query = "SELECT * FROM conditions";
     const result = await dbService.query(query);
@@ -347,7 +321,6 @@ class QueryBuildingService {
   }
 }
 
-export const getSavedQueryByName = QueryBuildingService.getSavedQueryByName;
 export const saveCustomQuery = QueryBuildingService.saveCustomQuery;
 export const getSavedQueryById = QueryBuildingService.getSavedQueryById;
 export const deleteQueryById = QueryBuildingService.deleteQueryById;

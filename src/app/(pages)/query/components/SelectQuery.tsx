@@ -6,7 +6,7 @@ import {
   PatientDiscoveryResponse,
   patientRecordsQuery,
   PatientRecordsResponse,
-} from "@/app/backend/query-execution/service";
+} from "@/app/backend/query-execution/actions";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import { Patient } from "fhir/r4";
 

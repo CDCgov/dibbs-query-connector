@@ -20,7 +20,7 @@ import {
   updateNewbornScreeningCategorySql,
 } from "./seedSqlStructs";
 import {
-  checkDBForData,
+  checkDBForData as checkDBForDataInternal,
   checkValueSetInsertion,
   generateBatchVsacPromises,
   indexErsdResponseByOid,
@@ -31,9 +31,8 @@ import {
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { DbClient } from "../db/service";
 import { auditable } from "../audit-logs/decorator";
+import { adminRequired } from "../db/decorators";
 import { translateVSACToInternalValueSet } from "./utils";
-import path from "path";
-import { readFileSync } from "fs";
 
 // Number of retry attempts for a single VSAC condition lookup that fails with a
 // transient transport error (e.g. undici "fetch failed" from a connection reset
@@ -76,39 +75,6 @@ function invalidUmlsKeyError(): Error {
     "VSAC rejected the UMLS API key. Please check that it is valid and not expired, and refer to the documentation below on how to get a new one",
     { cause: INVALID_API_KEY_LITERAL },
   );
-}
-
-/**
- * Helper utility to resolve the path of a JSON asset file across environments.
- * In production (standalone build), __dirname resolves relative to the bundled
- * output. In dev (Turbopack), __dirname may resolve to a virtual path, so we
- * fall back to process.cwd()-based resolution.
- * @param filename The file to read from. Must be located in the assets folder.
- * @returns The stringified file data.
- */
-export async function readJsonFromRelativePath(filename: string) {
-  const allowedDirs = [
-    path.resolve(__dirname, "../../assets"),
-    path.resolve(process.cwd(), "src/app/assets"),
-    path.resolve(process.cwd(), ".next/server/app/assets"),
-  ];
-
-  for (const dir of allowedDirs) {
-    const resolved = path.resolve(dir, filename);
-    if (!resolved.startsWith(dir + path.sep)) {
-      continue;
-    }
-    try {
-      return readFileSync(resolved, "utf-8");
-    } catch {
-      // Try next candidate
-    }
-  }
-
-  console.error(
-    `Could not find asset file ${filename}. Tried: ${allowedDirs.map((d) => path.join(d, filename)).join(", ")}`,
-  );
-  throw new Error(`Could not load asset file "${filename}".`);
 }
 
 class SeedingService {
@@ -355,6 +321,7 @@ class SeedingService {
    * @param cString The "code*system*text" representation of the condition.
    * @returns The assembled ConditionStruct ready for DB insertion.
    */
+  @adminRequired
   static async fetchConditionWithRetry(
     cString: string,
   ): Promise<ConditionStruct> {
@@ -448,10 +415,20 @@ class SeedingService {
     return { success: true };
   }
 
+  /**
+   * Checks whether the database has been seeded with condition data
+   * @returns true if seed data is present
+   */
+  @adminRequired
+  static async checkDBForData() {
+    return checkDBForDataInternal();
+  }
+
+  @adminRequired
   @auditable
   static async createDibbsDB() {
     // Check if the DB already contains valuesets
-    const dbHasData = await checkDBForData();
+    const dbHasData = await checkDBForDataInternal();
 
     if (!dbHasData) {
       const dbClient = new DbClient();
@@ -529,6 +506,7 @@ class SeedingService {
 }
 
 export const createDibbsDB = SeedingService.createDibbsDB;
+export const checkDBForData = SeedingService.checkDBForData;
 
 // Exported so the condition-lookup retry/backoff behavior can be unit tested.
 export const fetchConditionWithRetry = SeedingService.fetchConditionWithRetry;

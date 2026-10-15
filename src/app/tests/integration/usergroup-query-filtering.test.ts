@@ -21,6 +21,7 @@ const mockGetLoggedInUser = jest.fn();
 jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
   adminAccessCheck: jest.fn(() => Promise.resolve(true)),
+  authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
   isAuthDisabledServerCheck: jest.fn(() => false),
   getLoggedInUser: () => mockGetLoggedInUser(),
 }));

@@ -1,12 +1,14 @@
 import {
-  addUserIfNotExists,
   updateUserRole,
   getAllUsers,
-  getUserRole,
   getUserByUsername,
-  updateUserDetails,
   getAllAdmins,
 } from "@/app/backend/user-management";
+import {
+  addUserIfNotExists,
+  getUserRole,
+  updateUserDetails,
+} from "@/app/backend/auth/user-provisioning";
 
 import {
   createUserGroup,
@@ -25,6 +27,7 @@ jest.mock("@/app/utils/auth", () => {
   return {
     superAdminAccessCheck: jest.fn().mockResolvedValue(true),
     adminAccessCheck: jest.fn().mockResolvedValue(true),
+    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
   };
 });
 

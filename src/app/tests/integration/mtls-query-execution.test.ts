@@ -1,6 +1,6 @@
 import { Task, Bundle, Patient } from "fhir/r4";
 import { patientDiscoveryQuery } from "@/app/backend/query-execution/service";
-import { prepareFhirClient } from "@/app/backend/fhir-servers/service";
+import { prepareFhirClient } from "@/app/backend/fhir-servers/lib";
 import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 import { suppressConsoleLogs } from "./fixtures";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
@@ -9,7 +9,7 @@ jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn().mockReturnValue(true),
 }));
 
-jest.mock("@/app/backend/fhir-servers/service", () => ({
+jest.mock("@/app/backend/fhir-servers/lib", () => ({
   prepareFhirClient: jest.fn(),
   getFhirServerConfigs: jest.fn(),
   getFhirServerNames: jest.fn(),
@@ -119,7 +119,7 @@ describe("Query Execution with Mutual TLS", () => {
       const {
         getFhirServerConfigs,
         getFhirServerNames,
-      } = require("@/app/backend/fhir-servers/service");
+      } = require("@/app/backend/fhir-servers/lib");
       (getFhirServerConfigs as jest.Mock).mockResolvedValue([mockServerConfig]);
       (getFhirServerNames as jest.Mock).mockResolvedValue([
         mockServerConfig.name,
@@ -390,7 +390,7 @@ describe("Query Execution with Mutual TLS", () => {
       const {
         getFhirServerConfigs,
         getFhirServerNames,
-      } = require("@/app/backend/fhir-servers/service");
+      } = require("@/app/backend/fhir-servers/lib");
       (getFhirServerConfigs as jest.Mock).mockResolvedValue([
         nonMtlsServerConfig,
       ]);
@@ -436,7 +436,7 @@ describe("Query Execution with Mutual TLS", () => {
       const {
         getFhirServerConfigs,
         getFhirServerNames,
-      } = require("@/app/backend/fhir-servers/service");
+      } = require("@/app/backend/fhir-servers/lib");
       (getFhirServerConfigs as jest.Mock).mockResolvedValue([
         nonMtlsServerConfig,
       ]);
@@ -479,7 +479,7 @@ describe("Query Execution with Mutual TLS", () => {
       const {
         getFhirServerConfigs,
         getFhirServerNames,
-      } = require("@/app/backend/fhir-servers/service");
+      } = require("@/app/backend/fhir-servers/lib");
       (getFhirServerConfigs as jest.Mock).mockResolvedValue([
         matchServerConfig,
       ]);

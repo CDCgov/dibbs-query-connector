@@ -18,6 +18,12 @@ test.describe("SMART on FHIR", () => {
         name: "New server",
       }),
     ).toBeVisible();
+    // The USWDS modal wrapper fades in; wait for it to finish so axe doesn't
+    // measure color contrast against a half-transparent modal.
+    await expect(page.locator(".usa-modal-wrapper.is-visible")).toHaveCSS(
+      "opacity",
+      "1",
+    );
     await runAxeAccessibilityChecks(page);
 
     const serverName = `E2E Smart on FHIR ${Math.random() * 100}`;
