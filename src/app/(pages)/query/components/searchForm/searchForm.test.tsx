@@ -2,15 +2,15 @@ import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import { screen, waitFor } from "@testing-library/react";
 import SearchForm from "./SearchForm";
 import { useSearchParams } from "next/navigation";
-import { getFhirServerConfigs } from "@/app/backend/fhir-servers/service";
+import { getFhirServerSummaries } from "@/app/backend/fhir-servers/service";
 import { getConditionsData } from "@/app/backend/query-building/service";
-import { patientDiscoveryQuery } from "@/app/backend/query-execution/service";
+import { patientDiscoveryQuery } from "@/app/backend/query-execution/actions";
 import { hyperUnluckyPatient } from "@/app/constants";
 
 jest.mock("next/navigation");
 
 jest.mock("@/app/backend/fhir-servers/service", () => ({
-  getFhirServerConfigs: jest.fn().mockResolvedValue([
+  getFhirServerSummaries: jest.fn().mockResolvedValue([
     {
       name: "Matching Server",
       url: "https://example.com",
@@ -26,7 +26,7 @@ jest.mock("@/app/backend/fhir-servers/service", () => ({
   ]),
 }));
 
-jest.mock("@/app/backend/query-execution/service", () => ({
+jest.mock("@/app/backend/query-execution/actions", () => ({
   patientDiscoveryQuery: jest.fn(),
 }));
 
@@ -310,7 +310,7 @@ describe("SearchForm", () => {
     (useSearchParams as jest.Mock).mockReturnValue(
       new URLSearchParams(queryParams),
     );
-    (getFhirServerConfigs as jest.Mock).mockResolvedValue([
+    (getFhirServerSummaries as jest.Mock).mockResolvedValue([
       {
         name: "Matching Server",
         patientMatchConfiguration: {

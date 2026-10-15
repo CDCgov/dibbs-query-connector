@@ -86,6 +86,7 @@ jest.mock("@/app/utils/auth", () => {
   return {
     superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
     adminAccessCheck: jest.fn(() => Promise.resolve(true)),
+    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
   };
 });
 

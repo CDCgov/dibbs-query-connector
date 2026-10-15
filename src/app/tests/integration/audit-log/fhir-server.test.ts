@@ -21,6 +21,15 @@ jest.mock("@/app/backend/audit-logs/lib", () => {
     ...jest.requireActual("@/app/backend/audit-logs/lib"),
   };
 });
+
+jest.mock("@/app/utils/auth", () => {
+  return {
+    superAdminAccessCheck: jest.fn().mockResolvedValue(true),
+    adminAccessCheck: jest.fn().mockResolvedValue(true),
+    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
+  };
+});
+
 const auditCompletionSpy = jest.spyOn(
   AuditableDecorators,
   "generateAuditSuccessMessage",

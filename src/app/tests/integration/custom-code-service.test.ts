@@ -9,6 +9,10 @@ import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/app/constants";
 import { suppressConsoleLogs } from "./fixtures";
 import dbService from "@/app/backend/db/service";
 
+jest.mock("@/app/utils/auth", () => ({
+  adminAccessCheck: jest.fn().mockResolvedValue(true),
+}));
+
 describe("UserCreatedValuesetService Integration", () => {
   beforeAll(() => {
     suppressConsoleLogs();

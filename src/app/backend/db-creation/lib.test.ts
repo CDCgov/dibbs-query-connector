@@ -6,7 +6,7 @@ jest.mock("../db/service", () => ({
   default: {},
   DbClient: class {},
 }));
-jest.mock("./service", () => ({ readJsonFromRelativePath: jest.fn() }));
+jest.mock("./assets", () => ({ readJsonFromRelativePath: jest.fn() }));
 jest.mock("../code-systems/service", () => ({
   getERSD: jest.fn(),
   getVSACValueSet: jest.fn(),

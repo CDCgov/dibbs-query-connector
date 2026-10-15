@@ -1,22 +1,22 @@
 import { auth } from "@/auth";
 import { User } from "next-auth";
-import { getUserRole } from "@/app/backend/user-management";
+import { getUserRole } from "@/app/backend/auth/user-provisioning";
 import { UserRole } from "@/app/models/entities/users";
 import {
   isDemoMode,
-  isAuthDisabledClientCheck,
   isAuthDisabledServerCheck,
   getLoggedInUser,
   superAdminAccessCheck,
   adminAccessCheck,
 } from "@/app/utils/auth";
+import { isAuthDisabledClientCheck } from "@/app/utils/client-auth";
 import { getConditionsData } from "../backend/query-building/service";
 
 jest.mock("@/auth", () => ({
   auth: jest.fn(),
 }));
 
-jest.mock("@/app/backend/user-management", () => ({
+jest.mock("@/app/backend/auth/user-provisioning", () => ({
   getUserRole: jest.fn(),
 }));
 

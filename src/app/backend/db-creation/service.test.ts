@@ -17,6 +17,10 @@ jest.mock("@/app/backend/code-systems/service", () => ({
   getVSACValueSet: jest.fn(),
 }));
 
+jest.mock("@/app/utils/auth", () => ({
+  adminAccessCheck: jest.fn().mockResolvedValue(true),
+}));
+
 const mockGetVSACValueSet = getVSACValueSet as unknown as jest.Mock;
 
 const EXPECTED_INTERNAL_VALUESET: DibbsValueSet = {

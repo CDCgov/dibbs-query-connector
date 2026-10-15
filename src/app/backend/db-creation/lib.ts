@@ -1,5 +1,3 @@
-"use server";
-
 import { Concept } from "@/app/models/entities/concepts";
 import { Bundle, ValueSet } from "fhir/r4";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
@@ -31,7 +29,7 @@ import {
   stripErsdVersionSuffix,
   stripProtocolAndTLDFromSystemUrl,
 } from "./utils";
-import { readJsonFromRelativePath } from "./service";
+import { readJsonFromRelativePath } from "./assets";
 
 /**
  * helper function to generate VSAC promises

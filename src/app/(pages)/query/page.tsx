@@ -16,7 +16,7 @@ import WithAuth from "@/app/ui/components/withAuth/WithAuth";
 import {
   PatientDiscoveryResponse,
   PatientRecordsResponse,
-} from "@/app/backend/query-execution/service";
+} from "@/app/backend/query-execution/actions";
 import { getFhirServerNames } from "@/app/backend/fhir-servers/service";
 import Skeleton from "react-loading-skeleton";
 

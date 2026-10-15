@@ -32,8 +32,11 @@ import {
   QueryResponse,
   validatedPatientSearch,
 } from "@/app/models/entities/query";
-import { getFhirServerNames } from "@/app/backend/fhir-servers/service";
-import { getSavedQueryById } from "@/app/backend/query-building/service";
+// This route authenticates with a service token, not a user session, so it
+// uses the server-side helpers rather than the session-gated actions.
+import { getFhirServerNames } from "@/app/backend/fhir-servers/lib";
+import { getSavedQueryByIdHelp } from "@/app/backend/query-building/lib";
+import dbService from "@/app/backend/db/service";
 import { validateServiceToken } from "../api-auth";
 
 /**
@@ -72,7 +75,7 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const queryResults = await getSavedQueryById(id);
+  const queryResults = await getSavedQueryByIdHelp(id, dbService);
 
   if (queryResults === undefined) {
     const OperationOutcome = await handleRequestError(INVALID_QUERY);
@@ -194,7 +197,7 @@ export async function POST(request: NextRequest) {
     return await handleAndReturnError(INVALID_FHIR_SERVERS);
   }
 
-  const queryResults = await getSavedQueryById(id);
+  const queryResults = await getSavedQueryByIdHelp(id, dbService);
   if (queryResults === undefined) {
     return handleAndReturnError(INVALID_QUERY);
   }

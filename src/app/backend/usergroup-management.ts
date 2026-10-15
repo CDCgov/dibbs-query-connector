@@ -204,6 +204,7 @@ class UserGroupManagementService {
    * @param userIds - The unique identifier(s) of the users to add.
    * @returns The user IDs of the users added to the group.
    */
+  @adminRequired
   @auditable
   static async removeUsersFromGroup(
     groupId: string,
@@ -328,6 +329,7 @@ class UserGroupManagementService {
    * @param groupId identifier of the group whose members we are retrieving
    * @returns A list of Users for the given group
    */
+  @adminRequired
   static async getAllGroupMembers(groupId: string): Promise<QCResponse<User>> {
     try {
       const selectMembersByGroupQuery = `
@@ -354,6 +356,7 @@ class UserGroupManagementService {
    * @param groupId identifier of the group whose queries we are retrieving
    * @returns A list of Query data for the given group
    */
+  @adminRequired
   static async getAllGroupQueries(
     groupId: string,
   ): Promise<QCResponse<CustomUserQuery>> {
@@ -425,6 +428,7 @@ class UserGroupManagementService {
    * @param queryIds - The unique identifier of the query to add.
    * @returns The IDs of the queries added to the group.
    */
+  @adminRequired
   @auditable
   static async addQueriesToGroup(
     groupId: string,
@@ -481,6 +485,7 @@ class UserGroupManagementService {
    * @param queryIds - The unique identifiers of the query to remove.
    * @returns The query with updated groupAssignment data
    */
+  @adminRequired
   @auditable
   static async removeQueriesFromGroup(
     groupId: string,
@@ -526,6 +531,7 @@ class UserGroupManagementService {
    * @param queryId - The unique identifier of the query to add.
    * @returns A single query with all group assignments.
    */
+  @adminRequired
   static async getSingleQueryGroupAssignments(
     queryId: string,
   ): Promise<QCResponse<UserGroupMembership>> {
