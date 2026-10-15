@@ -59,6 +59,7 @@ jest.mock("@/app/utils/auth", () => ({
   ...jest.requireActual("@/app/utils/auth"),
   superAdminAccessCheck: jest.fn().mockResolvedValue(true),
   adminAccessCheck: jest.fn().mockResolvedValue(true),
+  authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
 }));
 
 jest.mock("@/app/backend/audit-logs/lib", () => {

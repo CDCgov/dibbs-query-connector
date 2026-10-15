@@ -33,6 +33,11 @@ jest.mock("@/app/utils/mtls-utils", () => {
   };
 });
 
+// testFhirServerConnection is restricted to super admins
+jest.mock("@/app/utils/auth", () => ({
+  superAdminAccessCheck: jest.fn().mockResolvedValue(true),
+}));
+
 // Mock the smart-on-fhir module
 jest.mock("@/app/backend/smart-on-fhir", () => ({
   createSmartJwt: jest.fn().mockResolvedValue("mocked-jwt-token"),

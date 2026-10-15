@@ -1,6 +1,5 @@
 "use server";
 
-import { QueryTableTimebox } from "../(pages)/queryBuilding/utils";
 import { DibbsConceptType } from "../models/entities/valuesets";
 import { DateRangeInfo } from "../ui/designSystem/timeboxing/DateRangePicker";
 import { adminRequired } from "./db/decorators";
@@ -36,6 +35,7 @@ class QueryTimefilteringService {
     return result.rows;
   }
 
+  @adminRequired
   static async deleteTimeboxSettings(queryId: string, conceptType: string) {
     const updateUserGroupMembersQuery = `
        DELETE FROM query_timeboxing WHERE query_id = $1 AND concept_type = $2;
@@ -49,6 +49,7 @@ class QueryTimefilteringService {
     return result.rows;
   }
 
+  @adminRequired
   static async getTimeboxRanges(queryId: string, conceptType: string) {
     const timeboxSelectionQuery = `
         SELECT time_window_start, time_window_end, is_relative_range FROM query_timeboxing
@@ -72,6 +73,7 @@ class QueryTimefilteringService {
 
     return undefined;
   }
+  @adminRequired
   static async getQueryTimeboxRanges(queryId: string) {
     const timeboxSelectionQuery = `
         SELECT time_window_start, time_window_end, concept_type, is_relative_range FROM query_timeboxing
@@ -96,43 +98,11 @@ class QueryTimefilteringService {
 
     return conceptTimebox;
   }
-
-  static async linkTimeboxRangesToQuery(queryId: string) {
-    const timeboxSql = `SELECT * FROM query_timeboxing WHERE query_id=$1;`;
-
-    const relatedTimeboxes = await dbService.query(timeboxSql, [queryId]);
-    const timeboxInfo: QueryTableTimebox = {};
-    relatedTimeboxes.rows.forEach((t) => {
-      let timeWindowStart = t.timeWindowStart;
-      let timeWindowEnd = t.timeWindowEnd;
-
-      if (t.isRelativeRange) {
-        // we want the relative ranges, so take the time delta and apply it to the current date
-        const endDate = new Date(timeWindowEnd);
-        const startDate = new Date(timeWindowStart);
-        const timeDeltaMilliseconds = endDate.getTime() - startDate.getTime();
-
-        timeWindowEnd = new Date();
-        timeWindowStart = new Date();
-        timeWindowStart.setTime(
-          timeWindowEnd.getTime() - timeDeltaMilliseconds,
-        );
-      }
-      return (timeboxInfo[t.conceptType as DibbsConceptType] = {
-        timeWindowStart: timeWindowStart.toISOString(),
-        timeWindowEnd: timeWindowEnd.toISOString(),
-      });
-    });
-
-    return timeboxInfo;
-  }
 }
 
 export const getTimeboxRanges = QueryTimefilteringService.getTimeboxRanges;
 export const getQueryTimeboxRanges =
   QueryTimefilteringService.getQueryTimeboxRanges;
-export const linkTimeboxRangesToQuery =
-  QueryTimefilteringService.linkTimeboxRangesToQuery;
 export const deleteTimeboxSettings =
   QueryTimefilteringService.deleteTimeboxSettings;
 export const updateTimeboxSettings =

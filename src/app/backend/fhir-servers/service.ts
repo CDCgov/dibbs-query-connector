@@ -1,9 +1,17 @@
 "use server";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { auditable } from "@/app/backend/audit-logs/decorator";
-import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 import dbService from "../db/service";
-import { transaction } from "../db/decorators";
+import {
+  authenticationRequired,
+  superAdminRequired,
+  transaction,
+} from "../db/decorators";
+import {
+  clearFhirServerConfigCache,
+  getFhirServerConfigs as getAllFhirServerConfigs,
+  getFhirServerNames as getAllFhirServerNames,
+} from "./lib";
 import { FHIR_SERVER_INSERT_QUERY } from "../db/util";
 import {
   AuthMethodType,
@@ -36,58 +44,47 @@ export interface PatientMatchData {
   supportsMatch: boolean;
 }
 
-class FhirServerConfigServiceInternal {
-  /**
-   * Internal implementation class that performs the underlying database read
-   * to the FHIR server table. This is extended by the external facade (which
-   * adds permissions checks) so that internal service code can call this method
-   * without permissions, which is required for any external code.
-   * @returns An array of the FHIR server configs
-   */
-  protected static async getFhirServerConfigs() {
-    const query = `SELECT * FROM fhir_servers;`;
-    const result = await dbService.query(query);
-    return result.rows as FhirServerConfig[];
-  }
+// Client-facing summary of a FHIR server. Standard users need the server list
+// and patient match settings to run queries, but never its credentials.
+export interface FhirServerSummary {
+  name: string;
+  defaultServer: boolean;
+  patientMatchConfiguration?: FhirServerConfig["patientMatchConfiguration"];
 }
 
-class FhirServerConfigService extends FhirServerConfigServiceInternal {
-  private static cachedFhirServerConfigs: FhirServerConfig[] | null = null;
-  private static cacheFetchedAt = 0;
-  // Mutations clear the cache in-process, but other instances in a
-  // multi-instance deployment won't see them; the TTL bounds that staleness
-  private static readonly CACHE_TTL_MS = 60_000;
-
+class FhirServerConfigService {
   /**
-   * Fetches the configuration for a FHIR server from the database.
+   * Fetches the full configuration, credentials included, for every FHIR
+   * server. Server-side code that runs queries should use
+   * getFhirServerConfigs in ./lib instead.
    * @param forceRefresh - Whether to flush the config cache
-   * @returns The configuration for the FHIR server.
+   * @returns The configurations for all FHIR servers
    */
-  // @superAdminRequired
+  @superAdminRequired
   static async getFhirServerConfigs(forceRefresh = false) {
-    const cacheExpired =
-      Date.now() - FhirServerConfigService.cacheFetchedAt >
-      FhirServerConfigService.CACHE_TTL_MS;
-    if (
-      forceRefresh ||
-      cacheExpired ||
-      FhirServerConfigService.cachedFhirServerConfigs === null
-    ) {
-      const newServerConfigs = await super.getFhirServerConfigs();
-      FhirServerConfigService.cachedFhirServerConfigs = newServerConfigs;
-      FhirServerConfigService.cacheFetchedAt = Date.now();
-    }
-    return FhirServerConfigService.cachedFhirServerConfigs;
+    return getAllFhirServerConfigs(forceRefresh);
   }
 
+  /**
+   * @returns The names of all FHIR servers, with the default server first
+   */
+  @authenticationRequired
   static async getFhirServerNames(): Promise<string[]> {
-    const configs = await FhirServerConfigService.getFhirServerConfigs();
-    // Sort a copy so that the default server is always first, without
-    // mutating the cached config array
-    const sortedConfigs = [...configs].sort((a, b) =>
-      b.defaultServer === true ? 1 : a.defaultServer === true ? -1 : 0,
-    );
-    return sortedConfigs.map((config) => config.name);
+    return getAllFhirServerNames();
+  }
+
+  /**
+   * Fetches the non-sensitive fields of every FHIR server, for the query page.
+   * @returns A summary of each FHIR server, without credentials
+   */
+  @authenticationRequired
+  static async getFhirServerSummaries(): Promise<FhirServerSummary[]> {
+    const configs = await getAllFhirServerConfigs();
+    return configs.map((config) => ({
+      name: config.name,
+      defaultServer: config.defaultServer,
+      patientMatchConfiguration: config.patientMatchConfiguration,
+    }));
   }
 
   /**
@@ -96,6 +93,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param wasSuccessful - Whether the connection attempt was successful
    * @returns An object indicating success or failure with optional error message
    */
+  @superAdminRequired
   @transaction
   static async updateFhirServerConnectionStatus(
     name: string,
@@ -113,8 +111,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     try {
       const result = await dbService.query(updateQuery, [name, wasSuccessful]);
 
-      // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
-      FhirServerConfigService.cachedFhirServerConfigs = null;
+      clearFhirServerConfigCache();
 
       if (result.rows.length === 0) {
         return {
@@ -149,6 +146,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param updateDetails.patientMatchConfiguration - Optional patient match configuration
    * @returns An object indicating success or failure with optional error message
    */
+  @superAdminRequired
   @transaction
   @auditable
   static async updateFhirServer(updateDetails: {
@@ -255,8 +253,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.queryStrategy || "default",
       ]);
 
-      // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
-      FhirServerConfigService.cachedFhirServerConfigs = null;
+      clearFhirServerConfigCache();
 
       if (result.rows.length === 0) {
         return {
@@ -279,62 +276,6 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
   }
 
   /**
-   * Persists a refreshed access token for a FHIR server. Deliberately narrow:
-   * token refresh runs in the background, so it must not rewrite configuration
-   * columns the way updateFhirServer does (a partial authData there would
-   * silently reset fields like query_strategy and endpoint_type to their
-   * defaults).
-   * @param id - The ID of the FHIR server
-   * @param accessToken - The new access token
-   * @param tokenExpiry - ISO timestamp when the token expires
-   * @returns An object indicating success or failure with optional error message
-   */
-  @transaction
-  static async updateFhirServerAccessToken(
-    id: string,
-    accessToken: string,
-    tokenExpiry: string,
-  ) {
-    const updateQuery = `
-    UPDATE fhir_servers
-    SET
-      access_token = $2,
-      token_expiry = $3
-    WHERE id = $1
-    RETURNING *;
-  `;
-
-    try {
-      const result = await dbService.query(updateQuery, [
-        id,
-        accessToken,
-        tokenExpiry,
-      ]);
-
-      // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
-      FhirServerConfigService.cachedFhirServerConfigs = null;
-
-      if (result.rows.length === 0) {
-        return {
-          success: false,
-          error: "Server not found",
-        };
-      }
-
-      return {
-        success: true,
-        server: result.rows[0],
-      };
-    } catch (error) {
-      console.error("Failed to update FHIR server access token:", error);
-      return {
-        success: false,
-        error: "Failed to update the server access token.",
-      };
-    }
-  }
-
-  /**
    * Inserts a new FHIR server configuration into the database.
    * @param name - The name of the FHIR server
    * @param hostname - The URL/hostname of the FHIR server
@@ -347,6 +288,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @returns An object indicating success or failure with optional error message
    */
 
+  @superAdminRequired
   @transaction
   @auditable
   static async insertFhirServer(
@@ -415,8 +357,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
         authData?.queryStrategy || "default",
       ]);
 
-      // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
-      FhirServerConfigService.cachedFhirServerConfigs = null;
+      clearFhirServerConfigCache();
 
       return {
         success: true,
@@ -436,6 +377,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
    * @param id - The ID of the FHIR server to delete
    * @returns An object indicating success or failure with optional error message
    */
+  @superAdminRequired
   @transaction
   @auditable
   static async deleteFhirServer(id: string) {
@@ -448,8 +390,7 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
     try {
       const result = await dbService.query(deleteQuery, [id]);
 
-      // Clear the cache so the next getFhirServerConfigs call will fetch fresh data
-      FhirServerConfigService.cachedFhirServerConfigs = null;
+      clearFhirServerConfigCache();
 
       if (result.rows.length === 0) {
         return {
@@ -470,35 +411,15 @@ class FhirServerConfigService extends FhirServerConfigServiceInternal {
       };
     }
   }
-
-  static async prepareFhirClient(serverName: string) {
-    const configs =
-      await FhirServerConfigServiceInternal.getFhirServerConfigs();
-    const config = configs.find((c) => c.name === serverName);
-
-    if (!config) throw new Error(`No server config found for ${serverName}`);
-
-    if (config.authType === "SMART") {
-      const client = new FHIRClient(config);
-      await client.ensureValidToken();
-      config.headers = {
-        ...(config.headers || {}),
-        Authorization: `Bearer ${config.accessToken}`,
-      };
-    }
-
-    return new FHIRClient(config);
-  }
 }
 
 export const getFhirServerConfigs =
   FhirServerConfigService.getFhirServerConfigs;
 export const getFhirServerNames = FhirServerConfigService.getFhirServerNames;
+export const getFhirServerSummaries =
+  FhirServerConfigService.getFhirServerSummaries;
 export const updateFhirServerConnectionStatus =
   FhirServerConfigService.updateFhirServerConnectionStatus;
 export const updateFhirServer = FhirServerConfigService.updateFhirServer;
-export const updateFhirServerAccessToken =
-  FhirServerConfigService.updateFhirServerAccessToken;
 export const insertFhirServer = FhirServerConfigService.insertFhirServer;
 export const deleteFhirServer = FhirServerConfigService.deleteFhirServer;
-export const prepareFhirClient = FhirServerConfigService.prepareFhirClient;

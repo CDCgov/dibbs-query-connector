@@ -1,7 +1,7 @@
 import { useSession } from "next-auth/react";
 import { useContext } from "react";
 import { DataContext } from "@/app/utils/DataProvider";
-import { isAuthDisabledClientCheck } from "@/app/utils/auth";
+import { isAuthDisabledClientCheck } from "@/app/utils/client-auth";
 import { User, UserRole } from "@/app/models/entities/users";
 import { CustomUserQuery } from "@/app/models/entities/query";
 

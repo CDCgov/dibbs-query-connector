@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Drawer from "@/app/ui/designSystem/drawer/Drawer";
 import TabGroup from "@/app/ui/designSystem/TabGroup/tabGroup";
 import styles from "./resultsView.module.scss";
-import { PatientRecordsResponse } from "../../../../backend/query-execution/service";
+import type { PatientRecordsResponse } from "../../../../backend/query-execution/actions";
 import { Icon, Button } from "@trussworks/react-uswds";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 

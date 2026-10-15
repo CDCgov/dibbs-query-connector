@@ -1,4 +1,7 @@
-"use server";
+// Query execution without access checks. Client components call the gated
+// wrappers in ./actions; the REST API and other server-side code call this
+// module directly. It must not be marked "use server", which would expose
+// every export as a POST-able endpoint.
 import { Bundle, FhirResource, OperationOutcome, Patient, Task } from "fhir/r4";
 
 import {
@@ -30,13 +33,11 @@ import type {
   PatientRecordsRequest,
   FullPatientRequest,
 } from "../../models/entities/query";
-import {
-  getFhirServerConfigs,
-  prepareFhirClient,
-} from "../fhir-servers/service";
+import { getFhirServerConfigs, prepareFhirClient } from "../fhir-servers/lib";
 import type FHIRClient from "@/backend/fhir-servers/fhir-client";
 import type { FhirRequestRecord } from "@/backend/fhir-servers/fhir-client";
-import { getSavedQueryByName } from "../query-building/service";
+import { getSavedQueryByNameHelp } from "../query-building/lib";
+import dbService from "../db/service";
 
 interface TaskPollingResult {
   tasksBundle: Bundle;
@@ -1344,7 +1345,10 @@ class QueryService {
   static async patientRecordsQuery(
     request: PatientRecordsRequest,
   ): Promise<QueryResponse & { fhirRequests: FhirRequestRecord[] }> {
-    const savedQuery = await getSavedQueryByName(request.queryName as string);
+    const savedQuery = await getSavedQueryByNameHelp(
+      request.queryName as string,
+      dbService,
+    );
 
     if (!savedQuery) {
       throw new Error(`Unable to query of name ${request?.queryName}`);

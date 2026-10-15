@@ -2,8 +2,8 @@ import { patientRecordsQuery } from "./service";
 import {
   getFhirServerConfigs,
   prepareFhirClient,
-} from "@/app/backend/fhir-servers/service";
-import { getSavedQueryByName } from "@/app/backend/query-building/service";
+} from "@/app/backend/fhir-servers/lib";
+import { getSavedQueryByNameHelp as getSavedQueryByName } from "@/app/backend/query-building/lib";
 import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 import {
   EMPTY_MEDICAL_RECORD_SECTIONS,
@@ -17,14 +17,14 @@ jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn().mockReturnValue(true),
 }));
 
-jest.mock("@/app/backend/fhir-servers/service", () => ({
+jest.mock("@/app/backend/fhir-servers/lib", () => ({
   prepareFhirClient: jest.fn(),
   getFhirServerConfigs: jest.fn(),
   getFhirServerNames: jest.fn(),
 }));
 
-jest.mock("@/app/backend/query-building/service", () => ({
-  getSavedQueryByName: jest.fn(),
+jest.mock("@/app/backend/query-building/lib", () => ({
+  getSavedQueryByNameHelp: jest.fn(),
 }));
 
 jest.mock("@/app/backend/audit-logs/decorator", () => ({

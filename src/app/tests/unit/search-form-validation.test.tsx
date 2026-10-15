@@ -4,13 +4,14 @@ import userEvent from "@testing-library/user-event";
 import SearchForm from "@/app/(pages)/query/components/searchForm/SearchForm";
 
 jest.mock("@/app/backend/fhir-servers/service", () => ({
-  getFhirServerConfigs: jest.fn().mockResolvedValue([]),
+  getFhirServerSummaries: jest.fn().mockResolvedValue([]),
 }));
 
 // Mock auth functions
 jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn().mockResolvedValue(true),
   adminAccessCheck: jest.fn().mockResolvedValue(true),
+  authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
 }));
 
 // Mock next/navigation

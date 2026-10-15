@@ -24,8 +24,11 @@ import {
 import {
   patientDiscoveryQuery,
   PatientDiscoveryResponse,
-} from "@/app/backend/query-execution/service";
-import { getFhirServerConfigs } from "@/app/backend/fhir-servers/service";
+} from "@/app/backend/query-execution/actions";
+import {
+  type FhirServerSummary,
+  getFhirServerSummaries,
+} from "@/app/backend/fhir-servers/service";
 import styles from "../searchForm/searchForm.module.scss";
 import { FormatPhoneAsDigits } from "@/app/utils/format-service";
 import TitleBox from "../stepIndicator/TitleBox";
@@ -34,7 +37,6 @@ import {
   validatedPatientSearch,
 } from "@/app/models/entities/query";
 import Checkbox from "@/app/ui/designSystem/checkbox/Checkbox";
-import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 
 interface SearchFormProps {
   setPatientDiscoveryQueryResponse: (
@@ -88,7 +90,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
   );
 
   const [fhirServerConfig, setFhirServerConfig] =
-    useState<FhirServerConfig | null>(null);
+    useState<FhirServerSummary | null>(null);
   const [patientMatchEnabled, setPatientMatchEnabled] = useState<boolean>();
   const params = useSearchParams();
 
@@ -142,7 +144,7 @@ const SearchForm: React.FC<SearchFormProps> = function SearchForm({
 
   useEffect(() => {
     const loadConfig = async () => {
-      const configs = await getFhirServerConfigs(true);
+      const configs = await getFhirServerSummaries();
       const match = configs.find((c) => c.name === fhirServer);
       if (match) {
         setFhirServerConfig(match);

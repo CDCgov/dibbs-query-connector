@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { redirect, usePathname } from "next/navigation";
 import { pagesConfig } from "@/app/utils/page-routes";
 import { DataContext } from "@/app/utils/DataProvider";
-import { isAuthDisabledClientCheck } from "@/app/utils/auth";
+import { isAuthDisabledClientCheck } from "@/app/utils/client-auth";
 import { getRole } from "@/app/(pages)/userManagement/utils";
 
 /**

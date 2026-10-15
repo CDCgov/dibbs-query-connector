@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { POST } from "@/app/api/query/route";
 import { suppressConsoleLogs } from "./fixtures";
 import { USE_CASE_DETAILS } from "@/app/constants";
-import { prepareFhirClient } from "@/app/backend/fhir-servers/service";
+import { prepareFhirClient } from "@/app/backend/fhir-servers/lib";
 import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 
 // Utility function to create a minimal NextRequest-like object
@@ -44,6 +44,7 @@ jest.mock("@/app/utils/auth", () => {
   return {
     superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
     adminAccessCheck: jest.fn(() => Promise.resolve(true)),
+    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
   };
 });
 
@@ -158,7 +159,7 @@ jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
   };
 });
 
-jest.mock("@/app/backend/fhir-servers/service", () => ({
+jest.mock("@/app/backend/fhir-servers/lib", () => ({
   prepareFhirClient: jest.fn(),
   getFhirServerConfigs: jest.fn(),
   getFhirServerNames: jest.fn(),
@@ -192,13 +193,13 @@ jest.mock("@/app/utils/format-service", () => ({
     .mockResolvedValue(["555-123-4567", "5551234567"]),
 }));
 
-jest.mock("@/app/backend/query-building/service", () => ({
-  getSavedQueryByName: jest.fn().mockResolvedValue({
+jest.mock("@/app/backend/query-building/lib", () => ({
+  getSavedQueryByNameHelp: jest.fn().mockResolvedValue({
     queryName: "Syphilis",
     queryData: {},
     medicalRecordSections: {},
   }),
-  getSavedQueryById: jest.fn().mockResolvedValue({
+  getSavedQueryByIdHelp: jest.fn().mockResolvedValue({
     queryName: "Syphilis",
     queryData: {},
     medicalRecordSections: {},
@@ -387,7 +388,7 @@ describe("API Query with Mutual TLS", () => {
       const {
         getFhirServerConfigs,
         getFhirServerNames,
-      } = require("@/app/backend/fhir-servers/service");
+      } = require("@/app/backend/fhir-servers/lib");
       (getFhirServerConfigs as jest.Mock).mockResolvedValue([
         mockMtlsServerConfig,
       ]);
@@ -625,7 +626,7 @@ PV1|1|I|ROOM-123^BED-A^HOSP||||ATTENDING^DOCTOR^A|||||||||||ADM001||||||||||||||
       const {
         getFhirServerConfigs,
         getFhirServerNames,
-      } = require("@/app/backend/fhir-servers/service");
+      } = require("@/app/backend/fhir-servers/lib");
       (getFhirServerConfigs as jest.Mock).mockResolvedValue([
         mockNonMtlsServerConfig,
       ]);

@@ -3,7 +3,8 @@ import { EndpointType } from "@/app/(pages)/fhirServers/page";
 import { createSmartJwt } from "../smart-on-fhir";
 import { fetchWithoutSSL } from "../../utils/utils";
 import dbService from "../db/service";
-import { AuthData, updateFhirServerAccessToken } from "./service";
+import type { AuthData } from "./service";
+import { updateFhirServerAccessToken } from "./lib";
 import {
   getOrCreateMtlsCert,
   getOrCreateMtlsKey,

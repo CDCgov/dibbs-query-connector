@@ -1,5 +1,3 @@
-"use server";
-
 import { auth } from "@/auth";
 import LandingPage from "./(pages)/landingPage/landingPage";
 import { isAuthDisabledServerCheck } from "./utils/auth";

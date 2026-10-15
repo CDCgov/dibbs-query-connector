@@ -1,6 +1,6 @@
-import { addUserIfNotExists } from "@/app/backend/user-management";
+import { addUserIfNotExists } from "@/app/backend/auth/user-provisioning";
 import NextAuth from "next-auth";
-import { logSignInToAuditTable } from "./app/backend/session-management";
+import { logSignInToAuditTable } from "./app/backend/auth/sign-in-audit";
 import {
   AuthContext,
   AuthStrategy,

@@ -1,4 +1,3 @@
-"use server";
 import { Bundle, OperationOutcome, Parameters } from "fhir/r4";
 import { MISSING_API_KEY_LITERAL } from "../../constants";
 import { encode } from "base-64";

@@ -9,7 +9,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { getPagesInSettingsMenu, PAGES } from "@/app/utils/page-routes";
 import { UserRole } from "@/app/models/entities/users";
-import { isAuthDisabledClientCheck } from "@/app/utils/auth";
+import { isAuthDisabledClientCheck } from "@/app/utils/client-auth";
 import { DataContext } from "@/app/utils/DataProvider";
 import { signOut } from "@/app/backend/session-management";
 import { Session } from "next-auth";
