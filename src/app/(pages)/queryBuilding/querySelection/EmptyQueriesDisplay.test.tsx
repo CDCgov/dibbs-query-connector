@@ -3,7 +3,10 @@ import { renderWithUser } from "@/app/tests/unit/setup";
 import { EmptyQueriesDisplay } from "./EmptyQueriesDisplay";
 import { createDibbsDB } from "@/app/backend/db-creation/service";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import { MISSING_API_KEY_LITERAL } from "@/app/constants";
+import {
+  INVALID_API_KEY_LITERAL,
+  MISSING_API_KEY_LITERAL,
+} from "@/app/constants";
 
 jest.mock("@/app/backend/db-creation/service", () => ({
   createDibbsDB: jest.fn(),
@@ -136,34 +139,40 @@ describe("EmptyQueriesDisplay", () => {
     expect(setDbSeeded).not.toHaveBeenCalled();
   });
 
-  it("shows the API-key documentation link when the failure cause is a missing key", async () => {
-    mockCreateDibbsDB.mockResolvedValue({
-      success: false,
-      message: "No API key configured",
-      cause: MISSING_API_KEY_LITERAL,
-    });
+  it.each([
+    ["missing", MISSING_API_KEY_LITERAL],
+    ["rejected", INVALID_API_KEY_LITERAL],
+  ])(
+    "shows the API-key documentation link when the key is %s",
+    async (_, cause) => {
+      mockCreateDibbsDB.mockResolvedValue({
+        success: false,
+        message: "API key problem",
+        cause,
+      });
 
-    const { user } = renderWithUser(
-      <EmptyQueriesDisplay
-        dbSeeded={false}
-        goForward={jest.fn()}
-        setDbSeeded={jest.fn()}
-      />,
-    );
+      const { user } = renderWithUser(
+        <EmptyQueriesDisplay
+          dbSeeded={false}
+          goForward={jest.fn()}
+          setDbSeeded={jest.fn()}
+        />,
+      );
 
-    await user.click(
-      screen.getByRole("button", { name: "Build your first query" }),
-    );
+      await user.click(
+        screen.getByRole("button", { name: "Build your first query" }),
+      );
 
-    await waitFor(() =>
-      expect(mockToast).toHaveBeenCalledWith(
-        expect.objectContaining({
-          heading: "Something went wrong.",
-          variant: "error",
-        }),
-      ),
-    );
-    // the missing-key branch passes a React node (the doc link), not a string
-    expect(typeof mockToast.mock.calls[0][0].body).toBe("object");
-  });
+      await waitFor(() =>
+        expect(mockToast).toHaveBeenCalledWith(
+          expect.objectContaining({
+            heading: "Something went wrong.",
+            variant: "error",
+          }),
+        ),
+      );
+      // the API-key branch passes a React node (the doc link), not a string
+      expect(typeof mockToast.mock.calls[0][0].body).toBe("object");
+    },
+  );
 });

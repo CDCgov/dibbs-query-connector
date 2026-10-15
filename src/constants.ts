@@ -2,6 +2,7 @@ import { FhirResource } from "fhir/r4";
 import { DibbsConceptType } from "./models/entities/valuesets";
 
 export const MISSING_API_KEY_LITERAL = "MISSING_API_KEY";
+export const INVALID_API_KEY_LITERAL = "INVALID_API_KEY";
 export const UNAUTHORIZED_LITERAL = "UNAUTHORIZED";
 
 export const GENERIC_ERROR_HEADING = "Something went wrong. ";
