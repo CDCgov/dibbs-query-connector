@@ -1,1 +1,13 @@
-{"manifestVersion":1,"name":"ersd","files":{"ersd_3.2.0":{"version":"3.2.0","releaseDate":"2026-08-12T11:29:58-06:00","hash":"8382ec49b23daefa308c2fb7131c719238a7795b84cb61625a01e63effb9b41c","fetchedAtUtc":"2026-10-16T17:35:03.060Z","resourceCount":1588}}}
+{
+  "manifestVersion": 1,
+  "name": "ersd",
+  "files": {
+    "ersd_3.2.0": {
+      "version": "3.2.0",
+      "releaseDate": "2026-08-12T11:29:58-06:00",
+      "hash": "8382ec49b23daefa308c2fb7131c719238a7795b84cb61625a01e63effb9b41c",
+      "fetchedAtUtc": "2026-10-16T17:35:03.060Z",
+      "resourceCount": 1588
+    }
+  }
+}
