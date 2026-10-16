@@ -2,9 +2,13 @@ import {
   MedicalRecordSections,
   NestedQuery,
   QueryTableResult,
+  QueryTableTimebox,
   QueryUpdateResult,
 } from "@/app/(pages)/queryBuilding/utils";
-import { DibbsValueSet } from "@/app/models/entities/valuesets";
+import {
+  DibbsConceptType,
+  DibbsValueSet,
+} from "@/app/models/entities/valuesets";
 import { randomUUID } from "crypto";
 import { DbService } from "../db/service";
 import { Pool } from "pg";
@@ -162,4 +166,85 @@ function formatQueryDataForDatabase(frontendInput: NestedQuery) {
     queryDataInsert: queryData,
     conditionInsert: formatConditionsForPostgres(conditionIds),
   };
+}
+
+/**
+ * Executes a search for a CustomQuery against the query-loaded Postgres
+ * Database, using the saved name associated with the query as the unique
+ * identifier by which to load the result.
+ * @param name The name given to a stored query in the DB.
+ * @param dbClient - the DB client to execute queries against
+ * @returns One or more rows from the DB matching the requested saved query,
+ * or an error if no results can be found.
+ */
+export async function getSavedQueryByNameHelp(
+  name: string,
+  dbClient: DbService | Pool,
+) {
+  const values = [name];
+
+  const getQuerybyNameSQL = `
+  select q.query_name, q.id, q.query_data, q.conditions_list, q.medical_record_sections
+  from query q 
+  where q.query_name = $1;
+`;
+
+  try {
+    const result = await dbClient.query(getQuerybyNameSQL, values);
+    if (result.rows.length === 0) {
+      console.error("No results found for query named:", name);
+      return undefined;
+    }
+
+    const foundQuery = result.rows[0];
+    const timeboxInfo = await linkTimeboxRangesToQueryHelp(
+      foundQuery.id,
+      dbClient,
+    );
+    // followup to get timeboxing information
+
+    foundQuery.timeboxWindows = timeboxInfo;
+    return foundQuery as unknown as QueryTableResult;
+  } catch (error) {
+    console.error("Error retrieving query:", error);
+    throw error;
+  }
+}
+
+/**
+ * Fetches a query's timebox settings, resolving relative ranges against the
+ * current date
+ * @param queryId - ID of the query
+ * @param dbClient - the DB client to execute queries against
+ * @returns The timebox window for each concept type the query sets one for
+ */
+export async function linkTimeboxRangesToQueryHelp(
+  queryId: string,
+  dbClient: DbService | Pool,
+) {
+  const timeboxSql = `SELECT * FROM query_timeboxing WHERE query_id=$1;`;
+
+  const relatedTimeboxes = await dbClient.query(timeboxSql, [queryId]);
+  const timeboxInfo: QueryTableTimebox = {};
+  relatedTimeboxes.rows.forEach((t) => {
+    let timeWindowStart = t.timeWindowStart;
+    let timeWindowEnd = t.timeWindowEnd;
+
+    if (t.isRelativeRange) {
+      // we want the relative ranges, so take the time delta and apply it to the current date
+      const endDate = new Date(timeWindowEnd);
+      const startDate = new Date(timeWindowStart);
+      const timeDeltaMilliseconds = endDate.getTime() - startDate.getTime();
+
+      timeWindowEnd = new Date();
+      timeWindowStart = new Date();
+      timeWindowStart.setTime(timeWindowEnd.getTime() - timeDeltaMilliseconds);
+    }
+    return (timeboxInfo[t.conceptType as DibbsConceptType] = {
+      timeWindowStart: timeWindowStart.toISOString(),
+      timeWindowEnd: timeWindowEnd.toISOString(),
+    });
+  });
+
+  return timeboxInfo;
 }

@@ -1,6 +1,8 @@
+// Server-only: the access checks below read roles from the database. Client
+// components get the auth-disabled flag from ./client-auth instead.
 import { auth } from "@/auth";
 import { Session, User } from "next-auth";
-import { getUserRole } from "../backend/user-management";
+import { getUserRole } from "../backend/auth/user-provisioning";
 import { UserRole } from "../models/entities/users";
 import { randomUUID } from "crypto";
 
@@ -10,18 +12,6 @@ import { randomUUID } from "crypto";
  */
 export function isDemoMode(): boolean {
   return process.env.DEMO_MODE === "true";
-}
-
-/**
- * Checks if the property AUTH_DISABLED is true
- * USE ONLY ON FRONTEND COMPONENTS
- * @param runtimeConfig - object that contains all runtime variables
- * @returns true if auth is disabled for the application
- */
-export function isAuthDisabledClientCheck(
-  runtimeConfig: Record<string, string> | undefined,
-): boolean {
-  return runtimeConfig?.AUTH_DISABLED === "true";
 }
 
 /**
@@ -40,6 +30,18 @@ export function isAuthDisabledServerCheck(): boolean {
 export async function getLoggedInUser(): Promise<User | undefined> {
   const session = await auth();
   return session ? session.user : undefined;
+}
+
+/**
+ * Performs an authentication check, for actions open to every role
+ * @returns true if there is a session with a signed-in user
+ */
+export async function authenticatedAccessCheck(): Promise<boolean> {
+  if (isAuthDisabledServerCheck()) {
+    return true;
+  }
+  const user = await getLoggedInUser();
+  return !!user?.username;
 }
 
 /**

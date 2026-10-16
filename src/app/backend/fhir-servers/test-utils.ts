@@ -3,6 +3,18 @@
 import { AuthData } from "./service";
 import FHIRClient from "./fhir-client";
 import { isIP } from "net";
+import { superAdminAccessCheck } from "@/app/utils/auth";
+
+/**
+ * These actions make outbound requests to caller-supplied URLs, so only super
+ * admins (who manage FHIR servers) may call them.
+ * @param key - name of the action, for the error message
+ */
+async function requireSuperAdmin(key: string) {
+  if (!(await superAdminAccessCheck())) {
+    throw Error(`Super admin permission check for ${key} failed`);
+  }
+}
 
 /**
  * Test the connection to a FHIR server
@@ -17,7 +29,8 @@ export async function testFhirServerConnection(
   disableCertValidation: boolean = false,
   authData?: AuthData,
 ) {
-  validateFhirServerUrl(url);
+  await requireSuperAdmin("testFhirServerConnection");
+  await assertValidFhirServerUrl(url);
   return FHIRClient.testConnection(url, disableCertValidation, authData);
 }
 
@@ -33,7 +46,8 @@ export async function checkFhirServerSupportsMatch(
   disableCertValidation: boolean = false,
   authData?: AuthData,
 ): Promise<{ supportsMatch: boolean; fhirVersion: string | null }> {
-  validateFhirServerUrl(url);
+  await requireSuperAdmin("checkFhirServerSupportsMatch");
+  await assertValidFhirServerUrl(url);
 
   return FHIRClient.checkSupportsMatch(url, disableCertValidation, authData);
 }
@@ -41,8 +55,18 @@ export async function checkFhirServerSupportsMatch(
 /**
  * Validation function for whether a FHIR server value is valid
  * @param urlString - string to validate
+ * @returns Resolves if the URL is valid, rejects with the reason otherwise
  */
 export async function validateFhirServerUrl(urlString: string): Promise<void> {
+  await requireSuperAdmin("validateFhirServerUrl");
+  return assertValidFhirServerUrl(urlString);
+}
+
+/**
+ * Throws if a FHIR server URL is malformed or points somewhere disallowed
+ * @param urlString - string to validate
+ */
+async function assertValidFhirServerUrl(urlString: string): Promise<void> {
   let url: URL;
   try {
     url = new URL(urlString);

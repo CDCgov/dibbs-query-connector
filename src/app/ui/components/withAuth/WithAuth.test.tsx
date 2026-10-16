@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import WithAuth from "./WithAuth";
 import * as nextAuthReact from "next-auth/react";
-import * as authUtils from "@/app/utils/auth";
+import * as authUtils from "@/app/utils/client-auth";
 import { UserRole } from "@/app/models/entities/users";
 import * as nextNavigation from "next/navigation";
 import * as Utils from "@/app/(pages)/userManagement/utils";
@@ -10,7 +10,7 @@ import { SessionContextValue } from "next-auth/react";
 
 jest.mock("next-auth/react");
 
-jest.mock("@/app/utils/auth", () => ({
+jest.mock("@/app/utils/client-auth", () => ({
   isAuthDisabledClientCheck: jest.fn().mockReturnValue(false),
 }));
 

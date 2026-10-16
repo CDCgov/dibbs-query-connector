@@ -23,7 +23,7 @@ jest.mock("next-auth/react", () => ({
 // mocked so the import chains through userManagement/utils and
 // QueryRedirectDisplay don't pull in the real db pool, which keeps jest's
 // process alive after the run
-jest.mock("@/app/utils/auth", () => ({
+jest.mock("@/app/utils/client-auth", () => ({
   isAuthDisabledClientCheck: jest.fn(() => false),
 }));
 

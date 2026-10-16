@@ -6,7 +6,7 @@ import {
   getQueriesForUser,
 } from "@/app/backend/query-building/service";
 import { getUserByUsername } from "@/app/backend/user-management";
-import { checkDBForData } from "@/app/backend/db-creation/lib";
+import { checkDBForData } from "@/app/backend/db-creation/service";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { useSession } from "next-auth/react";
 import { UserRole } from "@/app/models/entities/users";
@@ -21,7 +21,7 @@ jest.mock("@/app/backend/user-management", () => ({
   getUserByUsername: jest.fn(),
 }));
 
-jest.mock("@/app/backend/db-creation/lib", () => ({
+jest.mock("@/app/backend/db-creation/service", () => ({
   checkDBForData: jest.fn(),
 }));
 

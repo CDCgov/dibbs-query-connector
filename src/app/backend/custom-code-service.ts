@@ -32,6 +32,7 @@ class CustomCodeService {
     return match ? match[1] : system;
   }
 
+  @adminRequired
   static async addCustomCodeCondition(system: string): Promise<string> {
     const checkSql = `SELECT id FROM conditions WHERE id = $1`;
     const result = await dbService.query(checkSql, [CUSTOM_CONDITION_ID]);
@@ -47,6 +48,7 @@ class CustomCodeService {
     return CUSTOM_CONDITION_ID;
   }
 
+  @adminRequired
   static async getCustomValueSetById(
     id: string,
   ): Promise<QCResponse<DibbsValueSet>> {
@@ -85,6 +87,7 @@ class CustomCodeService {
     }
   }
 
+  @adminRequired
   @transaction
   @auditable
   static async insertCustomValueSet(
@@ -173,6 +176,7 @@ class CustomCodeService {
       : { success: false, error: errors.join(", ") };
   }
 
+  @adminRequired
   @transaction
   @auditable
   static async deleteCustomValueSet(
@@ -212,6 +216,7 @@ class CustomCodeService {
       : { success: false, error: errors.join(", ") };
   }
 
+  @adminRequired
   @transaction
   @auditable
   static async deleteCustomConcept(
@@ -250,6 +255,7 @@ class CustomCodeService {
 
   // insert or update query_data with a "custom" key containing these valuesets
   // if queryId is undefined, this creates a new query record with custom only
+  @adminRequired
   @transaction
   @auditable
   static async insertCustomValuesetsIntoQuery(

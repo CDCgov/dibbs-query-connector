@@ -25,8 +25,8 @@ import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import { getRole } from "@/app/(pages)/userManagement/utils";
 import { getUserByUsername } from "@/app/backend/user-management";
 import { User, UserRole } from "@/app/models/entities/users";
-import { isAuthDisabledClientCheck } from "@/app/utils/auth";
-import { checkDBForData } from "@/app/backend/db-creation/lib";
+import { isAuthDisabledClientCheck } from "@/app/utils/client-auth";
+import { checkDBForData } from "@/app/backend/db-creation/service";
 
 type QuerySelectionProps = {
   setBuildStep: Dispatch<SetStateAction<BuildStep>>;

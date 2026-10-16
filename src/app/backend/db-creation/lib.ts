@@ -1,5 +1,3 @@
-"use server";
-
 import { Concept } from "@/app/models/entities/concepts";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import {
@@ -24,8 +22,8 @@ import {
   generateConceptSqlPromises,
   generateValuesetConceptJoinSqlPromises,
 } from "./utils";
-import { readJsonFromRelativePath } from "./service";
 import { stripProtocolAndTLDFromSystemUrl } from "@/seed/process-data";
+import { readJsonFromRelativePath } from "./assets";
 
 /**
  * Function call to insert a new ValueSet into the database.

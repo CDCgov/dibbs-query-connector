@@ -1,8 +1,6 @@
 import dbService from "@/app/backend/db/service";
-import {
-  logSignInToAuditTable,
-  signOut,
-} from "@/app/backend/session-management";
+import { signOut } from "@/app/backend/session-management";
+import { logSignInToAuditTable } from "@/app/backend/auth/sign-in-audit";
 import {
   GET_ALL_AUDIT_ROWS,
   waitForAuditSuccess,
@@ -17,6 +15,7 @@ jest.mock("@/app/utils/auth", () => {
   return {
     superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
     adminAccessCheck: jest.fn(() => Promise.resolve(true)),
+    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
   };
 });
 
