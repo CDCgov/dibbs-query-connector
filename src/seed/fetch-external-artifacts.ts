@@ -1,4 +1,10 @@
-import { Bundle, OperationOutcome, Parameters, ValueSet } from "fhir/r4";
+import {
+  Bundle,
+  OperationOutcome,
+  Parameters,
+  Resource,
+  ValueSet,
+} from "fhir/r4";
 import base64 from "base-64";
 import { ConditionStruct } from "@/app/backend/db-creation/seedSqlStructs";
 import { ErsdConceptType, MISSING_API_KEY_LITERAL } from "@/constants";
@@ -130,6 +136,7 @@ export async function getVSACValueset(
     searchStructType === "valueset"
       ? `https://cts.nlm.nih.gov/fhir/ValueSet/${oid}`
       : `https://cts.nlm.nih.gov/fhir/CodeSystem/$lookup?system=${codeSystem}&code=${oid}`;
+
   const response = await fetch(vsacUrl, {
     method: "get",
     headers: new Headers({
@@ -449,4 +456,62 @@ export async function fetchErsdPayload() {
   );
 
   return createErsdPayload(ersdValuesets);
+}
+
+export type VsacCapabilityStatement = Resource & {
+  software: {
+    name: string;
+    version: string;
+    releaseDate: string;
+  };
+};
+/**
+ * Capability statement fetch for manifest writing
+ *
+ * @returns
+ */
+export async function fetchVsacCapability() {
+  const username: string = "apikey";
+  const umlsKey = process.env.UMLS_API_KEY;
+
+  if (!umlsKey) {
+    throw Error(
+      "UMLS API Key not set. Please refer to the documentation below on how to get your UMLS API key before continuing",
+      {
+        cause: MISSING_API_KEY_LITERAL,
+      },
+    );
+  }
+
+  const vsacUrl: string = "https://cts.nlm.nih.gov/fhir/metadata";
+
+  const response = await fetch(vsacUrl, {
+    method: "get",
+    headers: new Headers({
+      Authorization: "Basic " + base64.encode(username + ":" + umlsKey),
+      "Content-Type": "application/fhir+json",
+    }),
+  });
+  if (response.status === 200) {
+    const data = (await response.json()) as VsacCapabilityStatement;
+    return data;
+  } else {
+    const diagnosticIssue = await response.json().then((r) => {
+      try {
+        return r?.issue[0]?.diagnostics;
+      } catch {
+        return r;
+      }
+    });
+    return {
+      resourceType: "OperationOutcome",
+      issue: [
+        {
+          severity: "error",
+          code: "processing",
+          diagnostics: `${response.status}: ${diagnosticIssue}`,
+        },
+      ],
+    } as OperationOutcome;
+  }
 }

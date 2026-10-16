@@ -22,11 +22,8 @@ import {
   sleep,
   fetchDibbsValueSets,
 } from "@/seed/fetch-external-artifacts";
-import {
-  ErsdPayload,
-  VSAC_BATCH_DELAY_MS,
-  VSAC_FETCH_BATCH_SIZE,
-} from "@/seed/constants";
+import { VSAC_BATCH_DELAY_MS, VSAC_FETCH_BATCH_SIZE } from "@/seed/constants";
+import type { ErsdPayload } from "@/seed/constants";
 import { auditable } from "../audit-logs/decorator";
 import { adminRequired } from "../db/decorators";
 
@@ -47,6 +44,7 @@ class SeedingService {
    * neeed to manually manage the client connection rather than delegating it to the
    * pool because of the cross-relationships in the seeding data.
    */
+  @adminRequired
   static async seedBatchValueSetsFromVsac(
     ersdPayload: ErsdPayload,
     dbClient: DbClient,
@@ -167,6 +165,7 @@ class SeedingService {
    * pool because of the cross-relationships in the seeding data.
    * @returns A promise that resolves to an object indicating success or failure.
    */
+  @adminRequired
   static async executeCategoryUpdates(
     dbClient: DbClient,
   ): Promise<{ success: boolean }> {
