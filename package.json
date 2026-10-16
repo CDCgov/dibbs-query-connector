@@ -3,6 +3,7 @@
   "description": "DIBBs Query Connector: a Next.js full-stack application for public health staff to query healthcare organizations for patient records via FHIR and TEFCA networks.",
   "version": "1.2.4",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "docker compose -f docker-compose-dev.yaml up -d && next dev --turbopack; docker compose -f docker-compose-dev.yaml down --remove-orphans",
     "dev-win": "start docker compose -f docker-compose-dev.yaml up && next dev",
@@ -99,6 +100,7 @@
     "sass-embedded": "^1.105.1",
     "supertest": "^7.3.1",
     "testcontainers": "^12.2.0",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.1"
   }
