@@ -3,7 +3,7 @@ import { insertFhirServer } from "@/app/backend/fhir-servers/service";
 import dbService from "@/app/backend/db/service";
 
 // Let the super admin check pass so the first query is the transaction's BEGIN
-jest.mock("@/app/utils/auth", () => ({
+jest.mock("@/auth", () => ({
   superAdminAccessCheck: jest.fn().mockResolvedValue(true),
 }));
 

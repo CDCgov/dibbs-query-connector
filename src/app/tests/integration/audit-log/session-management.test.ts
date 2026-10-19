@@ -11,7 +11,7 @@ import * as AuditableDecorators from "@/app/backend/audit-logs/lib";
 import { auth } from "@/auth";
 import { suppressConsoleLogs } from "../fixtures";
 
-jest.mock("@/app/utils/auth", () => {
+jest.mock("@/auth", () => {
   return {
     superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
     adminAccessCheck: jest.fn(() => Promise.resolve(true)),

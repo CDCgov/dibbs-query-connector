@@ -55,8 +55,7 @@ jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
 });
 
 // Mock auth functions
-jest.mock("@/app/utils/auth", () => ({
-  ...jest.requireActual("@/app/utils/auth"),
+jest.mock("@/auth", () => ({
   superAdminAccessCheck: jest.fn().mockResolvedValue(true),
   adminAccessCheck: jest.fn().mockResolvedValue(true),
   authenticatedAccessCheck: jest.fn().mockResolvedValue(true),

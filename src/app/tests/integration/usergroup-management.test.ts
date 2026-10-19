@@ -14,7 +14,7 @@ import { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 
 const dbClient = dontUseOutsideConfigOrTests_getDbPool();
 
-jest.mock("@/app/utils/auth", () => ({
+jest.mock("@/auth", () => ({
   superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
   adminAccessCheck: jest.fn(() => Promise.resolve(true)),
   authenticatedAccessCheck: jest.fn().mockResolvedValue(true),

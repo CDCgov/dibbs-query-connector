@@ -5,7 +5,7 @@ import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 import { suppressConsoleLogs } from "./fixtures";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 
-jest.mock("@/app/utils/auth", () => ({
+jest.mock("@/auth", () => ({
   superAdminAccessCheck: jest.fn().mockReturnValue(true),
 }));
 

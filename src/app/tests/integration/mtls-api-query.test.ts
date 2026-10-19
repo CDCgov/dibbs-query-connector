@@ -40,7 +40,7 @@ jest.mock("@/app/api/api-auth", () => ({
   }),
 }));
 
-jest.mock("@/app/utils/auth", () => {
+jest.mock("@/auth", () => {
   return {
     superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
     adminAccessCheck: jest.fn(() => Promise.resolve(true)),

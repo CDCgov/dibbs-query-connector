@@ -6,7 +6,7 @@ import {
   deleteFhirServer,
 } from "@/app/backend/fhir-servers/service";
 
-jest.mock("@/app/utils/auth", () => {
+jest.mock("@/auth", () => {
   return {
     superAdminAccessCheck: jest.fn().mockResolvedValue(true),
     adminAccessCheck: jest.fn().mockResolvedValue(true),

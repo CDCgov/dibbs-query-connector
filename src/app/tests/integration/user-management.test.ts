@@ -23,7 +23,7 @@ import { suppressConsoleLogs } from "./fixtures";
 
 const dbClient = dontUseOutsideConfigOrTests_getDbPool();
 
-jest.mock("@/app/utils/auth", () => {
+jest.mock("@/auth", () => {
   return {
     superAdminAccessCheck: jest.fn().mockResolvedValue(true),
     adminAccessCheck: jest.fn().mockResolvedValue(true),

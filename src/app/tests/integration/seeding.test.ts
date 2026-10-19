@@ -5,8 +5,8 @@ import { ValueSet } from "fhir/r4";
 // import { suppressConsoleLogs } from "./fixtures";
 // import { insertValueSet } from "@/app/backend/db-creation/lib";
 
-jest.mock("@/app/backend/code-systems/service", () => {
-  const actual = jest.requireActual("@/app/backend/code-systems/service");
+jest.mock("@/code-systems/service", () => {
+  const actual = jest.requireActual("@/code-systems/service");
 
   return {
     __esModule: true,

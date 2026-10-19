@@ -16,7 +16,7 @@ import { dontUseOutsideConfigOrTests_getDbPool } from "@/app/backend/db/config";
 // network-bound test and its hooks generous, explicit timeouts.
 const NETWORK_TEST_TIMEOUT_MS = 30 * 1000;
 
-jest.mock("@/app/utils/auth", () => {
+jest.mock("@/auth", () => {
   return {
     superAdminAccessCheck: jest.fn().mockResolvedValue(true),
     adminAccessCheck: jest.fn().mockResolvedValue(true),

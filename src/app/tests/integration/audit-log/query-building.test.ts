@@ -21,7 +21,7 @@ import {
 import { CANCER_FRONTEND_NESTED_INPUT } from "../../../../../e2e/constants";
 import { randomUUID } from "crypto";
 
-jest.mock("@/app/utils/auth", () => {
+jest.mock("@/auth", () => {
   return {
     superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
     adminAccessCheck: jest.fn(() => Promise.resolve(true)),

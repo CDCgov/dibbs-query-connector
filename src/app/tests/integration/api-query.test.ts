@@ -26,6 +26,12 @@ jest.mock("@/app/api/api-auth", () => ({
   validateServiceToken: jest.fn(),
 }));
 
+jest.mock("@/auth", () => ({
+  superAdminAccessCheck: jest.fn().mockResolvedValue(true),
+  adminAccessCheck: jest.fn().mockResolvedValue(true),
+  authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
+}));
+
 // Mock the FHIRClient to prevent real authentication requests
 jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
   return {

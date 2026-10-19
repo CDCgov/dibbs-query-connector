@@ -5,7 +5,8 @@ import {
 } from "@/app/backend/query-building/service";
 import { createTestCancerQuery } from "../../../../e2e/utils";
 import { suppressConsoleLogs } from "./fixtures";
-jest.mock("@/app/utils/auth", () => {
+
+jest.mock("@/auth", () => {
   return {
     superAdminAccessCheck: jest.fn().mockResolvedValue(true),
     adminAccessCheck: jest.fn().mockResolvedValue(true),
