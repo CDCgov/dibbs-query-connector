@@ -8,10 +8,7 @@ import {
 } from "./utils";
 import { fetchConditionWithRetry } from "./service";
 import { getVSACValueSet } from "@/app/backend/code-systems/service";
-import {
-  INVALID_API_KEY_LITERAL,
-  MISSING_API_KEY_LITERAL,
-} from "@/app/constants";
+import { INVALID_API_KEY_LITERAL, MISSING_API_KEY_LITERAL } from "@/constants";
 
 jest.mock("@/app/backend/code-systems/service", () => ({
   getVSACValueSet: jest.fn(),
