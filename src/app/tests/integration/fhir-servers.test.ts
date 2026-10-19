@@ -7,13 +7,18 @@ import {
   insertFhirServer,
 } from "@/app/backend/fhir-servers/service";
 
-jest.mock("@/auth", () => {
+jest.mock("@/app/utils/auth", () => {
   return {
     superAdminAccessCheck: jest.fn().mockResolvedValue(true),
     adminAccessCheck: jest.fn().mockResolvedValue(true),
     authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
   };
 });
+
+jest.mock("@/app/backend/audit-logs/lib", () => ({
+  generateAuditSuccessMessage: jest.fn(),
+  generateAuditValues: jest.fn(),
+}));
 
 const TEST_FHIR_SERVER = {
   name: "Kongo Jungle",

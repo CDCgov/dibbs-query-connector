@@ -5,9 +5,13 @@ import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 import { suppressConsoleLogs } from "./fixtures";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 
-jest.mock("@/auth", () => ({
-  superAdminAccessCheck: jest.fn().mockReturnValue(true),
-}));
+jest.mock("@/app/utils/auth", () => {
+  return {
+    superAdminAccessCheck: jest.fn().mockResolvedValue(true),
+    adminAccessCheck: jest.fn().mockResolvedValue(true),
+    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
+  };
+});
 
 jest.mock("@/app/backend/fhir-servers/lib", () => ({
   prepareFhirClient: jest.fn(),
@@ -21,19 +25,9 @@ jest.mock("@/app/utils/mtls-utils", () => ({
   isMtlsAvailable: jest.fn().mockReturnValue(true),
 }));
 
-jest.mock("@/app/backend/audit-logs/decorator", () => ({
-  auditable: jest
-    .fn()
-    .mockImplementation(
-      () =>
-        (
-          target: unknown,
-          propertyName: string,
-          descriptor: PropertyDescriptor,
-        ) => {
-          return descriptor;
-        },
-    ),
+jest.mock("@/app/backend/audit-logs/lib", () => ({
+  generateAuditSuccessMessage: jest.fn(),
+  generateAuditValues: jest.fn(),
 }));
 
 describe("Query Execution with Mutual TLS", () => {

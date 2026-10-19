@@ -14,10 +14,17 @@ import { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 
 const dbClient = dontUseOutsideConfigOrTests_getDbPool();
 
-jest.mock("@/auth", () => ({
-  superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
-  adminAccessCheck: jest.fn(() => Promise.resolve(true)),
-  authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
+jest.mock("@/app/utils/auth", () => {
+  return {
+    superAdminAccessCheck: jest.fn().mockResolvedValue(true),
+    adminAccessCheck: jest.fn().mockResolvedValue(true),
+    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
+  };
+});
+
+jest.mock("@/app/backend/audit-logs/lib", () => ({
+  generateAuditSuccessMessage: jest.fn(),
+  generateAuditValues: jest.fn(),
 }));
 
 const TEST_GROUP_ID = "00000000-0000-0000-0000-000000000001";

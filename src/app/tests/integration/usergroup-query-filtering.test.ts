@@ -18,7 +18,7 @@ const dbClient = dontUseOutsideConfigOrTests_getDbPool();
 
 const mockGetLoggedInUser = jest.fn();
 
-jest.mock("@/auth", () => ({
+jest.mock("@/app/utils/auth", () => ({
   superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
   adminAccessCheck: jest.fn(() => Promise.resolve(true)),
   authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
