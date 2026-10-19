@@ -5,7 +5,7 @@ import {
 } from "@/app/utils/auth";
 import { QueryResult } from "pg";
 import { translateNestedObjectKeysIntoCamelCase } from "./util";
-import { UNAUTHORIZED_LITERAL } from "@/app/constants";
+import { UNAUTHORIZED_LITERAL } from "@/constants";
 import dbService from "./service";
 
 /**

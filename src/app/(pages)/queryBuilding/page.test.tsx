@@ -11,6 +11,13 @@ jest.mock("@/app/backend/db-creation/service", () => ({
   checkDBForData: jest.fn().mockResolvedValue(true),
 }));
 
+// Mock auth functions
+jest.mock("@/auth", () => ({
+  superAdminAccessCheck: jest.fn().mockResolvedValue(true),
+  adminAccessCheck: jest.fn().mockResolvedValue(true),
+  authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
+}));
+
 jest.mock("../userManagement/utils", () => ({
   getRole: jest.fn(),
 }));

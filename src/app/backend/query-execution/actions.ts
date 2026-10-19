@@ -4,7 +4,7 @@ import type {
   PatientDiscoveryRequest,
   PatientRecordsRequest,
 } from "../../models/entities/query";
-import { UNAUTHORIZED_LITERAL } from "../../constants";
+import { UNAUTHORIZED_LITERAL } from "@/constants";
 import { authenticationRequired } from "../db/decorators";
 import { getSavedQuerySummaries } from "../query-building/service";
 import {

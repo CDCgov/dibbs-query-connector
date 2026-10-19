@@ -19,6 +19,13 @@ jest.mock(
     ({ children }: React.PropsWithChildren) => <div>{children}</div>,
 );
 
+// Mock auth functions
+jest.mock("@/auth", () => ({
+  superAdminAccessCheck: jest.fn().mockResolvedValue(true),
+  adminAccessCheck: jest.fn().mockResolvedValue(true),
+  authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
+}));
+
 jest.mock("@/app/backend/usergroup-management", () => ({
   getAllUserGroups: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),
   getAllGroupMembers: jest.fn().mockResolvedValue({ items: [], totalItems: 0 }),

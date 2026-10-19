@@ -20,7 +20,7 @@ import {
   AddressData,
   PatientSearchFormValues,
   INSUFFICIENT_PATIENT_IDENTIFIERS,
-} from "@/app/constants";
+} from "@/constants";
 import {
   patientDiscoveryQuery,
   PatientDiscoveryResponse,

@@ -4,7 +4,7 @@ import {
   ErsdConceptType,
   INVALID_API_KEY_LITERAL,
   MISSING_API_KEY_LITERAL,
-} from "@/app/constants";
+} from "@/constants";
 import { OperationOutcome, Parameters, ValueSet } from "fhir/r4";
 import {
   ErsdOrVsacResponse,
