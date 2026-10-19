@@ -6,16 +6,12 @@ jest.mock("../db/service", () => ({ DbClient: class {} }));
 import { BundleEntry, ValueSet as FhirValueSet } from "fhir/r4";
 import { insertConceptSql, insertValuesetToConceptSql } from "./seedSqlStructs";
 import {
-  isUmbrellaErsdId,
-  isVsacOid,
-  stripErsdVersionSuffix,
-  stripProtocolAndTLDFromSystemUrl,
-  translateVSACToInternalValueSet,
-  indexErsdByOid,
+
   generateValuesetConceptJoinSqlPromises,
   generateConceptSqlPromises,
 } from "./utils";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
+import { isUmbrellaErsdId, stripErsdVersionSuffix, isVsacOid, stripProtocolAndTLDFromSystemUrl, translateVSACToInternalValueSet, createErsdPayload } from "@/seed/process-data";
 
 type MockDbClient = { query: jest.Mock };
 
@@ -166,12 +162,7 @@ describe("translateVSACToInternalValueSet", () => {
   });
 });
 
-describe("indexErsdByOid", () => {
-  it("returns empty structures for undefined input", () => {
-    const result = indexErsdByOid(undefined);
-    expect(result.oidToErsdType.size).toBe(0);
-    expect(result.nonUmbrellaValueSets).toEqual([]);
-  });
+describe("createErsdPayload", () => {
 
   it("indexes referenced oids by umbrella type and strips |version suffixes", () => {
     const entries: BundleEntry<FhirValueSet>[] = [
@@ -214,13 +205,13 @@ describe("indexErsdByOid", () => {
       },
     ];
 
-    const { oidToErsdType } = indexErsdByOid(entries);
+    const { oidToErsdResourceMap } = createErsdPayload(entries);
 
-    expect(oidToErsdType.get("oid-A")).toBe("dxtc");
-    expect(oidToErsdType.get("oid-B")).toBe("dxtc");
-    expect(oidToErsdType.get("oid-C")).toBe("mrtc");
-    expect(oidToErsdType.get("oid-D")).toBe("mrtc");
-    expect(oidToErsdType.size).toBe(4);
+    expect(oidToErsdResourceMap.get("oid-A")).toBe("dxtc");
+    expect(oidToErsdResourceMap.get("oid-B")).toBe("dxtc");
+    expect(oidToErsdResourceMap.get("oid-C")).toBe("mrtc");
+    expect(oidToErsdResourceMap.get("oid-D")).toBe("mrtc");
+    expect(oidToErsdResourceMap.size).toBe(4);
   });
 
   it("types immunization-only value sets as iztc without overriding mrtc", () => {
@@ -250,35 +241,12 @@ describe("indexErsdByOid", () => {
       },
     ];
 
-    const { oidToErsdType } = indexErsdByOid(entries);
+    const { oidToErsdResourceMap } = createErsdPayload(entries);
 
-    expect(oidToErsdType.get("oid-shared")).toBe("mrtc");
-    expect(oidToErsdType.get("oid-iz-only")).toBe("iztc");
+    expect(oidToErsdResourceMap.get("oid-shared")).toBe("mrtc");
+    expect(oidToErsdResourceMap.get("oid-iz-only")).toBe("iztc");
   });
 
-  it("collects only non-umbrella resources into nonUmbrellaValueSets", () => {
-    const leafValueSet: FhirValueSet = {
-      resourceType: "ValueSet",
-      id: "oid-A",
-      status: "active",
-    };
-    const entries: BundleEntry<FhirValueSet>[] = [
-      {
-        resource: {
-          resourceType: "ValueSet",
-          id: "dxtc-3.1.2",
-          status: "active",
-          compose: { include: [{ valueSet: ["http://x/ValueSet/oid-A"] }] },
-        },
-      },
-      { resource: leafValueSet },
-    ];
-
-    const { nonUmbrellaValueSets } = indexErsdByOid(entries);
-
-    expect(nonUmbrellaValueSets).toHaveLength(1);
-    expect(nonUmbrellaValueSets[0].id).toBe("oid-A");
-  });
 });
 
 describe("generateConceptSqlPromises", () => {

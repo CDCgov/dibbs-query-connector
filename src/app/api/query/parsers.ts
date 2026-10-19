@@ -7,7 +7,7 @@ import {
   genderOptions,
   raceOptions,
   ethnicityOptions,
-} from "@/app/constants";
+} from "@/constants";
 
 export type PatientIdentifiers = {
   first_name?: string;

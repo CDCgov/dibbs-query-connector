@@ -5,7 +5,7 @@ import {
 } from "@/app/backend/custom-code-service";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { randomUUID } from "crypto";
-import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/app/constants";
+import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/constants";
 import { suppressConsoleLogs } from "./fixtures";
 import dbService from "@/app/backend/db/service";
 

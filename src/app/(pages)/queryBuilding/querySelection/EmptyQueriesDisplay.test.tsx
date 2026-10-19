@@ -6,7 +6,7 @@ import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import {
   INVALID_API_KEY_LITERAL,
   MISSING_API_KEY_LITERAL,
-} from "@/app/constants";
+} from "@/constants";
 
 jest.mock("@/app/backend/db-creation/service", () => ({
   createDibbsDB: jest.fn(),

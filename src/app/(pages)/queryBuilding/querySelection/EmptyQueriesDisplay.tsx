@@ -9,7 +9,7 @@ import Link from "next/link";
 import {
   INVALID_API_KEY_LITERAL,
   MISSING_API_KEY_LITERAL,
-} from "@/app/constants";
+} from "@/constants";
 
 type EmptyQueryProps = {
   dbSeeded: boolean;

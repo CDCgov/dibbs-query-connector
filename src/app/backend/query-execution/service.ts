@@ -9,7 +9,7 @@ import {
   CDC_RACE_ETHNICITY_SYSTEM,
   raceOptions,
   ethnicityOptions,
-} from "../../constants";
+} from "@/constants";
 
 // ChainedPatientDemographics appears in a decorated method signature, which
 // requires a type-only import under emitDecoratorMetadata + isolatedModules.

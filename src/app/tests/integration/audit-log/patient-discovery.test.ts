@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { hyperUnluckyPatient, USE_CASE_DETAILS } from "@/app/constants";
+import { hyperUnluckyPatient, USE_CASE_DETAILS } from "@/constants";
 import {
   patientDiscoveryQuery,
   patientRecordsQuery,

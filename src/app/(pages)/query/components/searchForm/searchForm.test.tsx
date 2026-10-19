@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { getFhirServerSummaries } from "@/app/backend/fhir-servers/service";
 import { getConditionsData } from "@/app/backend/query-building/service";
 import { patientDiscoveryQuery } from "@/app/backend/query-execution/actions";
-import { hyperUnluckyPatient } from "@/app/constants";
+import { hyperUnluckyPatient } from "@/constants";
 
 jest.mock("next/navigation");
 

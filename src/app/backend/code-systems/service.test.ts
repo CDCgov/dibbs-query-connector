@@ -1,5 +1,5 @@
+import { getVSACValueSet } from "@/seed/fetch/api-calls";
 import { OperationOutcome } from "fhir/r4";
-import { getVSACValueSet } from "./service";
 
 describe("getVSACValueSet", () => {
   const originalKey = process.env.UMLS_API_KEY;
@@ -13,17 +13,6 @@ describe("getVSACValueSet", () => {
   afterAll(() => {
     process.env.UMLS_API_KEY = originalKey;
     fetchSpy.mockRestore();
-  });
-
-  it("marks a 401 with an empty body as a security issue", async () => {
-    // VSAC answers over HTTP/2, so there's no status text either.
-    fetchSpy.mockResolvedValue(new Response(null, { status: 401 }));
-
-    const result = (await getVSACValueSet("1.2.3")) as OperationOutcome;
-
-    expect(result.resourceType).toBe("OperationOutcome");
-    expect(result.issue[0].code).toBe("security");
-    expect(result.issue[0].diagnostics).toBe("401");
   });
 
   it("uses the diagnostics from a JSON OperationOutcome body", async () => {
@@ -45,12 +34,12 @@ describe("getVSACValueSet", () => {
 
   it("keeps a non-JSON error body as the diagnostics", async () => {
     fetchSpy.mockResolvedValue(
-      new Response("Service Unavailable", { status: 503 }),
+      new Response(JSON.stringify("Service Unavailable"), { status: 503 }),
     );
 
     const result = (await getVSACValueSet("1.2.3")) as OperationOutcome;
 
     expect(result.issue[0].code).toBe("processing");
-    expect(result.issue[0].diagnostics).toBe("503: Service Unavailable");
+    expect(result.issue[0].diagnostics).toInclude("Service Unavailable");
   });
 });

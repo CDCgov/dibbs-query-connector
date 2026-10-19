@@ -2,13 +2,22 @@ import {
   processFhirResponse,
   parseFhirSearch,
 } from "@/app/backend/query-execution/service";
-import { isFhirResource } from "@/app/constants";
+import { isFhirResource } from "@/constants";
 import { readJsonFile } from "../shared_utils/readJsonFile";
 import { Bundle, DiagnosticReport, FhirResource, Observation } from "fhir/r4";
 import { QueryResponse } from "@/app/models/entities/query";
 import { suppressConsoleLogs } from "../integration/fixtures";
 
-jest.mock("@/app/utils/auth", () => ({
+// Importing "../db/service" runs `new DbService()` at module load, which throws
+// `DATABASE_URL is not set`, and "./service" pulls in the audit log decorators.
+// Neither is exercised by the eRSD indexing under test, so both are stubbed.
+jest.mock("../../backend/db/service", () => ({
+  __esModule: true,
+  default: {},
+  DbClient: class {},
+}));
+
+jest.mock("@/auth", () => ({
   superAdminAccessCheck: jest.fn().mockReturnValue(true),
 }));
 

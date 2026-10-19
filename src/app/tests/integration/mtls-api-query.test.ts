@@ -2,7 +2,7 @@ import { Bundle, Task, Patient } from "fhir/r4";
 import { NextRequest } from "next/server";
 import { POST } from "@/app/api/query/route";
 import { suppressConsoleLogs } from "./fixtures";
-import { USE_CASE_DETAILS } from "@/app/constants";
+import { USE_CASE_DETAILS } from "@/constants";
 import { prepareFhirClient } from "@/app/backend/fhir-servers/lib";
 import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 

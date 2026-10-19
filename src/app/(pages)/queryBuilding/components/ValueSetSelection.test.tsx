@@ -16,7 +16,23 @@ import {
 
 const currentPage = "/";
 
-jest.mock("../../../backend/query-building/service", () => ({
+// Importing "../db/service" runs `new DbService()` at module load, which throws
+// `DATABASE_URL is not set`, and "./service" pulls in the audit log decorators.
+// Neither is exercised by the eRSD indexing under test, so both are stubbed.
+jest.mock("../../../backend/db/service", () => ({
+  __esModule: true,
+  default: {},
+  DbClient: class {},
+}));
+
+// Mock auth functions
+jest.mock("@/auth", () => ({
+  superAdminAccessCheck: jest.fn().mockResolvedValue(true),
+  adminAccessCheck: jest.fn().mockResolvedValue(true),
+  authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
+}));
+
+jest.mock("@/app/backend/query-building/service", () => ({
   getCustomQueries: jest.fn(),
   getSavedQueryById: jest.fn(),
   getConditionsData: jest.fn(),

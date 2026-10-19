@@ -22,7 +22,7 @@ import crypto from "crypto";
 
 import { formatCodeSystemPrefix } from "../utils/format-service";
 
-import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/app/constants";
+import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/constants";
 import dbService from "./db/service";
 
 class CustomCodeService {
