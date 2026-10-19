@@ -400,9 +400,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                                               class="vsName"
                                             >
                                               <span>
-                                                <span
-                                                  class=""
-                                                >
+                                                <span>
                                                   Gonorrhea [Neisseria species Unspecified] (Organism or Substance in Lab Results)
                                                 </span>
                                               </span>
@@ -491,9 +489,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
                                               class="vsName"
                                             >
                                               <span>
-                                                <span
-                                                  class=""
-                                                >
+                                                <span>
                                                   Gonorrhea [Neisseria gonorrhoeae] (Organism or Substance in Lab Results)
                                                 </span>
                                               </span>
@@ -567,6 +563,7 @@ exports[`tests the valueset selection page interactions filter bulk selection up
   </div>
   <div
     aria-describedby="warning-confirmation-modal-modal-description"
+    aria-hidden="true"
     aria-labelledby="warning-confirmation-modal-modal-heading"
     class="usa-modal-wrapper is-hidden"
     data-force-action="false"
