@@ -6,12 +6,18 @@ jest.mock("../db/service", () => ({ DbClient: class {} }));
 import { BundleEntry, ValueSet as FhirValueSet } from "fhir/r4";
 import { insertConceptSql, insertValuesetToConceptSql } from "./seedSqlStructs";
 import {
-
   generateValuesetConceptJoinSqlPromises,
   generateConceptSqlPromises,
 } from "./utils";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
-import { isUmbrellaErsdId, stripErsdVersionSuffix, isVsacOid, stripProtocolAndTLDFromSystemUrl, translateVSACToInternalValueSet, createErsdPayload } from "@/seed/process-data";
+import {
+  isUmbrellaErsdId,
+  stripErsdVersionSuffix,
+  isVsacOid,
+  stripProtocolAndTLDFromSystemUrl,
+  translateVSACToInternalValueSet,
+  createErsdPayload,
+} from "@/seed/process-data";
 
 type MockDbClient = { query: jest.Mock };
 
@@ -163,7 +169,6 @@ describe("translateVSACToInternalValueSet", () => {
 });
 
 describe("createErsdPayload", () => {
-
   it("indexes referenced oids by umbrella type and strips |version suffixes", () => {
     const entries: BundleEntry<FhirValueSet>[] = [
       {
@@ -246,7 +251,6 @@ describe("createErsdPayload", () => {
     expect(oidToErsdResourceMap.get("oid-shared")).toBe("mrtc");
     expect(oidToErsdResourceMap.get("oid-iz-only")).toBe("iztc");
   });
-
 });
 
 describe("generateConceptSqlPromises", () => {

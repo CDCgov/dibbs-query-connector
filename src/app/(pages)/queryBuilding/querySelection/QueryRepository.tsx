@@ -22,10 +22,7 @@ import { DataContext, DataContextValue } from "@/app/utils/DataProvider";
 import classNames from "classnames";
 import { ConditionsMap, EMPTY_QUERY_SELECTION } from "../utils";
 import { CustomUserQuery } from "@/app/models/entities/query";
-import {
-  CUSTOM_CONDITION_NAME,
-  CUSTOM_VALUESET_ARRAY_ID,
-} from "@/constants";
+import { CUSTOM_CONDITION_NAME, CUSTOM_VALUESET_ARRAY_ID } from "@/constants";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import LoadingRow from "@/app/ui/components/loading/loadingRow";
 import Skeleton from "react-loading-skeleton";
