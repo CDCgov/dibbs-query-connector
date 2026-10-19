@@ -18,10 +18,6 @@ jest.mock("@/auth", () => ({
   authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
 }));
 
-jest.mock("../userManagement/utils", () => ({
-  getRole: jest.fn(),
-}));
-
 jest.mock("@/app/backend/query-building/service", () => ({
   getQueryList: jest.fn(),
   getCustomQueries: jest.fn(),

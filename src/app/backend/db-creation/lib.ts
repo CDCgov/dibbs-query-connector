@@ -1,5 +1,4 @@
 import { Concept } from "@/app/models/entities/concepts";
-import { Bundle, ValueSet } from "fhir/r4";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import {
   CategoryStruct,
@@ -19,35 +18,12 @@ import {
   ValuesetToConceptStruct,
 } from "./seedSqlStructs";
 import dbService, { DbClient } from "../db/service";
-import { getERSD, getVSACValueSet, OidData } from "../code-systems/service";
 import {
   generateConceptSqlPromises,
   generateValuesetConceptJoinSqlPromises,
-  indexErsdByOid,
-  isUmbrellaErsdId,
-  isVsacOid,
-  stripErsdVersionSuffix,
-  stripProtocolAndTLDFromSystemUrl,
 } from "./utils";
+import { stripProtocolAndTLDFromSystemUrl } from "@/seed/process-data";
 import { readJsonFromRelativePath } from "./assets";
-
-/**
- * helper function to generate VSAC promises
- *
- * @param oidsToFetch - OIDs from the eRSD to query from VSAC
- * @returns Promises to resolve that will give you the requested VSAC valuesets
- */
-export async function generateBatchVsacPromises(oidsToFetch: string[]) {
-  const valueSetPromises = Promise.allSettled(
-    oidsToFetch.map(async (oid) => {
-      // First, we'll pull the value set from VSAC and map it to our representation
-      const vs = await getVSACValueSet(oid);
-      return { vs: vs, oid: oid };
-    }),
-  );
-
-  return valueSetPromises;
-}
 
 /**
  * Function call to insert a new ValueSet into the database.
@@ -432,88 +408,4 @@ export async function generateValueSetSqlPromise(
     vs.userCreated ?? false,
   ];
   return dbClient.query(insertValueSetSql, valuesArray);
-}
-
-/**
- * Helper function to clean url-related info from system fields
- * @param systemURL - system to clean
- * @returns the slug of the URL that includes only the system information
- */
-
-type ersdCondition = {
-  code: string;
-  system: string;
-  text: string;
-  valueset_id: string;
-};
-/**
- * Performs eRSD querying and parsing to generate OIDs and extract clinical
- * concepts from the eRSD. First, a call is made to the eRSD, which is filtered
- * for valuesets. These valusets are used to create a mapping between OID and
- * clinical service code, as well as to actually compile the list of OIDs of all
- * valuesets in the pull-down. Then, these two entities are bundled together
- * as a data structure for future scripting.
- * @returns An OidData object containing the OIDs extracted as well as the
- * clinical service type associated with each.
- */
-export async function indexErsdResponseByOid() {
-  console.log("Fetching and parsing eRSD.");
-  const ersd = await getERSD();
-
-  const valuesets = (ersd as unknown as Bundle)["entry"]?.filter(
-    (e) =>
-      (e.resource as { resourceType?: string })?.resourceType === "ValueSet",
-  );
-
-  const { nonUmbrellaValueSets, oidToErsdType } = indexErsdByOid(valuesets);
-  // Build up a mapping of OIDs to eRSD clinical types
-
-  // Only OID-identified value sets exist in VSAC. Anything else left over
-  // (umbrella groupings we don't map to a concept type, APHL-authored
-  // provisional value sets) would 404 there and fail the whole seed, so we
-  // leave it out of both the fetch list and the condition linkages.
-  const skippedIds = nonUmbrellaValueSets
-    .map((vs) => vs.id)
-    .filter((id) => !isVsacOid(id));
-  if (skippedIds.length > 0) {
-    console.warn(
-      `Skipping ${skippedIds.length} eRSD value set(s) that can't be fetched from VSAC: ${skippedIds.join(", ")}`,
-    );
-  }
-
-  let conditionExtractor: Array<ersdCondition> = [];
-  nonUmbrellaValueSets
-    .filter((vs) => isVsacOid(vs.id))
-    .reduce((acc: Array<ersdCondition>, vs: ValueSet) => {
-      const conditionSchemes = vs.useContext?.filter(
-        (context) =>
-          !(context.valueCodeableConcept?.coding || [])[0].system?.includes(
-            "us-ph-usage-context",
-          ),
-      );
-      (conditionSchemes || []).forEach((usc) => {
-        const ersdCond: ersdCondition = {
-          code: (usc.valueCodeableConcept?.coding || [])[0].code || "",
-          system: (usc.valueCodeableConcept?.coding || [])[0].system || "",
-          text: usc.valueCodeableConcept?.text || "",
-          valueset_id: stripErsdVersionSuffix(vs.id || ""),
-        };
-        conditionExtractor.push(ersdCond);
-      });
-      return conditionExtractor;
-    }, conditionExtractor);
-
-  // Take out the umbrella value sets from the ones we try to insert, then
-  // strip the `-YYYYMMDD` version suffix that eRSD v3 appends to non-umbrella
-  // ids so we send bare OIDs to VSAC and key the DB on bare OIDs (matches the
-  // static seed's `WHERE oid = $1` lookups).
-  let oids = valuesets
-    ?.map((vs) => vs.resource?.id)
-    .filter((oid) => !isUmbrellaErsdId(oid) && isVsacOid(oid))
-    .map((oid) => (oid ? stripErsdVersionSuffix(oid) : oid));
-  return {
-    oids: oids,
-    oidToErsdType: oidToErsdType,
-    conditions: conditionExtractor,
-  } as OidData;
 }
