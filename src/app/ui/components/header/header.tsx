@@ -3,7 +3,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
-import { metadata } from "@/constants";
 import classNames from "classnames";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
@@ -13,6 +12,7 @@ import { isAuthDisabledClientCheck } from "@/app/utils/client-auth";
 import { DataContext } from "@/app/utils/DataProvider";
 import { signOut } from "@/app/backend/session-management";
 import { Session } from "next-auth";
+import { metadata } from "@/constants";
 
 interface HeaderProps {
   session: Session | null;
