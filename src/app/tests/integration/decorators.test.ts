@@ -2,12 +2,8 @@ import { suppressConsoleLogs } from "./fixtures";
 import { insertFhirServer } from "@/app/backend/fhir-servers/service";
 import dbService from "@/app/backend/db/service";
 
-// Let the super admin check pass so the first query is the transaction's BEGIN
-jest.mock("@/app/utils/auth", () => {
-  return {
-    superAdminAccessCheck: jest.fn().mockResolvedValue(true),
-  };
-});
+jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/audit-logs/decorator");
 
 const dbClientQuery = jest.spyOn(dbService, "query");
 suppressConsoleLogs();

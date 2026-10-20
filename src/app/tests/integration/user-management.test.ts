@@ -23,18 +23,8 @@ import { suppressConsoleLogs } from "./fixtures";
 
 const dbClient = dontUseOutsideConfigOrTests_getDbPool();
 
-jest.mock("@/app/utils/auth", () => {
-  return {
-    superAdminAccessCheck: jest.fn().mockResolvedValue(true),
-    adminAccessCheck: jest.fn().mockResolvedValue(true),
-    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-  };
-});
-
-jest.mock("@/app/backend/audit-logs/lib", () => ({
-  generateAuditSuccessMessage: jest.fn(),
-  generateAuditValues: jest.fn(),
-}));
+jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/audit-logs/decorator");
 
 const TEST_USER_STANDARD = {
   id: "13e1efb2-5889-4157-8f34-78d7f02dbf84",

@@ -40,13 +40,8 @@ jest.mock("@/app/api/api-auth", () => ({
   }),
 }));
 
-jest.mock("@/auth", () => {
-  return {
-    superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    adminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-  };
-});
+jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/audit-logs/decorator");
 
 const mockPatientGet = {
   status: 200,

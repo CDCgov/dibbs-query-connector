@@ -2,12 +2,10 @@ import type { Config } from "jest";
 import nextJest from "next/jest.js";
 
 const createJestConfig = nextJest({
-  // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
   dir: "./",
 });
 
-// Add any custom config to be passed to Jest
-const config: Config = {
+const customJestConfig: Config = {
   coverageProvider: "v8",
   testEnvironment: "jest-fixed-jsdom",
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
@@ -18,5 +16,15 @@ const config: Config = {
   },
 };
 
-// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-export default createJestConfig(config);
+export default async () => {
+  const config = await createJestConfig(customJestConfig)();
+
+  return {
+    ...config,
+    // Next.js sets default transformIgnorePatterns which overrides custom config.
+    // We override it here after Next.js finishes generating its base config.
+    transformIgnorePatterns: [
+      "/node_modules/(?!(next-auth|@next-auth|@auth/core)/)",
+    ],
+  };
+};

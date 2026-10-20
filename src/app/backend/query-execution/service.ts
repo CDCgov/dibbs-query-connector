@@ -1420,6 +1420,7 @@ class QueryService {
   static async fullPatientQuery(
     queryRequest: FullPatientRequest,
   ): Promise<QueryResponse> {
+    console.log(queryRequest);
     const patient = await patientDiscoveryQuery(queryRequest);
 
     if (!Array.isArray(patient) || patient.length === 0) {

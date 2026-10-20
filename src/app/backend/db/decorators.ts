@@ -1,12 +1,12 @@
+import { QueryResult } from "pg";
+import { translateNestedObjectKeysIntoCamelCase } from "./util";
+import dbService from "./service";
 import {
   adminAccessCheck,
   authenticatedAccessCheck,
   superAdminAccessCheck,
 } from "@/app/utils/auth";
-import { QueryResult } from "pg";
-import { translateNestedObjectKeysIntoCamelCase } from "./util";
 import { UNAUTHORIZED_LITERAL } from "@/constants";
-import dbService from "./service";
 
 /**
  * Annotation to make a db query into a transaction. Requires all return branches

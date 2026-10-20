@@ -36,20 +36,6 @@ jest.mock("@/app/backend/query-building/lib", () => ({
   getSavedQueryByNameHelp: jest.fn(),
 }));
 
-jest.mock("@/app/backend/audit-logs/decorator", () => ({
-  auditable: jest
-    .fn()
-    .mockImplementation(
-      () =>
-        (
-          _target: unknown,
-          _propertyName: string,
-          descriptor: PropertyDescriptor,
-        ) =>
-          descriptor,
-    ),
-}));
-
 const PATIENT_ID = "patient-123";
 const LOINC_CODE = "5199-7";
 const RXNORM_CODE = "1665005";

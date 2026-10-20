@@ -18,18 +18,9 @@ import {
 import { createSmartJwt } from "@/app/backend/smart-on-fhir";
 import { suppressConsoleLogs } from "./fixtures";
 
-jest.mock("@/app/utils/auth", () => {
-  return {
-    superAdminAccessCheck: jest.fn().mockResolvedValue(true),
-    adminAccessCheck: jest.fn().mockResolvedValue(true),
-    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-  };
-});
+jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/audit-logs/decorator");
 
-jest.mock("@/app/backend/audit-logs/lib", () => ({
-  generateAuditSuccessMessage: jest.fn(),
-  generateAuditValues: jest.fn(),
-}));
 // A scratch keys dir with no key files, so tests exercise the
 // generate-in-db path rather than importing any local dev keys/ dir
 const EMPTY_KEYS_DIR = fs.mkdtempSync(

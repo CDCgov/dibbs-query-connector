@@ -7,29 +7,12 @@ import {
   getAuditEntry,
   TEST_USER,
 } from "./utils";
-import * as AuditableDecorators from "@/app/backend/audit-logs/lib";
 import { auth } from "@/auth";
 import { suppressConsoleLogs } from "../fixtures";
+import { auditDecoratorSpy } from "@/app/backend/audit-logs/__mocks__/decorator";
 
-jest.mock("@/auth", () => {
-  return {
-    superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    adminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-  };
-});
-
-jest.mock("@/app/backend/audit-logs/lib", () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual("@/app/backend/audit-logs/lib"),
-  };
-});
-
-const auditCompletionSpy = jest.spyOn(
-  AuditableDecorators,
-  "generateAuditSuccessMessage",
-);
+jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/audit-logs/decorator");
 
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
 
@@ -44,7 +27,7 @@ describe("sign in and out", () => {
     const actionTypeToCheck = "auditableSignOut";
 
     await signOut();
-    await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
+    await waitForAuditSuccess(actionTypeToCheck, auditDecoratorSpy);
     const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
 
     const userInfo = JSON.parse(auditEntry?.sessionParams).session.user;
@@ -64,7 +47,7 @@ describe("sign in and out", () => {
       given_name: TEST_USER.user.firstName,
       family_name: TEST_USER.user.lastName,
     });
-    await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
+    await waitForAuditSuccess(actionTypeToCheck, auditDecoratorSpy);
     const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
 
     const userInfo = JSON.parse(auditEntry?.profile);

@@ -18,12 +18,7 @@ jest.mock("@/app/backend/audit-logs/lib", () => {
   };
 });
 
-// Mock auth functions
-jest.mock("@/auth", () => ({
-  superAdminAccessCheck: jest.fn().mockResolvedValue(true),
-  adminAccessCheck: jest.fn().mockResolvedValue(true),
-  authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-}));
+jest.mock("@/app/backend/db/decorators");
 
 const mockBody = {
   resourceType: "Bundle",

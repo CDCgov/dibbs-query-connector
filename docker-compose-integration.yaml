@@ -8,7 +8,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=pw
       - POSTGRES_DB=tefca_db
-
+    attach: false
     volumes:
       - ./vs_dump.sql:/docker-entrypoint-initdb.d/vs_dump.sql
     healthcheck:
@@ -22,6 +22,7 @@ services:
     image: flyway/flyway:10.16-alpine
     command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
     platform: linux/amd64
+    attach: false
     volumes:
       - ./flyway/sql:/flyway/sql
       - ./flyway/conf/flyway.conf:/flyway/conf/flyway.conf
@@ -90,6 +91,7 @@ services:
     environment:
       - AIDBOX_BASE_URL=http://localhost:8080
       - APP_HOSTNAME=http://query-connector:3000
+    attach: false
     depends_on:
       db:
         condition: service_healthy

@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import { hyperUnluckyPatient, USE_CASE_DETAILS } from "@/constants";
 import {
   patientDiscoveryQuery,
@@ -11,12 +10,9 @@ import {
   PatientRecordsRequest,
 } from "@/app/models/entities/query";
 import dbService from "@/app/backend/db/service";
-
-import * as AuditableDecorators from "@/app/backend/audit-logs/lib";
 import {
   GET_ALL_AUDIT_ROWS,
   getAuditEntry,
-  TEST_USER,
   waitForAuditSuccess,
 } from "./utils";
 
@@ -54,26 +50,8 @@ jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
   };
 });
 
-// Mock auth functions
-jest.mock("@/auth", () => ({
-  superAdminAccessCheck: jest.fn().mockResolvedValue(true),
-  adminAccessCheck: jest.fn().mockResolvedValue(true),
-  authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-}));
-
-jest.mock("@/app/backend/audit-logs/lib", () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual("@/app/backend/audit-logs/lib"),
-  };
-});
-
-const auditCompletionSpy = jest.spyOn(
-  AuditableDecorators,
-  "generateAuditSuccessMessage",
-);
-
-(auth as jest.Mock).mockResolvedValue(TEST_USER);
+jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/audit-logs/decorator");
 
 describe("patient queries", () => {
   beforeAll(() => {

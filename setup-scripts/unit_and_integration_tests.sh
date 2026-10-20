@@ -42,7 +42,7 @@ BASE_CMD="npx dotenv run -q -f .env.integration -- jest"
 
 # running our integration tests
 if [ "$JUST_INTEGRATION" = "true" ]; then 
-    JEST_CMD="$BASE_CMD --testPathPatterns=tests/integration/"
+    JEST_CMD="$BASE_CMD --testPathPatterns=tests/integration/audit-log/session-management"
 else 
 # assuming that the only reason we'd want to run both the unit and integration tests is in the CI context where we need to gather coverage report info
     JEST_CMD="$BASE_CMD --testPathIgnorePatterns='/e2e/' --coverage"

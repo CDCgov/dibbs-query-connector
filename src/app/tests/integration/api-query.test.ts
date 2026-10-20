@@ -21,22 +21,12 @@ import {
 jest.mock("next-auth");
 jest.mock("next-auth/providers/keycloak");
 
+jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/audit-logs/decorator");
+
 // Mock the validateServiceToken function
 jest.mock("@/app/api/api-auth", () => ({
   validateServiceToken: jest.fn(),
-}));
-
-jest.mock("@/app/utils/auth", () => {
-  return {
-    superAdminAccessCheck: jest.fn().mockResolvedValue(true),
-    adminAccessCheck: jest.fn().mockResolvedValue(true),
-    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-  };
-});
-
-jest.mock("@/app/backend/audit-logs/lib", () => ({
-  generateAuditSuccessMessage: jest.fn(),
-  generateAuditValues: jest.fn(),
 }));
 
 // Mock the FHIRClient to prevent real authentication requests
@@ -94,14 +84,6 @@ export function createNextRequest(
     headers: requestHeaders,
   } as unknown as NextRequest;
 }
-
-jest.mock("@/app/utils/auth", () => {
-  return {
-    superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    adminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-  };
-});
 
 const PatientBundle = readJsonFile("./src/app/tests/assets/BundlePatient.json");
 const PatientResource: Patient | undefined = (
@@ -224,7 +206,6 @@ describe("POST Query FHIR Server - Authentication", () => {
 
 describe("POST Query FHIR Server - Authorized Requests", () => {
   beforeEach(() => {
-    suppressConsoleLogs();
     jest.clearAllMocks();
 
     // Mock successful authentication for all tests in this describe block
@@ -325,6 +306,7 @@ describe("POST Query FHIR Server - Authorized Requests", () => {
       new URLSearchParams("use_case=syphilis&fhir_server=Aidbox"),
       { Authorization: VALID_TOKEN },
     );
+
     const response = await POST(request);
     const body = await response.json();
     expect(body.resourceType).toBe("Bundle");
@@ -403,7 +385,7 @@ describe("POST Query FHIR Server - Authorized Requests", () => {
 
 describe("Authentication with Different Providers", () => {
   beforeEach(() => {
-    suppressConsoleLogs();
+    // suppressConsoleLogs();
     jest.clearAllMocks();
   });
 
@@ -468,7 +450,7 @@ describe("Authentication with Different Providers", () => {
 
 describe("SMART on FHIR JWT creation", () => {
   beforeEach(() => {
-    suppressConsoleLogs();
+    // suppressConsoleLogs();
     jest.clearAllMocks();
   });
 
