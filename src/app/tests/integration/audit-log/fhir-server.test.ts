@@ -1,44 +1,19 @@
 import dbService from "@/app/backend/db/service";
-import { auth } from "@/auth";
-import {
-  GET_ALL_AUDIT_ROWS,
-  getAuditEntry,
-  TEST_USER,
-  waitForAuditSuccess,
-} from "./utils";
-import * as AuditableDecorators from "@/app/backend/audit-logs/lib";
-import { suppressConsoleLogs } from "../fixtures";
+import { GET_ALL_AUDIT_ROWS, getAuditEntry, TEST_USER } from "./utils";
 import {
   insertFhirServer,
   updateFhirServer,
   deleteFhirServer,
 } from "@/app/backend/fhir-servers/service";
+import { auth } from "@/auth";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 
-jest.mock("@/app/backend/audit-logs/lib", () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual("@/app/backend/audit-logs/lib"),
-  };
-});
-
-jest.mock("@/app/utils/auth", () => {
-  return {
-    superAdminAccessCheck: jest.fn().mockResolvedValue(true),
-    adminAccessCheck: jest.fn().mockResolvedValue(true),
-    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-  };
-});
-
-const auditCompletionSpy = jest.spyOn(
-  AuditableDecorators,
-  "generateAuditSuccessMessage",
-);
+jest.mock("@/app/backend/db/decorators");
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
 
 describe("fhir server", () => {
   beforeAll(() => {
-    suppressConsoleLogs();
+    // suppressConsoleLogs();
   });
   it("fhir server addition / deletion / update", async () => {
     const TEST_FHIR_SERVER = {
@@ -65,17 +40,17 @@ describe("fhir server", () => {
       TEST_FHIR_SERVER.lastConnectionSuccessful,
     );
     const actionTypeToCheck = "insertFhirServer";
-    await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
 
     const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
+    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
 
-    expect(JSON.parse(auditEntry.name)).toBe(TEST_FHIR_SERVER.name);
-    expect(JSON.parse(auditEntry.hostname)).toBe(TEST_FHIR_SERVER.hostname);
-    expect(JSON.parse(auditEntry.lastConnectionSuccessful)).toBe(
+    const auditValues = auditEntry?.auditMessage;
+    expect(JSON.parse(auditValues.name)).toBe(TEST_FHIR_SERVER.name);
+    expect(JSON.parse(auditValues.hostname)).toBe(TEST_FHIR_SERVER.hostname);
+    expect(JSON.parse(auditValues.lastConnectionSuccessful)).toBe(
       TEST_FHIR_SERVER.lastConnectionSuccessful,
     );
 
-    // update
     const updateName = "Dire Dire Docks";
     await updateFhirServer({
       id: result.server.id,
@@ -89,20 +64,22 @@ describe("fhir server", () => {
       },
     });
     const updateTypeToCheck = "updateFhirServer";
-    await waitForAuditSuccess(updateTypeToCheck, auditCompletionSpy);
     const updateAuditEntry = await getAuditEntry(
       updateTypeToCheck,
       oldAuditIds,
     );
 
-    expect(JSON.parse(updateAuditEntry.updateDetails).name).toBe(updateName);
+    expect(updateAuditEntry?.actionType).toBe(actionTypeToCheck);
 
-    // delete
+    const updateAuditValues = updateAuditEntry?.auditMessage;
+    expect(JSON.parse(updateAuditValues.updateDetails).name).toBe(updateName);
+
     await deleteFhirServer(result.server.id);
     const finalTypeToCheck = "deleteFhirServer";
-    await waitForAuditSuccess(finalTypeToCheck, auditCompletionSpy);
 
     const finalEntry = await getAuditEntry(finalTypeToCheck, oldAuditIds);
-    expect(JSON.parse(finalEntry.id)).toBe(result.server.id);
+    const finalAuditValues = finalEntry?.auditMessage;
+
+    expect(JSON.parse(finalAuditValues.id)).toBe(result.server.id);
   });
 });

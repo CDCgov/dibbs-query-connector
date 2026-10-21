@@ -1,20 +1,9 @@
-import dbService from "@/app/backend/db/service";
+import { DbService } from "@/app/backend/db/service";
+import { UserRole } from "@/app/models/entities/users";
 import { waitFor } from "@testing-library/dom";
 
-export const GET_ALL_AUDIT_ROWS = "SELECT * FROM audit_logs;";
-
-export async function waitForAuditSuccess(
-  actionTypeToCheck: string,
-  spy: jest.SpyInstance,
-) {
-  await waitFor(() => {
-    expect(spy).toHaveBeenCalledWith(
-      actionTypeToCheck,
-      expect.anything(),
-      expect.anything(),
-    );
-  });
-}
+export const GET_ALL_AUDIT_ROWS =
+  "SELECT * FROM audit_logs WHERE action_type = $1 AND author = $2 ORDER BY created_at DESC LIMIT 1;";
 
 // don't reuse this test user outside audit log tests since we're filtering
 // the audit entry results off this user's authorship. Otherwise, the
@@ -26,29 +15,28 @@ export const TEST_USER = {
     email: "bowser.jr@koopa.evil",
     firstName: "Bowser",
     lastName: "Jr.",
+    qcRole: UserRole.SUPER_ADMIN,
   },
 };
 
 export async function getAuditEntry(
   actionTypeToCheck: string,
-  oldAuditIds: string[],
-): Promise<Record<string, string>> {
+  author: string = TEST_USER.user.username,
+): Promise<Record<string, Record<string, string>>> {
+  const dbService = new DbService();
   // The @auditable decorator writes audit rows asynchronously (fire-and-forget),
   // so the row may not be present the instant the action returns. Poll until the
   // matching entry appears rather than reading once and racing the write.
   return waitFor(
     async () => {
-      const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS);
-      const auditResults = newAuditRows.rows.filter((r) => {
-        return (
-          r.author === TEST_USER.user.username &&
-          r.actionType === actionTypeToCheck &&
-          !oldAuditIds.includes(r.id)
-        );
-      });
-      const auditEntry = auditResults[0]?.auditMessage;
+      const newAuditRows = await dbService.query(GET_ALL_AUDIT_ROWS, [
+        actionTypeToCheck,
+        author,
+      ]);
+
+      const auditEntry = newAuditRows.rows[0];
       expect(auditEntry).toBeDefined();
-      return auditEntry as Record<string, string>;
+      return auditEntry as Record<string, Record<string, string>>;
     },
     { timeout: 5000 },
   );

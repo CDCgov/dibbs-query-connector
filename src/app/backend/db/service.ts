@@ -13,7 +13,7 @@ export class DbClient {
     }
 
     throw Error(
-      "Db client not initialized. Call connect first before making queries",
+      "DB client not initialized. Call connect first before making queries",
     );
   }
 
@@ -35,6 +35,10 @@ export class DbService {
   @camelCaseDbColumnNames
   async query(querySql: string, values?: unknown[]) {
     return await this.dbPool.query(querySql, values);
+  }
+
+  async end() {
+    return this.dbPool.end();
   }
 }
 

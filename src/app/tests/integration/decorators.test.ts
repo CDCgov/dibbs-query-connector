@@ -2,7 +2,6 @@ import { suppressConsoleLogs } from "./fixtures";
 import { insertFhirServer } from "@/app/backend/fhir-servers/service";
 import dbService from "@/app/backend/db/service";
 
-jest.mock("@/app/backend/db/decorators");
 jest.mock("@/app/backend/audit-logs/decorator");
 
 const dbClientQuery = jest.spyOn(dbService, "query");

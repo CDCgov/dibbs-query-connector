@@ -10,11 +10,7 @@ import {
   PatientRecordsRequest,
 } from "@/app/models/entities/query";
 import dbService from "@/app/backend/db/service";
-import {
-  GET_ALL_AUDIT_ROWS,
-  getAuditEntry,
-  waitForAuditSuccess,
-} from "./utils";
+import { GET_ALL_AUDIT_ROWS, getAuditEntry } from "./utils";
 
 // Mock the FHIRClient to prevent real authentication requests
 jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
@@ -51,7 +47,6 @@ jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
 });
 
 jest.mock("@/app/backend/db/decorators");
-jest.mock("@/app/backend/audit-logs/decorator");
 
 describe("patient queries", () => {
   beforeAll(() => {
@@ -73,7 +68,6 @@ describe("patient queries", () => {
       phone: hyperUnluckyPatient.Phone,
     };
     await patientDiscoveryQuery(request);
-    await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
     const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
 
     expect(auditEntry).toStrictEqual({
@@ -93,12 +87,11 @@ describe("patient queries", () => {
       queryName: USE_CASE_DETAILS.chlamydia.queryName,
     };
     await patientRecordsQuery(request);
-    await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
     const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
-
-    expect(JSON.parse(auditEntry?.fhirServer)).toBe(request.fhirServer);
-    expect(JSON.parse(auditEntry?.patientId)).toBe(request.patientId);
-    expect(JSON.parse(auditEntry?.savedQuery).queryData).toStrictEqual(
+    const auditValues = auditEntry?.auditMessage;
+    expect(JSON.parse(auditValues?.fhirServer)).toBe(request.fhirServer);
+    expect(JSON.parse(auditValues?.patientId)).toBe(request.patientId);
+    expect(JSON.parse(auditValues?.savedQuery).queryData).toStrictEqual(
       DEFAULT_CHLAMYDIA_QUERY.queryData,
     );
   });

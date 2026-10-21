@@ -46,6 +46,7 @@ class QueryBuildingService {
     author: string,
     queryId?: string,
   ) {
+    console.log("calling query building service");
     return saveCustomQueryHelp(
       queryInput,
       queryName,

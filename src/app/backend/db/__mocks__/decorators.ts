@@ -22,8 +22,8 @@ module.exports = {
 
   authenticationRequired: jest.fn().mockImplementation(() => {
     return (
-      target: unknown,
-      propertyKey: string,
+      _target: unknown,
+      _propertyKey: string,
       descriptor: PropertyDescriptor,
     ) => {
       const originalMethod = descriptor.value;
@@ -41,8 +41,8 @@ module.exports = {
 
   adminRequired: jest.fn().mockImplementation(() => {
     return (
-      target: unknown,
-      propertyKey: string,
+      _target: unknown,
+      _propertyKey: string,
       descriptor: PropertyDescriptor,
     ) => {
       const originalMethod = descriptor.value;
@@ -60,8 +60,8 @@ module.exports = {
 
   superAdminRequired: jest.fn().mockImplementation(() => {
     return (
-      target: unknown,
-      propertyKey: string,
+      _target: unknown,
+      _propertyKey: string,
       descriptor: PropertyDescriptor,
     ) => {
       const originalMethod = descriptor.value;

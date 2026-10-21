@@ -15,7 +15,8 @@ export function auditable(
   key: string,
   descriptor: PropertyDescriptor,
 ) {
-  const method = descriptor.value;
+  console.log("starting audit ");
+
   const argLabels = target[key]
     .toString()
     // match everything between the first "(" and first ")" and use [1] to get
@@ -31,90 +32,65 @@ export function auditable(
 
     // using this recursive pattern with .then's rather than async / await to
     // allow for the decorator to work on synchronous functions
-    const attemptWrite = (retryCounter: number): Promise<void> => {
-      return generateAuditValues(key, argLabels, args)
-        .then(
-          async ([
-            author,
-            methodName,
-            auditMessage,
-            timestamp,
-            auditChecksum,
-          ]) => {
-            const result = await dbService.query(insertQuery, [
-              author,
-              methodName,
-              auditMessage,
-              timestamp,
-              auditChecksum,
-            ]);
+    const attemptWrite = async (retryCounter: number): Promise<void> => {
+      try {
+        const [author, methodName_1, auditMessage, timestamp, auditChecksum] =
+          await generateAuditValues(key, argLabels, args);
+        const result = await dbService.query(insertQuery, [
+          author,
+          methodName_1,
+          auditMessage,
+          timestamp,
+          auditChecksum,
+        ]);
 
-            const insertedRow = result.rows[0];
-            const successMessage = generateAuditSuccessMessage(
-              insertedRow?.actionType ?? insertedRow?.action_type,
-              insertedRow.id,
-              auditChecksum as string,
-            );
-            console.info(successMessage);
-            return;
-          },
-        )
-        .catch((e) => {
-          console.error(
-            `Audit log write attempt ${
-              retryCounter + 1
-            } failed with error: ${e}. ${
-              retryCounter + 1 < AUDIT_LOG_MAX_RETRIES ? "Retrying..." : ""
-            }`,
+        const insertedRow = result.rows[0];
+        const successMessage = generateAuditSuccessMessage(
+          insertedRow?.actionType ?? insertedRow?.action_type,
+          insertedRow.id,
+          auditChecksum as string,
+        );
+        console.info(successMessage);
+        return;
+      } catch (e) {
+        console.error(
+          `Audit log write attempt ${retryCounter + 1} failed with error: ${e}. ${retryCounter + 1 < AUDIT_LOG_MAX_RETRIES ? "Retrying..." : ""}`,
+        );
+
+        if (retryCounter + 1 >= AUDIT_LOG_MAX_RETRIES) {
+          console.info(
+            `Audit log write attempt for ${key} failed after ${AUDIT_LOG_MAX_RETRIES} attempts.`,
           );
-
-          if (retryCounter + 1 >= AUDIT_LOG_MAX_RETRIES) {
-            console.info(
-              `Audit log write attempt for ${key} failed after ${AUDIT_LOG_MAX_RETRIES} attempts.`,
-            );
-            return;
-          }
-
-          // Add exponential backoff
-          return new Promise<void>((resolve) =>
-            setTimeout(
-              () => {
-                resolve(attemptWrite(retryCounter + 1));
-              },
-              1000 * Math.pow(2, retryCounter),
-            ),
-          );
-        });
+          return;
+        }
+        return new Promise<void>((resolve) =>
+          setTimeout(
+            () => {
+              resolve(attemptWrite(retryCounter + 1));
+            },
+            1000 * Math.pow(2, retryCounter),
+          ),
+        );
+      }
     };
 
+    console.log("starting audit attempt");
     // Start the first attempt
-    return attemptWrite(0);
+    return await attemptWrite(0);
   };
 
-  const decoratedFunctionIsAsync = method.constructor.name === "AsyncFunction";
+  const originalMethod = descriptor.value;
+  descriptor.value = async function (this: unknown, ...args: unknown[]) {
+    try {
+      console.log("starting audit write");
 
-  // need to do this check so that async vs sync returns are properly typed
-  descriptor.value = decoratedFunctionIsAsync
-    ? async function (this: unknown, ...args: unknown[]) {
-        try {
-          writeToAuditTable(args);
-
-          return await method.apply(this, args);
-        } catch (error) {
-          console.error(`Async method ${key} threw error`, error);
-          throw error;
-        }
-      }
-    : function (this: unknown, ...args: unknown[]) {
-        try {
-          writeToAuditTable(args);
-
-          return method.apply(this, args);
-        } catch (error) {
-          console.error(`Method ${key} threw error`, error);
-          throw error;
-        }
-      };
+      await writeToAuditTable(args);
+      return await originalMethod.apply(this, args);
+    } catch (error) {
+      console.error(`Method ${key} threw error`, error);
+      throw error;
+    }
+  };
 
   return descriptor;
 }

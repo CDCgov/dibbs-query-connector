@@ -1,18 +1,9 @@
 import dbService from "@/app/backend/db/service";
 import { signOut } from "@/app/backend/session-management";
 import { logSignInToAuditTable } from "@/app/backend/auth/sign-in-audit";
-import {
-  GET_ALL_AUDIT_ROWS,
-  waitForAuditSuccess,
-  getAuditEntry,
-  TEST_USER,
-} from "./utils";
+import { GET_ALL_AUDIT_ROWS, getAuditEntry, TEST_USER } from "./utils";
 import { auth } from "@/auth";
 import { suppressConsoleLogs } from "../fixtures";
-import { auditDecoratorSpy } from "@/app/backend/audit-logs/__mocks__/decorator";
-
-jest.mock("@/app/backend/db/decorators");
-jest.mock("@/app/backend/audit-logs/decorator");
 
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
 
@@ -20,6 +11,7 @@ describe("sign in and out", () => {
   beforeAll(() => {
     suppressConsoleLogs();
   });
+
   it("sign out should generate an audit entry", async () => {
     const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
       (r) => r.id,
@@ -27,10 +19,12 @@ describe("sign in and out", () => {
     const actionTypeToCheck = "auditableSignOut";
 
     await signOut();
-    await waitForAuditSuccess(actionTypeToCheck, auditDecoratorSpy);
-    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
 
-    const userInfo = JSON.parse(auditEntry?.sessionParams).session.user;
+    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
+    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
+
+    const userInfo = JSON.parse(auditEntry?.auditMessage?.sessionParams).session
+      .user;
     expect(userInfo.username).toBe(TEST_USER.user.username);
     expect(userInfo.firstName).toBe(TEST_USER.user.firstName);
     expect(userInfo.lastName).toBe(TEST_USER.user.lastName);
@@ -47,10 +41,11 @@ describe("sign in and out", () => {
       given_name: TEST_USER.user.firstName,
       family_name: TEST_USER.user.lastName,
     });
-    await waitForAuditSuccess(actionTypeToCheck, auditDecoratorSpy);
-    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
 
-    const userInfo = JSON.parse(auditEntry?.profile);
+    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
+    expect(auditEntry?.actionType).toBe(actionTypeToCheck);
+
+    const userInfo = JSON.parse(auditEntry?.auditMessage?.profile);
     expect(userInfo.preferredUsername).toBe(TEST_USER.user.username);
     expect(userInfo.givenName).toBe(TEST_USER.user.firstName);
     expect(userInfo.familyName).toBe(TEST_USER.user.lastName);
