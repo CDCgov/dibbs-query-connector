@@ -40,7 +40,7 @@ jest.mock("@/app/api/api-auth", () => ({
   }),
 }));
 
-jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
 
 const mockPatientGet = {

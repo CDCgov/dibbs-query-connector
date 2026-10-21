@@ -15,8 +15,6 @@ export function auditable(
   key: string,
   descriptor: PropertyDescriptor,
 ) {
-  console.log("starting audit ");
-
   const argLabels = target[key]
     .toString()
     // match everything between the first "(" and first ")" and use [1] to get
@@ -74,7 +72,6 @@ export function auditable(
       }
     };
 
-    console.log("starting audit attempt");
     // Start the first attempt
     return await attemptWrite(0);
   };

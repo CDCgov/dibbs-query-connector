@@ -23,7 +23,7 @@ import { suppressConsoleLogs } from "./fixtures";
 
 const dbClient = dontUseOutsideConfigOrTests_getDbPool();
 
-jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
 
 const TEST_USER_STANDARD = {

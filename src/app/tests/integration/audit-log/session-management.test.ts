@@ -1,7 +1,7 @@
 import dbService from "@/app/backend/db/service";
 import { signOut } from "@/app/backend/session-management";
 import { logSignInToAuditTable } from "@/app/backend/auth/sign-in-audit";
-import { GET_ALL_AUDIT_ROWS, getAuditEntry, TEST_USER } from "./utils";
+import { getAuditEntry, TEST_USER } from "./utils";
 import { auth } from "@/auth";
 import { suppressConsoleLogs } from "../fixtures";
 
@@ -12,15 +12,16 @@ describe("sign in and out", () => {
     suppressConsoleLogs();
   });
 
+  beforeEach(async () => {
+    await dbService.query("TRUNCATE TABLE audit_logs RESTART IDENTITY CASCADE");
+  });
+
   it("sign out should generate an audit entry", async () => {
-    const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
-      (r) => r.id,
-    );
     const actionTypeToCheck = "auditableSignOut";
 
     await signOut();
 
-    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
+    const auditEntry = await getAuditEntry(actionTypeToCheck);
     expect(auditEntry?.actionType).toBe(actionTypeToCheck);
 
     const userInfo = JSON.parse(auditEntry?.auditMessage?.sessionParams).session
@@ -31,9 +32,6 @@ describe("sign in and out", () => {
   });
 
   it("sign in should generate an audit entry", async () => {
-    const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
-      (r) => r.id,
-    );
     const actionTypeToCheck = "auditableSignIn";
 
     await logSignInToAuditTable({
@@ -42,7 +40,7 @@ describe("sign in and out", () => {
       family_name: TEST_USER.user.lastName,
     });
 
-    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
+    const auditEntry = await getAuditEntry(actionTypeToCheck);
     expect(auditEntry?.actionType).toBe(actionTypeToCheck);
 
     const userInfo = JSON.parse(auditEntry?.auditMessage?.profile);

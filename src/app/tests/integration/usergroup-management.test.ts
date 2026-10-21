@@ -14,7 +14,7 @@ import { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 
 const dbClient = dontUseOutsideConfigOrTests_getDbPool();
 
-jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
 
 const TEST_GROUP_ID = "00000000-0000-0000-0000-000000000001";

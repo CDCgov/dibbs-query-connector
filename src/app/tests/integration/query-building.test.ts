@@ -6,7 +6,7 @@ import {
 import { createTestCancerQuery } from "../../../../e2e/utils";
 import { suppressConsoleLogs } from "./fixtures";
 
-jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
 
 describe("Saving a custom query", () => {

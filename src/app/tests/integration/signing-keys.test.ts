@@ -18,7 +18,7 @@ import {
 import { createSmartJwt } from "@/app/backend/smart-on-fhir";
 import { suppressConsoleLogs } from "./fixtures";
 
-jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
 
 // A scratch keys dir with no key files, so tests exercise the

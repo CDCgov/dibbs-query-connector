@@ -1,5 +1,5 @@
 import { dontUseOutsideConfigOrTests_getDbPool } from "./config";
-import { camelCaseDbColumnNames } from "./decorators";
+import { camelCaseDbColumnNames } from "./decorators/decorators";
 import { Pool, PoolClient } from "pg";
 
 export class DbClient {

@@ -18,7 +18,7 @@ const dbClient = dontUseOutsideConfigOrTests_getDbPool();
 
 const mockGetLoggedInUser = jest.fn();
 
-jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
 
 const TEST_GROUP_ID = "00000000-0000-0000-0000-000000000007";

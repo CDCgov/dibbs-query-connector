@@ -21,7 +21,7 @@ import {
 jest.mock("next-auth");
 jest.mock("next-auth/providers/keycloak");
 
-jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
 
 // Mock the validateServiceToken function

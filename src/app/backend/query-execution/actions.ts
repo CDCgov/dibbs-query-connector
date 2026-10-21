@@ -5,12 +5,12 @@ import type {
   PatientRecordsRequest,
 } from "../../models/entities/query";
 import { UNAUTHORIZED_LITERAL } from "@/constants";
-import { authenticationRequired } from "../db/decorators";
 import { getSavedQuerySummaries } from "../query-building/service";
 import {
   patientDiscoveryQuery as runPatientDiscoveryQuery,
   patientRecordsQuery as runPatientRecordsQuery,
 } from "./service";
+import { authenticationRequired } from "../db/decorators/auth";
 
 export type {
   PatientDiscoveryResponse,

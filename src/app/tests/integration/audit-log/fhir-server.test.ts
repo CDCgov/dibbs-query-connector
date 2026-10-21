@@ -1,5 +1,5 @@
 import dbService from "@/app/backend/db/service";
-import { GET_ALL_AUDIT_ROWS, getAuditEntry, TEST_USER } from "./utils";
+import { getAuditEntry, TEST_USER } from "./utils";
 import {
   insertFhirServer,
   updateFhirServer,
@@ -8,13 +8,18 @@ import {
 import { auth } from "@/auth";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 
-jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/db/decorators/auth");
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
 
 describe("fhir server", () => {
   beforeAll(() => {
     // suppressConsoleLogs();
   });
+
+  beforeEach(async () => {
+    await dbService.query("TRUNCATE TABLE audit_logs RESTART IDENTITY CASCADE");
+  });
+
   it("fhir server addition / deletion / update", async () => {
     const TEST_FHIR_SERVER = {
       id: "jolly-roger-bay",
@@ -27,10 +32,6 @@ describe("fhir server", () => {
       authType: "none",
     } as FhirServerConfig;
 
-    const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
-      (r) => r.id,
-    );
-
     // insert
     const result = await insertFhirServer(
       TEST_FHIR_SERVER.name,
@@ -41,7 +42,7 @@ describe("fhir server", () => {
     );
     const actionTypeToCheck = "insertFhirServer";
 
-    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
+    const auditEntry = await getAuditEntry(actionTypeToCheck);
     expect(auditEntry?.actionType).toBe(actionTypeToCheck);
 
     const auditValues = auditEntry?.auditMessage;
@@ -64,10 +65,7 @@ describe("fhir server", () => {
       },
     });
     const updateTypeToCheck = "updateFhirServer";
-    const updateAuditEntry = await getAuditEntry(
-      updateTypeToCheck,
-      oldAuditIds,
-    );
+    const updateAuditEntry = await getAuditEntry(updateTypeToCheck);
 
     expect(updateAuditEntry?.actionType).toBe(actionTypeToCheck);
 
@@ -77,7 +75,7 @@ describe("fhir server", () => {
     await deleteFhirServer(result.server.id);
     const finalTypeToCheck = "deleteFhirServer";
 
-    const finalEntry = await getAuditEntry(finalTypeToCheck, oldAuditIds);
+    const finalEntry = await getAuditEntry(finalTypeToCheck);
     const finalAuditValues = finalEntry?.auditMessage;
 
     expect(JSON.parse(finalAuditValues.id)).toBe(result.server.id);

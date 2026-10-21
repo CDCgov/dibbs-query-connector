@@ -16,7 +16,7 @@ import { dontUseOutsideConfigOrTests_getDbPool } from "@/app/backend/db/config";
 // network-bound test and its hooks generous, explicit timeouts.
 const NETWORK_TEST_TIMEOUT_MS = 30 * 1000;
 
-jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
 
 describe("time filtering query", () => {

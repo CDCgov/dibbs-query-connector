@@ -10,7 +10,7 @@ import {
   PatientRecordsRequest,
 } from "@/app/models/entities/query";
 import dbService from "@/app/backend/db/service";
-import { GET_ALL_AUDIT_ROWS, getAuditEntry } from "./utils";
+import { getAuditEntry } from "./utils";
 
 // Mock the FHIRClient to prevent real authentication requests
 jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
@@ -46,17 +46,18 @@ jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
   };
 });
 
-jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/db/decorators/auth");
 
 describe("patient queries", () => {
   beforeAll(() => {
     suppressConsoleLogs();
   });
 
+  beforeEach(async () => {
+    await dbService.query("TRUNCATE TABLE audit_logs RESTART IDENTITY CASCADE");
+  });
+
   it("patient discovery query should generate an audit entry", async () => {
-    const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
-      (r) => r.id,
-    );
     const actionTypeToCheck = "makePatientDiscoveryRequest";
 
     const request: PatientDiscoveryRequest = {
@@ -68,7 +69,7 @@ describe("patient queries", () => {
       phone: hyperUnluckyPatient.Phone,
     };
     await patientDiscoveryQuery(request);
-    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
+    const auditEntry = await getAuditEntry(actionTypeToCheck);
 
     expect(auditEntry).toStrictEqual({
       request: JSON.stringify(request),
@@ -76,9 +77,6 @@ describe("patient queries", () => {
   });
 
   it("patient records query should generate an audit entry", async () => {
-    const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
-      (r) => r.id,
-    );
     const actionTypeToCheck = "makePatientRecordsRequest";
 
     const request: PatientRecordsRequest = {
@@ -87,7 +85,7 @@ describe("patient queries", () => {
       queryName: USE_CASE_DETAILS.chlamydia.queryName,
     };
     await patientRecordsQuery(request);
-    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
+    const auditEntry = await getAuditEntry(actionTypeToCheck);
     const auditValues = auditEntry?.auditMessage;
     expect(JSON.parse(auditValues?.fhirServer)).toBe(request.fhirServer);
     expect(JSON.parse(auditValues?.patientId)).toBe(request.patientId);

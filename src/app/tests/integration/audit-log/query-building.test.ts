@@ -1,6 +1,5 @@
 import dbService from "@/app/backend/db/service";
 import { getAuditEntry, TEST_USER } from "./utils"; // Make sure to remove oldAuditIds from this utility!
-import QueryBuildingService from "@/app/backend/query-building/service";
 import {
   EMPTY_MEDICAL_RECORD_SECTIONS,
   NestedQuery,
@@ -10,14 +9,17 @@ import { CANCER_FRONTEND_NESTED_INPUT } from "../../../../../e2e/constants";
 import { randomUUID } from "crypto";
 import { suppressConsoleLogs } from "../fixtures";
 import { auth } from "@/auth";
+import {
+  deleteQueryById,
+  saveCustomQuery,
+} from "@/app/backend/query-building/service";
 
-jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/db/decorators/auth");
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
 
 describe("query building auditable integrations", () => {
   beforeAll(() => {
-    // Suppress logs if needed
-    // suppressConsoleLogs()
+    suppressConsoleLogs();
   });
 
   beforeEach(async () => {
@@ -30,7 +32,7 @@ describe("query building auditable integrations", () => {
     const author = "Test Steward";
     const queryId = randomUUID();
 
-    await QueryBuildingService.saveCustomQuery(
+    await saveCustomQuery(
       queryInputFixture,
       EMPTY_MEDICAL_RECORD_SECTIONS,
       randomName,
@@ -50,7 +52,7 @@ describe("query building auditable integrations", () => {
 
   it("should generate an audit entry when deleting a query", async () => {
     const queryId = randomUUID();
-    const queryCreated = await QueryBuildingService.saveCustomQuery(
+    const queryCreated = await saveCustomQuery(
       CANCER_FRONTEND_NESTED_INPUT as NestedQuery,
       EMPTY_MEDICAL_RECORD_SECTIONS,
       "Delete Test Query",
@@ -62,7 +64,7 @@ describe("query building auditable integrations", () => {
 
     const createdQueryId = (queryCreated as QueryUpdateResult[])[0].id;
 
-    await QueryBuildingService.deleteQueryById(createdQueryId);
+    await deleteQueryById(createdQueryId);
 
     const deletionAuditEvent = await getAuditEntry("deleteQueryById");
     const deleteAuditValues = deletionAuditEvent?.auditMessage;

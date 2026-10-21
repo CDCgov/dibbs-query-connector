@@ -5,7 +5,7 @@ import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 import { suppressConsoleLogs } from "./fixtures";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 
-jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
 
 jest.mock("@/app/backend/fhir-servers/lib", () => ({

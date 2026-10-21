@@ -31,8 +31,8 @@ import {
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { DbClient } from "../db/service";
 import { auditable } from "../audit-logs/decorator";
-import { adminRequired } from "../db/decorators";
 import { translateVSACToInternalValueSet } from "./utils";
+import { adminRequired } from "../db/decorators/auth";
 
 // Number of retry attempts for a single VSAC condition lookup that fails with a
 // transient transport error (e.g. undici "fetch failed" from a connection reset

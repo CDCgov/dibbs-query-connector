@@ -1,6 +1,6 @@
 import dbService from "@/app/backend/db/service";
 
-jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
 
 describe("db service", () => {

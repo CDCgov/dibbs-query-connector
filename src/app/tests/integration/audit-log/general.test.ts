@@ -6,10 +6,10 @@ import { patientDiscoveryQuery } from "@/app/backend/query-execution/service";
 import { PatientDiscoveryRequest } from "@/app/models/entities/query";
 import { hyperUnluckyPatient } from "@/constants";
 import * as DecoratorUtils from "@/app/backend/audit-logs/lib";
-import { dontUseOutsideConfigOrTests_getDbPool } from "@/app/backend/db/config";
 import { suppressConsoleLogs } from "../fixtures";
 import { auth } from "@/auth";
 import { TEST_USER } from "./utils";
+import dbService from "@/app/backend/db/service";
 
 jest.mock("@/app/backend/audit-logs/lib", () => {
   return {
@@ -18,7 +18,7 @@ jest.mock("@/app/backend/audit-logs/lib", () => {
   };
 });
 
-jest.mock("@/app/backend/db/decorators");
+jest.mock("@/app/backend/db/decorators/auth");
 
 const mockBody = {
   resourceType: "Bundle",
@@ -66,7 +66,6 @@ jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
 
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
 
-const dbClient = dontUseOutsideConfigOrTests_getDbPool();
 describe("checks for generic audit logs", () => {
   beforeAll(() => {
     suppressConsoleLogs();
@@ -112,7 +111,7 @@ describe("checks for generic audit logs", () => {
       DecoratorUtils,
       "generateAuditValues",
     );
-    const querySpy = jest.spyOn(dbClient, "query");
+    const querySpy = jest.spyOn(dbService, "query");
     // generate errors within the query write AUDIT_LOG_MAX_RETRIES - 1 times
     for (let i = 0; i < AUDIT_LOG_MAX_RETRIES; i++) {
       querySpy.mockImplementationOnce(() => {
@@ -141,17 +140,17 @@ describe("checks for generic audit logs", () => {
       phone: hyperUnluckyPatient.Phone,
     };
     await patientDiscoveryQuery(request);
-    const result = await dbClient.query(
+    const result = await dbService.query(
       "SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 1",
     );
     const insertedId = result.rows[0].id;
     await expect(
-      dbClient.query(`UPDATE audit_logs SET author = 'hacker' WHERE id = $1`, [
+      dbService.query(`UPDATE audit_logs SET author = 'hacker' WHERE id = $1`, [
         insertedId,
       ]),
     ).rejects.toThrow(/UPDATEs to audit_logs are not permitted/i);
     await expect(
-      dbClient.query(`DELETE FROM audit_logs WHERE id = $1`, [insertedId]),
+      dbService.query(`DELETE FROM audit_logs WHERE id = $1`, [insertedId]),
     ).rejects.toThrow(/DELETEs from audit_logs are not permitted/i);
   });
 });

@@ -1,5 +1,3 @@
-const actual = jest.requireActual("../decorators");
-
 // State to hold active test rules
 let mockAccessAllowed = {
   auth: true,
@@ -8,8 +6,6 @@ let mockAccessAllowed = {
 };
 
 module.exports = {
-  ...actual,
-
   __setMockAccessAllowed: (
     allowed: {
       auth: boolean;
