@@ -69,6 +69,8 @@ services:
       - aidbox_db
     ports:
       - 8080:8080
+    extra_hosts:
+      - "host.docker.internal:${HOST_IP:-host-gateway}"
     environment:
       AIDBOX_TERMINOLOGY_SERVICE_BASE_URL: https://tx.fhir.org/r4
       AIDBOX_FHIR_PACKAGES: hl7.fhir.r4.core#4.0.1
