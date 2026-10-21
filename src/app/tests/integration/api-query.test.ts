@@ -30,38 +30,7 @@ jest.mock("@/app/api/api-auth", () => ({
 }));
 
 // Mock the FHIRClient to prevent real authentication requests
-jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
-  return {
-    __esModule: true,
-    default: jest.fn().mockImplementation(() => ({
-      get: jest.fn().mockResolvedValue({
-        resourceType: "Bundle",
-        entry: [
-          {
-            resource: {
-              resourceType: "Patient",
-              id: "test-patient-123",
-              name: [{ given: ["Test"], family: "Patient" }],
-              identifier: [{ value: "MRN-12345" }],
-            },
-          },
-        ],
-      }),
-      post: jest.fn().mockResolvedValue({
-        status: 200,
-        url: "http://mock-server.com/fhir",
-        text: jest.fn().mockResolvedValue(""),
-        json: jest.fn().mockResolvedValue({
-          resourceType: "Bundle",
-          entry: [],
-        }),
-      }),
-      getAccessToken: jest.fn().mockResolvedValue("mock-token"),
-      ensureValidToken: jest.fn().mockResolvedValue(undefined),
-      getRequestLog: jest.fn().mockReturnValue([]),
-    })),
-  };
-});
+jest.mock("@/app/backend/fhir-servers/fhir-client");
 
 import { validateServiceToken } from "@/app/api/api-auth";
 import { createSmartJwt } from "@/app/backend/smart-on-fhir";

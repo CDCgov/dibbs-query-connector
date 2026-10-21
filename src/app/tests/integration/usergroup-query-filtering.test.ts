@@ -6,24 +6,28 @@ import {
 import { getAllUsersWithSingleGroupStatus } from "@/app/backend/user-management";
 import { dontUseOutsideConfigOrTests_getDbPool } from "@/app/backend/db/config";
 import { User } from "@/app/models/entities/users";
-import { suppressConsoleLogs } from "./fixtures";
+import {
+  suppressConsoleLogs,
+  TEST_USER_ADMIN,
+  TEST_USER_STANDARD,
+  TEST_USER_STANDARD_TWO,
+  TEST_USER_SUPER,
+} from "./fixtures";
 import { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 import {
   getQueriesForUser,
   getSavedQuerySummaries,
 } from "@/app/backend/query-building/service";
 import { CustomUserQuery } from "@/app/models/entities/query";
+import { setMockAccessAllowed } from "@/app/backend/db/decorators/__mocks__/auth";
+import { auth } from "@/auth";
 
 const dbClient = dontUseOutsideConfigOrTests_getDbPool();
-
-const mockGetLoggedInUser = jest.fn();
 
 jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
 
 const TEST_GROUP_ID = "00000000-0000-0000-0000-000000000007";
-const TEST_USER_1_ID = "00000000-0000-0000-0000-000000000012";
-const TEST_USER_2_ID = "00000000-0000-0000-0000-000000000013";
 const TEST_QUERY_1_ID = "00000000-0000-0000-0000-000000000015";
 const TEST_QUERY_2_ID = "00000000-0000-0000-0000-000000000016";
 const TEST_QUERY_3_ID = "00000000-0000-0000-0000-000000000017";
@@ -31,35 +35,36 @@ const TEST_QUERY_CONDITIONS: string[] = [];
 const TEST_QUERY_DATA: QueryDataColumn = {};
 
 describe("User Group and Query Membership Tests", () => {
-  beforeAll(async () => {
+  beforeAll(() => {
     suppressConsoleLogs();
+  });
 
-    await dbClient.query("BEGIN");
-
-    // Insert test users
+  beforeEach(async () => {
+    // Seed test users
     const insertUsersQuery = `
       INSERT INTO users (id, username, first_name, last_name, qc_role)
       VALUES
-        ($1, 'QtheMagnificent', 'Q', 'Omnipotent', 'Super Admin'),
-        ($2, 'mamaTroi', 'Lwaxana', 'Troi', 'Standard User');
+      ('${TEST_USER_SUPER.id}', '${TEST_USER_SUPER.username}', '${TEST_USER_SUPER.firstName}', '${TEST_USER_SUPER.lastName}', '${TEST_USER_SUPER.qcRole}'),
+      ('${TEST_USER_STANDARD.id}', '${TEST_USER_STANDARD.username}', '${TEST_USER_STANDARD.firstName}', '${TEST_USER_STANDARD.lastName}', '${TEST_USER_STANDARD.qcRole}'),
+      ('${TEST_USER_ADMIN.id}', '${TEST_USER_ADMIN.username}', '${TEST_USER_ADMIN.firstName}', '${TEST_USER_ADMIN.lastName}', '${TEST_USER_ADMIN.qcRole}');
     `;
-    await dbClient.query(insertUsersQuery, [TEST_USER_1_ID, TEST_USER_2_ID]);
+    await dbClient.query(insertUsersQuery);
 
-    // Insert test group
+    // Seed test group
     const insertGroupQuery = `
       INSERT INTO usergroup (id, name)
-      VALUES ($1, 'Enterprise Visitors');
+      VALUES ($1, 'Mushroom Kingdom');
     `;
     await dbClient.query(insertGroupQuery, [TEST_GROUP_ID]);
 
-    // Insert test queries
-    const insertQueryQuery = `INSERT INTO query (id, query_name, conditions_list, query_data)
-    VALUES
-      ($1, 'Where is Jean Luc Picard?', $4, $5),
-      ($2, 'Eaten any good books lately?', $4, $5),
-      ($3, 'Darling, dont be silly.', $4, $5);
+    // Seed test queries
+    const insertQueryQuery = `
+      INSERT INTO query (id, query_name, conditions_list, query_data)
+      VALUES
+        ($1, 'Wahoooo!', $4, $5),
+        ($2, 'Its a me, Mario', $4, $5),
+        ($3, 'So long, King Bowser', $4, $5);
     `;
-
     await dbClient.query(insertQueryQuery, [
       TEST_QUERY_1_ID,
       TEST_QUERY_2_ID,
@@ -69,41 +74,17 @@ describe("User Group and Query Membership Tests", () => {
     ]);
   });
 
-  afterAll(async () => {
-    try {
-      await dbClient.query(
-        "DELETE FROM usergroup_to_users WHERE usergroup_id = $1;",
-        [TEST_GROUP_ID],
-      );
-      await dbClient.query(
-        "DELETE FROM usergroup_to_query WHERE usergroup_id = $1;",
-        [TEST_GROUP_ID],
-      );
-      await dbClient.query("DELETE FROM usergroup WHERE id = $1;", [
-        TEST_GROUP_ID,
-      ]);
-      await dbClient.query("DELETE FROM users WHERE id IN ($1, $2);", [
-        TEST_USER_1_ID,
-        TEST_USER_2_ID,
-      ]);
-      await dbClient.query("DELETE FROM query WHERE id IN ($1, $2, $3);", [
-        TEST_QUERY_1_ID,
-        TEST_QUERY_2_ID,
-        TEST_QUERY_3_ID,
-      ]);
-      await dbClient.query("ROLLBACK");
-    } catch (error) {
-      console.error("Rollback failed:", error);
-    }
+  afterEach(async () => {
+    await dbClient.query(
+      "TRUNCATE TABLE usergroup, users, query RESTART IDENTITY CASCADE;",
+    );
+
+    jest.clearAllMocks();
   });
 
-  /**
-   * Tests retrieving user group memberships.
-   */
   test("should retrieve user group memberships", async () => {
     const result: User[] =
       await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
-    await dbClient.query("COMMIT");
 
     expect(Array.isArray(result)).toBe(true);
     expect(result[0]).toHaveProperty("id");
@@ -113,71 +94,78 @@ describe("User Group and Query Membership Tests", () => {
     const membership = result[0].userGroupMemberships?.find(
       (m: { usergroupId: string; usergroupName: string }) =>
         m.usergroupId === TEST_GROUP_ID,
-      (m: { usergroupId: string; usergroupName: string }) =>
-        m.usergroupName === "Test Group",
     );
     expect(membership).toBeDefined();
     expect(membership?.isMember).toBeDefined();
   });
 
-  /**
-   * Tests adding queries to a user group.
-   */
   test("should add multiple queries to a group", async () => {
+    (auth as jest.Mock).mockResolvedValue({ user: TEST_USER_ADMIN });
+
+    setMockAccessAllowed({
+      auth: true,
+      admin: true,
+      super: false,
+    });
+
     const result = await addQueriesToGroup(TEST_GROUP_ID, [
       TEST_QUERY_2_ID,
       TEST_QUERY_3_ID,
     ]);
-    await dbClient.query("COMMIT");
 
     expect(result.totalItems).toBe(2);
-    expect(result.items.some((query) => query.queryId == TEST_QUERY_2_ID));
-    expect(result.items.some((query) => query.queryId == TEST_QUERY_3_ID));
+    expect(
+      result.items.some((query) => query.queryId === TEST_QUERY_2_ID),
+    ).toBe(true);
+    expect(
+      result.items.some((query) => query.queryId === TEST_QUERY_3_ID),
+    ).toBe(true);
 
     const queriesList = (await getAllGroupQueries(TEST_GROUP_ID)).items;
 
     expect(queriesList.length).toBe(2);
-    expect(queriesList.some((query) => query.queryId == TEST_QUERY_2_ID)).toBe(
+    expect(queriesList.some((query) => query.queryId === TEST_QUERY_2_ID)).toBe(
       true,
     );
-    expect(queriesList.some((query) => query.queryId == TEST_QUERY_3_ID)).toBe(
+    expect(queriesList.some((query) => query.queryId === TEST_QUERY_3_ID)).toBe(
       true,
     );
 
-    // check that querying by user returns the right queries
+    // Verify querying by user returns the assigned queries
+    await addUsersToGroup(TEST_GROUP_ID, [TEST_USER_ADMIN.id]);
+
     const usersToCheck: User[] =
       await getAllUsersWithSingleGroupStatus(TEST_GROUP_ID);
 
-    const testUser = usersToCheck.filter(
-      (u) => u.username === "QtheMagnificent",
-    )[0];
+    const testUser = usersToCheck.find(
+      (u) => u.username === TEST_USER_ADMIN.username,
+    )!;
     const testUserFilteredQueries = await getQueriesForUser(testUser);
 
     expect(testUserFilteredQueries).toBeDefined();
     expect((testUserFilteredQueries as CustomUserQuery[]).length).toBe(2);
     expect(
       (testUserFilteredQueries as CustomUserQuery[]).some(
-        (query) => query.queryId == TEST_QUERY_2_ID,
+        (query) => query.queryId === TEST_QUERY_2_ID,
       ),
     ).toBe(true);
     expect(
       (testUserFilteredQueries as CustomUserQuery[]).some(
-        (query) => query.queryId == TEST_QUERY_3_ID,
+        (query) => query.queryId === TEST_QUERY_3_ID,
       ),
     ).toBe(true);
   });
 
-  /**
-   * Tests that query summaries for a standard user only include queries
-   * assigned to a group the user belongs to.
-   */
   test("should restrict query summaries for a standard user to their group's queries", async () => {
-    // mamaTroi is a Standard user; add them to the test group, which has
-    // queries 2 and 3 assigned by the previous test
-    await addUsersToGroup(TEST_GROUP_ID, [TEST_USER_2_ID]);
-    await dbClient.query("COMMIT");
+    (auth as jest.Mock).mockResolvedValue({ user: TEST_USER_STANDARD_TWO });
+    setMockAccessAllowed({
+      auth: true,
+      admin: false,
+      super: false,
+    });
 
-    mockGetLoggedInUser.mockResolvedValue({ username: "mamaTroi" });
+    await addQueriesToGroup(TEST_GROUP_ID, [TEST_QUERY_2_ID, TEST_QUERY_3_ID]);
+    await addUsersToGroup(TEST_GROUP_ID, [TEST_USER_STANDARD_TWO.id]);
 
     const summaries = await getSavedQuerySummaries();
 
@@ -185,19 +173,21 @@ describe("User Group and Query Membership Tests", () => {
     expect(summaries.map((s) => s.queryId).sort()).toEqual(
       [TEST_QUERY_2_ID, TEST_QUERY_3_ID].sort(),
     );
-    // summaries are lightweight: no valuesets / query data included
     expect(Object.keys(summaries[0]).sort()).toEqual(["queryId", "queryName"]);
   });
 
-  /**
-   * Tests that super admins see all queries in their summaries.
-   */
   test("should return all queries in summaries for a super admin", async () => {
-    mockGetLoggedInUser.mockResolvedValue({ username: "QtheMagnificent" });
+    (auth as jest.Mock).mockResolvedValue({ user: TEST_USER_SUPER });
+
+    setMockAccessAllowed({
+      auth: true,
+      admin: true,
+      super: true,
+    });
 
     const summaries = await getSavedQuerySummaries();
-
     const summaryIds = summaries.map((s) => s.queryId);
+
     [TEST_QUERY_1_ID, TEST_QUERY_2_ID, TEST_QUERY_3_ID].forEach((queryId) => {
       expect(summaryIds).toContain(queryId);
     });

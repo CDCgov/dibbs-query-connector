@@ -1,5 +1,4 @@
 import dbService from "@/app/backend/db/service";
-import { UserRole } from "@/app/models/entities/users";
 import { waitFor } from "@testing-library/dom";
 
 // don't reuse this test user outside audit log tests since we're filtering
@@ -12,7 +11,6 @@ export const TEST_USER = {
     email: "bowser.jr@koopa.evil",
     firstName: "Bowser",
     lastName: "Jr.",
-    qcRole: UserRole.SUPER_ADMIN,
   },
 };
 

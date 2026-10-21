@@ -19,28 +19,16 @@ import {
 
 import { dontUseOutsideConfigOrTests_getDbPool } from "@/app/backend/db/config";
 import { UserRole } from "@/app/models/entities/users";
-import { suppressConsoleLogs } from "./fixtures";
+import {
+  suppressConsoleLogs,
+  TEST_USER_STANDARD,
+  TEST_USER_SUPER,
+} from "./fixtures";
 
 const dbClient = dontUseOutsideConfigOrTests_getDbPool();
 
 jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
-
-const TEST_USER_STANDARD = {
-  id: "13e1efb2-5889-4157-8f34-78d7f02dbf84",
-  username: "yoshi",
-  firstName: "Green",
-  lastName: "Yoshi",
-  qcRole: UserRole.STANDARD,
-};
-
-const TEST_USER_SUPER = {
-  id: "7dd8b2a7-658c-4152-afcd-8b514fb5343b",
-  username: "luigi",
-  firstName: "Lugi",
-  lastName: "Mario",
-  qcRole: UserRole.SUPER_ADMIN,
-};
 
 describe("User Management Integration Tests", () => {
   beforeEach(async () => {

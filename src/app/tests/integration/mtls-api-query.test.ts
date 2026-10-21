@@ -43,7 +43,7 @@ jest.mock("@/app/api/api-auth", () => ({
 jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
 
-const mockPatientGet = {
+const mockPatientGetResponse = {
   status: 200,
   json: async () => ({
     resourceType: "Bundle",
@@ -78,81 +78,29 @@ const mockPatientGet = {
   url: "http://mock-server.com/fhir",
 };
 
-jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
-  return {
-    __esModule: true,
-    default: jest.fn().mockImplementation(() => ({
-      get: jest.fn().mockResolvedValue({
-        status: 200,
-        json: async () => ({
-          resourceType: "Bundle",
-          type: "searchset",
-          entry: [
-            {
-              resource: {
-                resourceType: "Patient",
-                id: "test-patient-123",
-                name: [{ given: ["John"], family: "Doe" }],
-                birthDate: "1990-01-01",
-                identifier: [
-                  {
-                    type: {
-                      coding: [
-                        {
-                          system:
-                            "http://terminology.hl7.org/CodeSystem/v2-0203",
-                          code: "MR",
-                        },
-                      ],
-                    },
-                    system: "http://hospital.org/mrn",
-                    value: "MRN-12345",
-                  },
-                ],
-              },
-            },
-          ],
-        }),
-        text: async () => "",
-        clone: async () => mockPatientGet,
-        headers: new Headers({ "content-type": "application/json" }),
-        url: "http://mock-server.com/fhir",
-      }),
-      post: jest.fn().mockResolvedValue({
-        status: 200,
-        url: "http://mock-server.com/fhir",
-        text: jest.fn().mockResolvedValue(""),
-        json: jest.fn().mockResolvedValue({
-          resourceType: "Bundle",
-          type: "searchset",
-          entry: [],
-        }),
-        headers: new Headers(),
-      }),
-      postJson: jest.fn().mockResolvedValue({
-        status: 201,
-        json: async () => ({
-          resourceType: "Bundle",
-          type: "collection",
-          entry: [
-            {
-              resource: {
-                resourceType: "Task",
-                id: "parent-task-123",
-                status: "requested",
-                intent: "order",
-              },
-            },
-          ],
-        }),
-        headers: new Headers(),
-        url: "http://mock-server.com/fhir",
-      }),
-      getBatch: jest.fn(),
-      getRequestLog: jest.fn().mockReturnValue([]),
-    })),
-  };
-});
+const mockPostJsonReponse = {
+  status: 201,
+  json: async () => ({
+    resourceType: "Bundle",
+    type: "collection",
+    entry: [
+      {
+        resource: {
+          resourceType: "Task",
+          id: "parent-task-123",
+          status: "requested",
+          intent: "order",
+        },
+      },
+    ],
+  }),
+  headers: new Headers(),
+  url: "http://mock-server.com/fhir",
+};
+
+jest.mock("@/app/backend/fhir-servers/fhir-client");
+mockGet.mockResolvedValue(mockPatientGetResponse);
+mockPostJson.mockResolvedValue(mockPostJsonReponse);
 
 jest.mock("@/app/backend/fhir-servers/lib", () => ({
   prepareFhirClient: jest.fn(),
@@ -166,20 +114,7 @@ jest.mock("@/app/utils/mtls-utils", () => ({
   isMtlsAvailable: jest.fn().mockReturnValue(true),
 }));
 
-jest.mock("@/app/backend/audit-logs/decorator", () => ({
-  auditable: jest
-    .fn()
-    .mockImplementation(
-      () =>
-        (
-          target: unknown,
-          propertyName: string,
-          descriptor: PropertyDescriptor,
-        ) => {
-          return descriptor;
-        },
-    ),
-}));
+jest.mock("@/app/backend/audit-logs/decorator");
 
 // Mock critical missing dependencies
 jest.mock("@/app/utils/format-service", () => ({
@@ -266,6 +201,10 @@ jest.mock("node-hl7-client", () => ({
 
 import { validateServiceToken } from "@/app/api/api-auth";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
+import {
+  mockGet,
+  mockPostJson,
+} from "@/app/backend/fhir-servers/__mocks__/fhir-client";
 
 describe("API Query with Mutual TLS", () => {
   let mockFhirClient: jest.Mocked<FHIRClient>;

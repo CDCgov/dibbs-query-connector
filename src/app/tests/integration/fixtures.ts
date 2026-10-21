@@ -1,3 +1,4 @@
+import { UserRole } from "@/app/models/entities/users";
 import { NextRequest } from "next/server";
 
 export const PATIENT_HL7_MESSAGE = `{
@@ -31,3 +32,35 @@ export function createNextRequest(
     headers: requestHeaders,
   } as unknown as NextRequest;
 }
+
+export const TEST_USER_STANDARD = {
+  id: "13e1efb2-5889-4157-8f34-78d7f02dbf84",
+  username: "toad",
+  firstName: "Toad",
+  lastName: "Mushroom",
+  qcRole: UserRole.STANDARD,
+};
+
+export const TEST_USER_STANDARD_TWO = {
+  id: "5f15d0ec-9eb4-4930-b45c-fdc6e6d175fc",
+  username: "toadette",
+  firstName: "Toadette",
+  lastName: "Mushroom",
+  qcRole: UserRole.STANDARD,
+};
+
+export const TEST_USER_ADMIN = {
+  id: "43214488-5b1a-4572-985c-08fc9bea985b",
+  username: "yoshi",
+  firstName: "Green",
+  lastName: "Yoshi",
+  qcRole: UserRole.ADMIN,
+};
+
+export const TEST_USER_SUPER = {
+  id: "7dd8b2a7-658c-4152-afcd-8b514fb5343b",
+  username: "luigi",
+  firstName: "Lugi",
+  lastName: "Mario",
+  qcRole: UserRole.SUPER_ADMIN,
+};
