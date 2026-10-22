@@ -1,12 +1,14 @@
 import { Task, Bundle, Patient } from "fhir/r4";
 import { patientDiscoveryQuery } from "@/app/backend/query-execution/service";
 import { prepareFhirClient } from "@/app/backend/fhir-servers/lib";
-import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
-import { suppressConsoleLogs } from "./fixtures";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
+import { resetMocksToDefault } from "../mocks";
+import { createFhirClientMock } from "@/app/backend/fhir-servers/__mocks__/fhir-client";
+import { suppressConsoleLogs } from "../fixtures";
 
 jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
+jest.mock("@/app/backend/fhir-servers/fhir-client");
 
 jest.mock("@/app/backend/fhir-servers/lib", () => ({
   prepareFhirClient: jest.fn(),
@@ -20,86 +22,71 @@ jest.mock("@/app/utils/mtls-utils", () => ({
   isMtlsAvailable: jest.fn().mockReturnValue(true),
 }));
 
+const mockServerConfig = {
+  id: "test-mtls",
+  name: "Test mTLS Server",
+  hostname: "https://mtls.example.com/fhir",
+  authType: "mutual-tls",
+  endpointType: "fanout",
+  disableCertValidation: false,
+  defaultServer: false,
+} as FhirServerConfig;
+
+const mockParentTask: Task = {
+  resourceType: "Task",
+  id: "parent-task-123",
+  status: "requested",
+  intent: "order",
+};
+
+const mockChildTask: Task = {
+  resourceType: "Task",
+  id: "child-task-456",
+  status: "completed",
+  intent: "order",
+  partOf: [{ reference: "Task/parent-task-123" }],
+  output: [
+    {
+      type: { text: "patient-results" },
+      valueString:
+        "https://mtls.example.com/ndjson/results/Patient-Page1.ndjson",
+    },
+  ],
+};
+
+const mockPatient: Patient = {
+  resourceType: "Patient",
+  id: "patient-123",
+  name: [{ given: ["John"], family: "Doe" }],
+  birthDate: "1990-01-01",
+};
+
+const mockPatientBundle: Bundle = {
+  resourceType: "Bundle",
+  type: "searchset",
+  entry: [
+    {
+      resource: mockPatient,
+      fullUrl: "https://mtls.example.com/fhir/Patient/patient-123",
+    },
+  ],
+};
+
 describe("Query Execution with Mutual TLS", () => {
-  let mockFhirClient: jest.Mocked<FHIRClient>;
-
-  beforeEach(() => {
-    suppressConsoleLogs();
-    jest.clearAllMocks();
-
-    // Mock setTimeout for Jest worker environment
-    global.setTimeout = jest.fn((callback: () => void) => {
-      callback();
-      return 0 as unknown as NodeJS.Timeout;
-    }) as unknown as typeof setTimeout;
-
-    mockFhirClient = {
-      get: jest.fn(),
-      post: jest.fn(),
-      postJson: jest.fn(),
-      getBatch: jest.fn(),
-      getRequestLog: jest.fn().mockReturnValue([]),
-    } as unknown as jest.Mocked<FHIRClient>;
-
-    (prepareFhirClient as jest.Mock).mockResolvedValue(mockFhirClient);
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   describe("Task-based patient discovery for mTLS servers", () => {
-    const mockServerConfig = {
-      id: "test-mtls",
-      name: "Test mTLS Server",
-      hostname: "https://mtls.example.com/fhir",
-      authType: "mutual-tls",
-      endpointType: "fanout",
-      disableCertValidation: false,
-      defaultServer: false,
-    } as FhirServerConfig;
-
-    const mockParentTask: Task = {
-      resourceType: "Task",
-      id: "parent-task-123",
-      status: "requested",
-      intent: "order",
-    };
-
-    const mockChildTask: Task = {
-      resourceType: "Task",
-      id: "child-task-456",
-      status: "completed",
-      intent: "order",
-      partOf: [{ reference: "Task/parent-task-123" }],
-      output: [
-        {
-          type: { text: "patient-results" },
-          valueString:
-            "https://mtls.example.com/ndjson/results/Patient-Page1.ndjson",
-        },
-      ],
-    };
-
-    const mockPatient: Patient = {
-      resourceType: "Patient",
-      id: "patient-123",
-      name: [{ given: ["John"], family: "Doe" }],
-      birthDate: "1990-01-01",
-    };
-
-    const mockPatientBundle: Bundle = {
-      resourceType: "Bundle",
-      type: "searchset",
-      entry: [
-        {
-          resource: mockPatient,
-          fullUrl: "https://mtls.example.com/fhir/Patient/patient-123",
-        },
-      ],
-    };
+    let mockFhirClient = createFhirClientMock();
 
     beforeEach(() => {
+      // reset the mock state
+      resetMocksToDefault();
+      suppressConsoleLogs();
+
+      // Mock setTimeout for Jest worker environment
+      global.setTimeout = jest.fn((callback: () => void) => {
+        callback();
+        return 0 as unknown as NodeJS.Timeout;
+      }) as unknown as typeof setTimeout;
+
       const {
         getFhirServerConfigs,
         getFhirServerNames,
@@ -108,6 +95,8 @@ describe("Query Execution with Mutual TLS", () => {
       (getFhirServerNames as jest.Mock).mockResolvedValue([
         mockServerConfig.name,
       ]);
+
+      (prepareFhirClient as jest.Mock).mockResolvedValue(mockFhirClient);
     });
 
     it("should perform Task-based query for mTLS enabled server", async () => {

@@ -11,13 +11,6 @@ import { auth } from "@/auth";
 import { TEST_USER } from "./utils";
 import dbService from "@/app/backend/db/service";
 
-jest.mock("@/app/backend/audit-logs/lib", () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual("@/app/backend/audit-logs/lib"),
-  };
-});
-
 jest.mock("@/app/backend/db/decorators/auth");
 
 const mockBody = {

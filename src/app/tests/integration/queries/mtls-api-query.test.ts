@@ -1,10 +1,9 @@
 import { Bundle, Task, Patient } from "fhir/r4";
 import { NextRequest } from "next/server";
 import { POST } from "@/app/api/query/route";
-import { suppressConsoleLogs } from "./fixtures";
+import { suppressConsoleLogs } from "../fixtures";
 import { USE_CASE_DETAILS } from "@/constants";
 import { prepareFhirClient } from "@/app/backend/fhir-servers/lib";
-import FHIRClient from "@/app/backend/fhir-servers/fhir-client";
 
 // Utility function to create a minimal NextRequest-like object
 function createNextRequest(
@@ -99,8 +98,6 @@ const mockPostJsonReponse = {
 };
 
 jest.mock("@/app/backend/fhir-servers/fhir-client");
-mockGet.mockResolvedValue(mockPatientGetResponse);
-mockPostJson.mockResolvedValue(mockPostJsonReponse);
 
 jest.mock("@/app/backend/fhir-servers/lib", () => ({
   prepareFhirClient: jest.fn(),
@@ -201,13 +198,11 @@ jest.mock("node-hl7-client", () => ({
 
 import { validateServiceToken } from "@/app/api/api-auth";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
-import {
-  mockGet,
-  mockPostJson,
-} from "@/app/backend/fhir-servers/__mocks__/fhir-client";
+import { createFhirClientMock } from "@/app/backend/fhir-servers/__mocks__/fhir-client";
+
+let mockFhirClient = createFhirClientMock();
 
 describe("API Query with Mutual TLS", () => {
-  let mockFhirClient: jest.Mocked<FHIRClient>;
   const SYPHILIS_QUERY_ID = USE_CASE_DETAILS.syphilis.id;
   const VALID_TOKEN = "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI...";
 
@@ -292,13 +287,8 @@ describe("API Query with Mutual TLS", () => {
       return 0 as unknown as NodeJS.Timeout;
     }) as unknown as typeof setTimeout;
 
-    mockFhirClient = {
-      get: jest.fn(),
-      post: jest.fn(),
-      postJson: jest.fn(),
-      getBatch: jest.fn(),
-      getRequestLog: jest.fn().mockReturnValue([]),
-    } as unknown as jest.Mocked<FHIRClient>;
+    mockFhirClient.get.mockResolvedValue(mockPatientGetResponse);
+    mockFhirClient.post.mockResolvedValue(mockPostJsonReponse);
 
     (prepareFhirClient as jest.Mock).mockResolvedValue(mockFhirClient);
   });

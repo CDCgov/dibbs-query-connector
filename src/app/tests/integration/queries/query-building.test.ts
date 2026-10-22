@@ -3,16 +3,19 @@ import {
   getCustomQueries,
   getSavedQueryById,
 } from "@/app/backend/query-building/service";
-import { createTestCancerQuery } from "../../../../e2e/utils";
-import { suppressConsoleLogs } from "./fixtures";
+import { createTestCancerQuery } from "../../../../../e2e/utils";
+import { suppressConsoleLogs } from "../fixtures";
+import { resetMocksToDefault } from "../mocks";
 
 jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
 
 describe("Saving a custom query", () => {
-  beforeAll(() => {
+  beforeEach(() => {
+    resetMocksToDefault();
     suppressConsoleLogs();
   });
+
   it("saving a custom query", async () => {
     const testQuery = await createTestCancerQuery();
     expect(Object.keys(testQuery.queryData)).toStrictEqual(["2"]);

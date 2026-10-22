@@ -8,6 +8,7 @@ import { randomUUID } from "crypto";
 import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/constants";
 import { suppressConsoleLogs } from "./fixtures";
 import dbService from "@/app/backend/db/service";
+import { resetMocksToDefault } from "./mocks";
 
 jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
@@ -16,6 +17,11 @@ describe("UserCreatedValuesetService Integration", () => {
   beforeAll(() => {
     suppressConsoleLogs();
   });
+
+  beforeEach(() => {
+    resetMocksToDefault();
+  });
+
   const testUUID = "mock-vsid-0001";
   const vsVersion = "1.0.0";
   const vsName = "Cooties test";

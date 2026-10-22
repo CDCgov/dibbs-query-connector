@@ -15,6 +15,15 @@ export const setMockAccessAllowed = (
   mockAccessAllowed = allowed;
 };
 
+export const resetAuthMockState = () => {
+  setMockAccessAllowed({
+    auth: true,
+    admin: true,
+    super: true,
+  });
+  jest.clearAllMocks();
+};
+
 export const authenticationRequired = jest.fn().mockImplementation(() => {
   return (
     _target: unknown,

@@ -13,7 +13,7 @@ import dbService from "../service";
  * @returns - Success information of the db transaction, as well as additional
  * error / db result types as specified in the function body
  */
-export function transaction<T extends { success: boolean }>(
+export function transaction<T extends { success: boolean; error?: string }>(
   _: Object,
   key: string,
   // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -26,8 +26,9 @@ export function transaction<T extends { success: boolean }>(
     try {
       await dbService.query("BEGIN");
       const result = method && (await method.apply(this, args));
+      console.log(result);
       if (result === undefined || result.success === false) {
-        throw Error("Transaction failed");
+        throw Error(result?.error || "Transaction failed");
       }
       await dbService.query("COMMIT");
 

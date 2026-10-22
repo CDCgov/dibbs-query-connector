@@ -208,7 +208,6 @@ class QueryBuildingService {
       username = user?.username ?? "";
       const role = await getUserRole(username);
 
-      console.log(user, role);
       unrestricted = role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN;
     }
 

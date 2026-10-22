@@ -94,8 +94,8 @@ class FhirServerConfigService {
    * @param wasSuccessful - Whether the connection attempt was successful
    * @returns An object indicating success or failure with optional error message
    */
-  @superAdminRequired
   @transaction
+  @superAdminRequired
   static async updateFhirServerConnectionStatus(
     name: string,
     wasSuccessful: boolean,
@@ -147,8 +147,8 @@ class FhirServerConfigService {
    * @param updateDetails.patientMatchConfiguration - Optional patient match configuration
    * @returns An object indicating success or failure with optional error message
    */
-  @superAdminRequired
   @transaction
+  @superAdminRequired
   @auditable
   static async updateFhirServer(updateDetails: {
     id: string;
@@ -289,8 +289,8 @@ class FhirServerConfigService {
    * @returns An object indicating success or failure with optional error message
    */
 
-  @superAdminRequired
   @transaction
+  @superAdminRequired
   @auditable
   static async insertFhirServer(
     name: string,
@@ -378,8 +378,8 @@ class FhirServerConfigService {
    * @param id - The ID of the FHIR server to delete
    * @returns An object indicating success or failure with optional error message
    */
-  @superAdminRequired
   @transaction
+  @superAdminRequired
   @auditable
   static async deleteFhirServer(id: string) {
     const deleteQuery = `

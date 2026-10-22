@@ -17,6 +17,7 @@ import {
 } from "@/app/backend/signing-keys";
 import { createSmartJwt } from "@/app/backend/smart-on-fhir";
 import { suppressConsoleLogs } from "./fixtures";
+import { resetMocksToDefault } from "./mocks";
 
 jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
@@ -34,8 +35,9 @@ async function resetKeys() {
 
 describe("signing key persistence", () => {
   beforeEach(async () => {
-    suppressConsoleLogs();
     await resetKeys();
+    resetMocksToDefault();
+    suppressConsoleLogs();
   });
 
   afterAll(async () => {

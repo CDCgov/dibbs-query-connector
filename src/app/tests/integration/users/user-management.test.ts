@@ -23,7 +23,8 @@ import {
   suppressConsoleLogs,
   TEST_USER_STANDARD,
   TEST_USER_SUPER,
-} from "./fixtures";
+} from "../fixtures";
+import { resetMocksToDefault } from "../mocks";
 
 const dbClient = dontUseOutsideConfigOrTests_getDbPool();
 
@@ -31,9 +32,7 @@ jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/audit-logs/decorator");
 
 describe("User Management Integration Tests", () => {
-  beforeEach(async () => {
-    suppressConsoleLogs();
-
+  beforeAll(async () => {
     // Insert first user as super admin
     const insertSuperUsersQuery = `
      INSERT INTO users (id, username, first_name, last_name, qc_role)
@@ -49,13 +48,15 @@ describe("User Management Integration Tests", () => {
     ]);
   });
 
-  afterEach(async () => {
+  beforeEach(() => {
+    resetMocksToDefault();
+    suppressConsoleLogs();
+  });
+
+  afterAll(async () => {
     try {
-      await dbClient.query("DELETE FROM users WHERE username = $1;", [
-        TEST_USER_STANDARD.username,
-      ]);
-      await dbClient.query("DELETE FROM users WHERE username = $1;", [
-        TEST_USER_SUPER.username,
+      await dbClient.query("DELETE FROM users WHERE id = $1;", [
+        TEST_USER_STANDARD.id,
       ]);
       await dbClient.query("DELETE FROM users WHERE id = $1;", [
         TEST_USER_SUPER.id,
@@ -63,6 +64,16 @@ describe("User Management Integration Tests", () => {
     } catch (error) {
       console.error("Rollback failed:", error);
     }
+  });
+
+  test("get user by username", async () => {
+    await addUserIfNotExists(TEST_USER_STANDARD);
+    const result = await getUserByUsername(TEST_USER_STANDARD.username);
+
+    const user = result.items[0];
+    expect(user).toHaveProperty("id");
+    expect(user).toHaveProperty("username", TEST_USER_STANDARD.username);
+    expect(user).toHaveProperty("qcRole", UserRole.STANDARD);
   });
 
   /**
@@ -83,15 +94,6 @@ describe("User Management Integration Tests", () => {
   /**
    * Tests getting a user by username.
    */
-  test("get user by username", async () => {
-    await addUserIfNotExists(TEST_USER_STANDARD);
-    const result = await getUserByUsername(TEST_USER_STANDARD.username);
-
-    const user = result.items[0];
-    expect(user).toHaveProperty("id");
-    expect(user).toHaveProperty("username", TEST_USER_STANDARD.username);
-    expect(user).toHaveProperty("qcRole", UserRole.STANDARD);
-  });
 
   /**
    * Tests updating the role of an existing user.
