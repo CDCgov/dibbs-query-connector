@@ -1390,7 +1390,6 @@ class QueryService {
    * fhir client info.
    * @returns - The response body from the FHIR server.
    */
-  @auditable
   static async patientDiscoveryQuery(
     request: PatientDiscoveryRequest,
   ): Promise<QueryResponse["Patient"] | { uncertainMatchError: true }> {
