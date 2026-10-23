@@ -1,5 +1,28 @@
-FROM quay.io/keycloak/keycloak:26.8
+FROM quay.io/keycloak/keycloak:26.8 AS keycloak
+
+# Red Hat's ca-certificates still ships two roots distrusted after the eMudhra CA
+# key compromise: emSign ECC Root CA - G3 and Comodo's AAA Certificate Services.
+# The Keycloak image has neither awk nor the p11-kit library update-ca-trust
+# needs, so drop them from a copy of its trust source in a UBI stage and
+# re-extract every bundle there. This is a no-op once Red Hat ships a fixed package.
+FROM registry.access.redhat.com/ubi9/ubi:latest AS ca-trust
+COPY --from=keycloak /usr/share/pki/ca-trust-source/ca-bundle.trust.p11-kit \
+  /usr/share/pki/ca-trust-source/ca-bundle.trust.p11-kit
+RUN gawk -i inplace -v RS= -v ORS='\n\n' \
+  '!/\nlabel: "(emSign ECC Root CA - G3|Comodo AAA Services root)"\n/' \
+  /usr/share/pki/ca-trust-source/ca-bundle.trust.p11-kit \
+  && update-ca-trust extract
+
+FROM keycloak
 USER root
+
+# Replace the trust source and every extracted bundle, Java's cacerts included.
+# COPY only adds files, so clear the old bundles first or the per-certificate
+# files for the dropped roots would stay behind.
+COPY --from=ca-trust /usr/share/pki/ca-trust-source/ca-bundle.trust.p11-kit \
+  /usr/share/pki/ca-trust-source/ca-bundle.trust.p11-kit
+RUN rm -rf /etc/pki/ca-trust/extracted
+COPY --from=ca-trust /etc/pki/ca-trust/extracted/ /etc/pki/ca-trust/extracted/
 
 # Copy all keycloak files to /opt/keycloak
 COPY ./keycloak/ /opt/keycloak/
@@ -9,6 +32,17 @@ RUN chmod +x /opt/keycloak/select-realm.sh && \
   mkdir -p /opt/keycloak/data/import && \
   chown -R 1000:1000 /opt/keycloak/data/import && \
   chmod -R 755 /opt/keycloak/data/import
+
+# Fail the build if either distrusted root is left in any CA bundle, whether from
+# the OS or vendored by a Python package. Each pattern is one line of a root's
+# base64 body (emSign ECC Root CA - G3, then AAA Certificate Services), so it
+# matches however a bundle labels the certificate. grep exits 1 only when
+# nothing matched.
+RUN grep -rlF \
+  -e 'CUfvO6wIBHxcmbHtRwfSAjEAnbpV/KlK6O3t5nYBQnvI+GDZjVGLVTv7jHvrZQnD' \
+  -e 'l2D4kF501KKaU73yqWjgom7C12yxow+ev+to51byrvLjKzg6CYG1a4XXvi3tPxq3' \
+  /etc /usr /var; \
+  test $? -eq 1
 
 # Use script as the entrypoint
 USER 1000
