@@ -1,3 +1,7 @@
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/audit-logs/decorator");
+jest.mock("@/app/backend/db/decorators/util");
+
 import { suppressConsoleLogs } from "../fixtures";
 import {
   insertFhirServer,
@@ -7,14 +11,10 @@ import {
 } from "@/app/backend/fhir-servers/service";
 import { resetMocksToDefault } from "../mocks";
 
-jest.mock("@/app/backend/db/decorators/auth");
-jest.mock("@/app/backend/audit-logs/decorator");
-jest.mock("@/app/backend/db/decorators/util");
-
 describe("FHIR Servers Mutual TLS Tests", () => {
   beforeEach(() => {
     resetMocksToDefault();
-    // suppressConsoleLogs();
+    suppressConsoleLogs();
   });
 
   afterEach(async () => {

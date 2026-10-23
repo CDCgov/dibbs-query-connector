@@ -26,7 +26,6 @@ export function transaction<T extends { success: boolean; error?: string }>(
     try {
       await dbService.query("BEGIN");
       const result = method && (await method.apply(this, args));
-      console.log(result);
       if (result === undefined || result.success === false) {
         throw Error(result?.error || "Transaction failed");
       }
@@ -34,7 +33,9 @@ export function transaction<T extends { success: boolean; error?: string }>(
 
       return result;
     } catch (error) {
-      console.error(`Database transaction ${key} failed. Rolling back...`);
+      console.error(
+        `Database transaction ${key} failed with ${error}. Rolling back...`,
+      );
       await dbService.query("ROLLBACK");
 
       type ErrorResult<T extends { success: boolean }> = T & {

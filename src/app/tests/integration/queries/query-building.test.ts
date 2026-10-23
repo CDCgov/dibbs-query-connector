@@ -1,3 +1,7 @@
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/db/decorators/util");
+jest.mock("@/app/backend/audit-logs/decorator");
+
 import {
   deleteQueryById,
   getCustomQueries,
@@ -6,9 +10,6 @@ import {
 import { createTestCancerQuery } from "../../../../../e2e/utils";
 import { suppressConsoleLogs } from "../fixtures";
 import { resetMocksToDefault } from "../mocks";
-
-jest.mock("@/app/backend/db/decorators/auth");
-jest.mock("@/app/backend/audit-logs/decorator");
 
 describe("Saving a custom query", () => {
   beforeEach(() => {
@@ -24,7 +25,8 @@ describe("Saving a custom query", () => {
 
   it("deletes a query correctly", async () => {
     const testQuery = await createTestCancerQuery();
-    await deleteQueryById(testQuery.queryId);
+    const result = await deleteQueryById(testQuery.queryId);
+    expect(result.success).toBe(true);
 
     const shouldReturnEmptyArray = await getSavedQueryById(testQuery.queryId);
     expect(shouldReturnEmptyArray).toStrictEqual(undefined);

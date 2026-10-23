@@ -1,3 +1,6 @@
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/audit-logs/decorator");
+
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -18,9 +21,6 @@ import {
 import { createSmartJwt } from "@/app/backend/smart-on-fhir";
 import { suppressConsoleLogs } from "./fixtures";
 import { resetMocksToDefault } from "./mocks";
-
-jest.mock("@/app/backend/db/decorators/auth");
-jest.mock("@/app/backend/audit-logs/decorator");
 
 // A scratch keys dir with no key files, so tests exercise the
 // generate-in-db path rather than importing any local dev keys/ dir

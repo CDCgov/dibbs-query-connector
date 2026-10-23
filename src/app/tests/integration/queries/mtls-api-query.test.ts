@@ -4,26 +4,15 @@ import { POST } from "@/app/api/query/route";
 import { suppressConsoleLogs } from "../fixtures";
 import { USE_CASE_DETAILS } from "@/constants";
 import { prepareFhirClient } from "@/app/backend/fhir-servers/lib";
-
-// Utility function to create a minimal NextRequest-like object
-function createNextRequest(
-  body: unknown,
-  searchParams: URLSearchParams,
-  headers?: Record<string, string>,
-): NextRequest {
-  const requestHeaders = new Headers(headers);
-
-  return {
-    json: async () => body,
-    text: async () => body,
-    nextUrl: { searchParams },
-    method: "POST",
-    headers: requestHeaders,
-  } as unknown as NextRequest;
-}
+import { validateServiceToken } from "@/app/api/api-auth";
+import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
+import { createFhirClientMock } from "@/app/backend/fhir-servers/__mocks__/fhir-client";
 
 jest.mock("next-auth");
 jest.mock("next-auth/providers/keycloak");
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/audit-logs/decorator");
+jest.mock("@/app/backend/fhir-servers/fhir-client");
 
 // Mock the validateServiceToken function
 jest.mock("@/app/api/api-auth", () => ({
@@ -39,66 +28,6 @@ jest.mock("@/app/api/api-auth", () => ({
   }),
 }));
 
-jest.mock("@/app/backend/db/decorators/auth");
-jest.mock("@/app/backend/audit-logs/decorator");
-
-const mockPatientGetResponse = {
-  status: 200,
-  json: async () => ({
-    resourceType: "Bundle",
-    type: "searchset",
-    entry: [
-      {
-        resource: {
-          resourceType: "Patient",
-          id: "test-patient-123",
-          name: [{ given: ["John"], family: "Doe" }],
-          birthDate: "1990-01-01",
-          identifier: [
-            {
-              type: {
-                coding: [
-                  {
-                    system: "http://terminology.hl7.org/CodeSystem/v2-0203",
-                    code: "MR",
-                  },
-                ],
-              },
-              system: "http://hospital.org/mrn",
-              value: "MRN-12345",
-            },
-          ],
-        },
-      },
-    ],
-  }),
-  text: async () => "",
-  headers: new Headers({ "content-type": "application/json" }),
-  url: "http://mock-server.com/fhir",
-};
-
-const mockPostJsonReponse = {
-  status: 201,
-  json: async () => ({
-    resourceType: "Bundle",
-    type: "collection",
-    entry: [
-      {
-        resource: {
-          resourceType: "Task",
-          id: "parent-task-123",
-          status: "requested",
-          intent: "order",
-        },
-      },
-    ],
-  }),
-  headers: new Headers(),
-  url: "http://mock-server.com/fhir",
-};
-
-jest.mock("@/app/backend/fhir-servers/fhir-client");
-
 jest.mock("@/app/backend/fhir-servers/lib", () => ({
   prepareFhirClient: jest.fn(),
   getFhirServerConfigs: jest.fn(),
@@ -110,8 +39,6 @@ jest.mock("@/app/utils/mtls-utils", () => ({
   getOrCreateMtlsKey: jest.fn().mockReturnValue("mock-key"),
   isMtlsAvailable: jest.fn().mockReturnValue(true),
 }));
-
-jest.mock("@/app/backend/audit-logs/decorator");
 
 // Mock critical missing dependencies
 jest.mock("@/app/utils/format-service", () => ({
@@ -196,70 +123,9 @@ jest.mock("node-hl7-client", () => ({
   })),
 }));
 
-import { validateServiceToken } from "@/app/api/api-auth";
-import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
-import { createFhirClientMock } from "@/app/backend/fhir-servers/__mocks__/fhir-client";
-
 let mockFhirClient = createFhirClientMock();
 
 describe("API Query with Mutual TLS", () => {
-  const SYPHILIS_QUERY_ID = USE_CASE_DETAILS.syphilis.id;
-  const VALID_TOKEN = "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI...";
-
-  const mockPatientResource: Patient = {
-    resourceType: "Patient",
-    id: "test-patient-123",
-    name: [{ given: ["John"], family: "Doe" }],
-    birthDate: "1990-01-01",
-    identifier: [
-      {
-        type: {
-          coding: [
-            {
-              system: "http://terminology.hl7.org/CodeSystem/v2-0203",
-              code: "MR",
-            },
-          ],
-        },
-        system: "http://hospital.org/mrn",
-        value: "MRN-12345",
-      },
-    ],
-  };
-
-  const mockParentTask: Task = {
-    resourceType: "Task",
-    id: "parent-task-123",
-    status: "requested",
-    intent: "order",
-  };
-
-  const mockChildTask: Task = {
-    resourceType: "Task",
-    id: "child-task-456",
-    status: "completed",
-    intent: "order",
-    partOf: [{ reference: "Task/parent-task-123" }],
-    output: [
-      {
-        type: { text: "patient-results" },
-        valueString:
-          "https://mtls.example.com/ndjson/results/Patient-Page1.ndjson",
-      },
-    ],
-  };
-
-  const mockPatientBundle: Bundle = {
-    resourceType: "Bundle",
-    type: "searchset",
-    entry: [
-      {
-        resource: mockPatientResource,
-        fullUrl: "https://mtls.example.com/fhir/Patient/test-patient-123",
-      },
-    ],
-  };
-
   beforeEach(() => {
     suppressConsoleLogs();
     jest.clearAllMocks();
@@ -606,3 +472,132 @@ PV1|1|I|ROOM-123^BED-A^HOSP||||ATTENDING^DOCTOR^A|||||||||||ADM001||||||||||||||
     });
   });
 });
+
+// Utility function to create a minimal NextRequest-like object
+function createNextRequest(
+  body: unknown,
+  searchParams: URLSearchParams,
+  headers?: Record<string, string>,
+): NextRequest {
+  const requestHeaders = new Headers(headers);
+
+  return {
+    json: async () => body,
+    text: async () => body,
+    nextUrl: { searchParams },
+    method: "POST",
+    headers: requestHeaders,
+  } as unknown as NextRequest;
+}
+
+const SYPHILIS_QUERY_ID = USE_CASE_DETAILS.syphilis.id;
+const VALID_TOKEN = "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI...";
+
+const mockPatientGetResponse = {
+  status: 200,
+  json: async () => ({
+    resourceType: "Bundle",
+    type: "searchset",
+    entry: [
+      {
+        resource: {
+          resourceType: "Patient",
+          id: "test-patient-123",
+          name: [{ given: ["John"], family: "Doe" }],
+          birthDate: "1990-01-01",
+          identifier: [
+            {
+              type: {
+                coding: [
+                  {
+                    system: "http://terminology.hl7.org/CodeSystem/v2-0203",
+                    code: "MR",
+                  },
+                ],
+              },
+              system: "http://hospital.org/mrn",
+              value: "MRN-12345",
+            },
+          ],
+        },
+      },
+    ],
+  }),
+  text: async () => "",
+  headers: new Headers({ "content-type": "application/json" }),
+  url: "http://mock-server.com/fhir",
+};
+
+const mockPostJsonReponse = {
+  status: 201,
+  json: async () => ({
+    resourceType: "Bundle",
+    type: "collection",
+    entry: [
+      {
+        resource: {
+          resourceType: "Task",
+          id: "parent-task-123",
+          status: "requested",
+          intent: "order",
+        },
+      },
+    ],
+  }),
+  headers: new Headers(),
+  url: "http://mock-server.com/fhir",
+};
+
+const mockPatientResource: Patient = {
+  resourceType: "Patient",
+  id: "test-patient-123",
+  name: [{ given: ["John"], family: "Doe" }],
+  birthDate: "1990-01-01",
+  identifier: [
+    {
+      type: {
+        coding: [
+          {
+            system: "http://terminology.hl7.org/CodeSystem/v2-0203",
+            code: "MR",
+          },
+        ],
+      },
+      system: "http://hospital.org/mrn",
+      value: "MRN-12345",
+    },
+  ],
+};
+
+const mockParentTask: Task = {
+  resourceType: "Task",
+  id: "parent-task-123",
+  status: "requested",
+  intent: "order",
+};
+
+const mockChildTask: Task = {
+  resourceType: "Task",
+  id: "child-task-456",
+  status: "completed",
+  intent: "order",
+  partOf: [{ reference: "Task/parent-task-123" }],
+  output: [
+    {
+      type: { text: "patient-results" },
+      valueString:
+        "https://mtls.example.com/ndjson/results/Patient-Page1.ndjson",
+    },
+  ],
+};
+
+const mockPatientBundle: Bundle = {
+  resourceType: "Bundle",
+  type: "searchset",
+  entry: [
+    {
+      resource: mockPatientResource,
+      fullUrl: "https://mtls.example.com/fhir/Patient/test-patient-123",
+    },
+  ],
+};

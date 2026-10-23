@@ -1,3 +1,7 @@
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/db/decorators/util");
+jest.mock("@/app/backend/audit-logs/decorator");
+
 import {
   insertCustomValueSet,
   insertCustomValuesetsIntoQuery,
@@ -9,9 +13,6 @@ import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/constants";
 import { suppressConsoleLogs } from "./fixtures";
 import dbService from "@/app/backend/db/service";
 import { resetMocksToDefault } from "./mocks";
-
-jest.mock("@/app/backend/db/decorators/auth");
-jest.mock("@/app/backend/audit-logs/decorator");
 
 describe("UserCreatedValuesetService Integration", () => {
   beforeAll(() => {

@@ -24,59 +24,83 @@ export const resetAuthMockState = () => {
   jest.clearAllMocks();
 };
 
-export const authenticationRequired = jest.fn().mockImplementation(() => {
-  return (
-    _target: unknown,
-    _propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) => {
-    const originalMethod = descriptor.value;
+export const authenticationRequired = jest
+  .fn()
+  .mockImplementation(
+    (_target: unknown, propertyKey: string, descriptor: PropertyDescriptor) => {
+      return mockAccessDetermination(
+        propertyKey,
+        descriptor,
+        mockAccessAllowed.auth,
+      );
+    },
+  );
 
-    descriptor.value = function (...args: unknown[]) {
-      if (!mockAccessAllowed.auth) {
-        throw new Error("Unauthorized");
-      }
-      return originalMethod.apply(this, args);
-    };
+export const adminRequired = jest
+  .fn()
+  .mockImplementation(
+    (_target: unknown, propertyKey: string, descriptor: PropertyDescriptor) => {
+      return mockAccessDetermination(
+        propertyKey,
+        descriptor,
+        mockAccessAllowed.admin,
+      );
+    },
+  );
 
-    return descriptor;
+export const superAdminRequired = jest
+  .fn()
+  .mockImplementation(
+    (_target: unknown, propertyKey: string, descriptor: PropertyDescriptor) => {
+      return mockAccessDetermination(
+        propertyKey,
+        descriptor,
+        mockAccessAllowed.super,
+      );
+    },
+  );
+
+function mockAccessDetermination(
+  propertyKey: string,
+  descriptor: PropertyDescriptor,
+  accessLevel: boolean,
+) {
+  // Capture the original properties regardless of how @auditable modified them
+  const originalValue = descriptor.value;
+  const originalGet = descriptor.get;
+  const originalInitializer = (descriptor as any).initializer;
+
+  // Create our wrapper function
+  const mockWrapper = function (this: any, ...args: unknown[]) {
+    if (!accessLevel) {
+      throw new Error("Higher access required");
+    }
+
+    let methodToCall;
+    if (originalValue) {
+      methodToCall = originalValue;
+    } else if (originalGet) {
+      methodToCall = originalGet.call(this);
+    } else if (originalInitializer) {
+      methodToCall = originalInitializer.call(this);
+    }
+
+    if (!methodToCall) {
+      throw new Error(
+        `Could not resolve original method for ${propertyKey}. Check decorator chain.`,
+      );
+    }
+
+    return methodToCall.apply(this, args);
   };
-});
 
-export const adminRequired = jest.fn().mockImplementation(() => {
-  return (
-    _target: unknown,
-    _propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) => {
-    const originalMethod = descriptor.value;
+  if (originalValue !== undefined) {
+    descriptor.value = mockWrapper;
+  } else if (originalGet !== undefined) {
+    descriptor.get = () => mockWrapper;
+  } else if (originalInitializer !== undefined) {
+    (descriptor as any).initializer = () => mockWrapper;
+  }
 
-    descriptor.value = function (...args: unknown[]) {
-      if (!mockAccessAllowed.admin) {
-        throw new Error("Admin access required");
-      }
-      return originalMethod.apply(this, args);
-    };
-
-    return descriptor;
-  };
-});
-
-export const superAdminRequired = jest.fn().mockImplementation(() => {
-  return (
-    _target: unknown,
-    _propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) => {
-    const originalMethod = descriptor.value;
-
-    descriptor.value = function (...args: unknown[]) {
-      if (!mockAccessAllowed.super) {
-        throw new Error("Super admin access required");
-      }
-      return originalMethod.apply(this, args);
-    };
-
-    return descriptor;
-  };
-});
+  return descriptor;
+}

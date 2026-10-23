@@ -17,13 +17,13 @@ export const TEST_USER = {
 export async function getAuditEntry(
   actionTypeToCheck: string,
   author: string = TEST_USER.user.username,
-): Promise<Record<string, Record<string, string>>> {
-  // The @auditable decorator writes audit rows asynchronously (fire-and-forget),
-  // so the row may not be present the instant the action returns. Poll until the
-  // matching entry appears rather than reading once and racing the write.
+): Promise<Record<string, string>> {
   const AUDIT_QUERY =
     "SELECT * FROM audit_logs WHERE action_type = $1 AND author = $2 ORDER BY created_at DESC LIMIT 1;";
 
+  // The @auditable decorator writes audit rows asynchronously (fire-and-forget),
+  // so the row may not be present the instant the action returns. Poll until the
+  // matching entry appears rather than reading once and racing the write.
   return waitFor(
     async () => {
       const newAuditRows = await dbService.query(AUDIT_QUERY, [
@@ -33,7 +33,9 @@ export async function getAuditEntry(
 
       const auditEntry = newAuditRows.rows[0];
       expect(auditEntry).toBeDefined();
-      return auditEntry as Record<string, Record<string, string>>;
+
+      jest.clearAllMocks();
+      return auditEntry.auditMessage;
     },
     { timeout: 5000 },
   );

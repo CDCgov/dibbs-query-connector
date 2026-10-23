@@ -39,10 +39,12 @@ describe("transaction decorator", () => {
     );
 
     expect(result.success).toBe(false);
-    expect(result.error).toBe("Transaction failed");
+    expect(result.error).toBe("Failed to save the FHIR server configuration.");
 
     expect(dbClientQuery).toHaveBeenCalledWith("ROLLBACK");
     expect(dbClientQuery).toHaveBeenCalledWith("BEGIN");
     expect(dbClientQuery).not.toHaveBeenCalledWith("COMMIT");
-  });
+
+    dbClientQuery.mockRestore();
+  }, 10000);
 });

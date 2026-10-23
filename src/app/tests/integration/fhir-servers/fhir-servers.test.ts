@@ -1,5 +1,8 @@
-import { suppressConsoleLogs } from "../fixtures";
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/audit-logs/decorator");
+jest.mock("@/app/backend/db/decorators/util");
 
+import { suppressConsoleLogs } from "../fixtures";
 import {
   getFhirServerConfigs,
   updateFhirServer,
@@ -7,10 +10,6 @@ import {
   insertFhirServer,
 } from "@/app/backend/fhir-servers/service";
 import { resetMocksToDefault } from "../mocks";
-
-jest.mock("@/app/backend/db/decorators/auth");
-jest.mock("@/app/backend/audit-logs/decorator");
-jest.mock("@/app/backend/db/decorators/util");
 
 const TEST_FHIR_SERVER = {
   name: "Kongo Jungle",
@@ -26,7 +25,7 @@ const DEFAULT_FHIR_SERVER_LENGTH = 10;
 describe("FHIR Servers tests", () => {
   beforeEach(() => {
     resetMocksToDefault();
-    // suppressConsoleLogs();
+    suppressConsoleLogs();
   });
 
   it("getter function grabs expected information", async () => {

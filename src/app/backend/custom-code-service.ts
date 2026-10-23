@@ -88,8 +88,8 @@ class CustomCodeService {
     }
   }
 
-  @adminRequired
   @transaction
+  @adminRequired
   @auditable
   static async insertCustomValueSet(
     vs: DibbsValueSet,
@@ -256,8 +256,8 @@ class CustomCodeService {
 
   // insert or update query_data with a "custom" key containing these valuesets
   // if queryId is undefined, this creates a new query record with custom only
-  @adminRequired
   @transaction
+  @adminRequired
   @auditable
   static async insertCustomValuesetsIntoQuery(
     userId: string,

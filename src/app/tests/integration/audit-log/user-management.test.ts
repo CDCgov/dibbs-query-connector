@@ -1,183 +1,164 @@
-// import { getAuditEntry, TEST_USER } from "./utils";
-// import { auth } from "@/auth";
-// import {
-//   addQueriesToGroup,
-//   addUsersToGroup,
-//   createUserGroup,
-//   deleteUserGroup,
-//   removeUsersFromGroup,
-//   updateUserGroup,
-// } from "@/app/backend/usergroup-management";
-// import dbService from "@/app/backend/db/service";
-// import {
-//   addUserIfNotExists,
-//   updateUserDetails,
-//   updateUserRole,
-// } from "@/app/backend/user-management";
-// import { UserRole } from "@/app/models/entities/users";
-// import { randomUUID } from "crypto";
-// import { getQueryList } from "@/app/backend/query-building/service";
-// import { suppressConsoleLogs } from "../fixtures";
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/db/decorators/util");
+(auth as jest.Mock).mockResolvedValue(TEST_USER);
 
-// (auth as jest.Mock).mockResolvedValue(TEST_USER);
-// jest.mock("@/app/backend/db/decorators/auth");
+import { getAuditEntry, TEST_USER } from "./utils";
+import { auth } from "@/auth";
+import {
+  addQueriesToGroup,
+  addUsersToGroup,
+  createUserGroup,
+  deleteUserGroup,
+  removeUsersFromGroup,
+  updateUserGroup,
+} from "@/app/backend/usergroup-management";
+import dbService from "@/app/backend/db/service";
+import {
+  addUserIfNotExists,
+  updateUserDetails,
+  updateUserRole,
+} from "@/app/backend/user-management";
+import { UserRole } from "@/app/models/entities/users";
+import { randomUUID } from "crypto";
+import { getQueryList } from "@/app/backend/query-building/service";
+import { suppressConsoleLogs } from "../fixtures";
 
-// describe("user management tests", () => {
-//   beforeAll(() => {
-//     suppressConsoleLogs();
-//   });
-//   beforeEach(async () => {
-//     await dbService.query("TRUNCATE TABLE audit_logs RESTART IDENTITY CASCADE");
-//   });
+describe("user management tests", () => {
+  beforeAll(() => {
+    suppressConsoleLogs();
+  });
 
-//   it("user group creation, update, deletion", async () => {
-//     const actionTypeToCheck = "createUserGroup";
-//     const TEST_GROUP_NAME = "Koopalings" + Math.random() * 1000;
+  it("user group creation, update, deletion", async () => {
+    const actionTypeToCheck = "createUserGroup";
+    const TEST_GROUP_NAME = "Koopalings" + Math.random() * 1000;
 
-//     const { items } = await createUserGroup(TEST_GROUP_NAME);
+    const { items } = await createUserGroup(TEST_GROUP_NAME);
 
-//     const auditEntry = await getAuditEntry(actionTypeToCheck);
-//     const auditValues = auditEntry?.auditMessage;
-//     expect(JSON.parse(auditValues.groupName)).toBe(TEST_GROUP_NAME);
+    const auditEntry = await getAuditEntry(actionTypeToCheck);
+    expect(JSON.parse(auditEntry.groupName)).toBe(TEST_GROUP_NAME);
 
-//     const NEW_GROUP_NAME = "Koopa Troopas";
-//     await updateUserGroup(items[0].id, NEW_GROUP_NAME);
-//     const updateGroupAction = "updateUserGroup";
+    const NEW_GROUP_NAME = "Koopa Troopas";
+    await updateUserGroup(items[0].id, NEW_GROUP_NAME);
+    const updateGroupAction = "updateUserGroup";
 
-//     const updateEntry = await getAuditEntry(updateGroupAction);
-//     const updateAuditValues = updateEntry?.auditMessage;
+    const updateEntry = await getAuditEntry(updateGroupAction);
 
-//     expect(JSON.parse(updateAuditValues?.id)).toBe(items[0].id);
-//     expect(JSON.parse(updateAuditValues?.newName)).toBe(NEW_GROUP_NAME);
+    expect(JSON.parse(updateEntry?.id)).toBe(items[0].id);
+    expect(JSON.parse(updateEntry?.newName)).toBe(NEW_GROUP_NAME);
 
-//     await deleteUserGroup(items[0].id);
-//     const deletionAction = "deleteUserGroup";
+    await deleteUserGroup(items[0].id);
+    const deletionAction = "deleteUserGroup";
 
-//     const deleteEntry = await getAuditEntry(deletionAction);
-//     const deleteAuditValues = deleteEntry?.auditMessage;
+    const deleteEntry = await getAuditEntry(deletionAction);
+    expect(JSON.parse(deleteEntry?.id)).toBe(items[0].id);
+  });
+  it("user addition and detail and role update", async () => {
+    const randomUsername = TEST_USER.user.username + Math.random() * 1000;
+    const randomUserToken = {
+      id: TEST_USER.user.id,
+      username: randomUsername,
+      email: TEST_USER.user.id,
+      firstName: TEST_USER.user.id,
+      lastName: TEST_USER.user.id,
+      qcRole: UserRole.STANDARD,
+    };
+    const actionTypeToCheck = "addUserIfNotExists";
+    const { user } = await addUserIfNotExists(randomUserToken);
 
-//     expect(JSON.parse(deleteAuditValues?.id)).toBe(items[0].id);
-//   });
-//   it("user addition and detail and role update", async () => {
-//     const randomUsername = TEST_USER.user.username + Math.random() * 1000;
-//     const randomUserToken = {
-//       id: TEST_USER.user.id,
-//       username: randomUsername,
-//       email: TEST_USER.user.id,
-//       firstName: TEST_USER.user.id,
-//       lastName: TEST_USER.user.id,
-//       qcRole: UserRole.STANDARD,
-//     };
-//     const actionTypeToCheck = "addUserIfNotExists";
-//     const { user } = await addUserIfNotExists(randomUserToken);
+    const auditEntry = await getAuditEntry(actionTypeToCheck);
+    expect(JSON.parse(auditEntry?.userToken)).toStrictEqual(randomUserToken);
+    const CREATED_USER_ID = user.id;
 
-//     const auditEntry = await getAuditEntry(actionTypeToCheck);
-//     const auditValues = auditEntry?.auditMessage;
+    const updateActionType = "updateUserDetails";
 
-//     expect(JSON.parse(auditValues?.userToken)).toStrictEqual(randomUserToken);
-//     const CREATED_USER_ID = user.id;
+    const UPDATED_USER_NAME = "Bowser Jr. III";
+    await updateUserDetails(
+      CREATED_USER_ID,
+      UPDATED_USER_NAME,
+      "Bowser",
+      "Jr. III",
+      UserRole.SUPER_ADMIN,
+    );
 
-//     const updateActionType = "updateUserDetails";
+    const updateUserDetailsEntry = await getAuditEntry(updateActionType);
+    expect(JSON.parse(updateUserDetailsEntry?.userId)).toStrictEqual(
+      CREATED_USER_ID,
+    );
+    expect(JSON.parse(updateUserDetailsEntry?.updatedUserName)).toStrictEqual(
+      UPDATED_USER_NAME,
+    );
+    expect(JSON.parse(updateUserDetailsEntry?.updatedRole)).toStrictEqual(
+      UserRole.SUPER_ADMIN,
+    );
 
-//     const UPDATED_USER_NAME = "Bowser Jr. III";
-//     await updateUserDetails(
-//       CREATED_USER_ID,
-//       UPDATED_USER_NAME,
-//       "Bowser",
-//       "Jr. III",
-//       UserRole.SUPER_ADMIN,
-//     );
+    await updateUserRole(CREATED_USER_ID, UserRole.STANDARD);
+    const updateRoleActionType = "updateUserRole";
+    const updateUserRoleEntry = await getAuditEntry(updateRoleActionType);
+    expect(JSON.parse(updateUserRoleEntry?.userId)).toStrictEqual(
+      CREATED_USER_ID,
+    );
+    expect(JSON.parse(updateUserRoleEntry?.newRole)).toStrictEqual(
+      UserRole.STANDARD,
+    );
 
-//     const updateUserDetailsEntry = await getAuditEntry(updateActionType);
-//     const updateAuditValues = updateUserDetailsEntry?.auditMessage;
+    await dbService.query("DELETE FROM users WHERE id=$1", [user.id]);
+  });
+  it("user group user addition and removal", async () => {
+    const TEST_GROUP_NAME = "Koopalings" + Math.random() * 1000;
 
-//     expect(JSON.parse(updateAuditValues?.userId)).toStrictEqual(
-//       CREATED_USER_ID,
-//     );
-//     expect(JSON.parse(updateAuditValues?.updatedUserName)).toStrictEqual(
-//       UPDATED_USER_NAME,
-//     );
-//     expect(JSON.parse(updateAuditValues?.updatedRole)).toStrictEqual(
-//       UserRole.SUPER_ADMIN,
-//     );
+    const { items } = await createUserGroup(TEST_GROUP_NAME);
+    const CREATED_GROUP_ID = items[0].id;
+    const randomUsername = TEST_USER.user.username + Math.random() * 1000;
+    const randomId = randomUUID();
+    const randomUserToken = {
+      id: randomId,
+      username: randomUsername,
+      email: TEST_USER.user.id,
+      firstName: TEST_USER.user.id,
+      lastName: TEST_USER.user.id,
+      qcRole: UserRole.STANDARD,
+    };
 
-//     await updateUserRole(CREATED_USER_ID, UserRole.STANDARD);
-//     const updateRoleActionType = "updateUserRole";
-//     const updateUserRoleEntry = await getAuditEntry(updateRoleActionType);
-//     const updateUserValues = updateUserRoleEntry?.auditMessage;
+    const { user } = await addUserIfNotExists(randomUserToken);
+    await addUsersToGroup(CREATED_GROUP_ID, [user.id]);
+    const additionActionType = "addUsersToGroup";
 
-//     expect(JSON.parse(updateUserValues?.userId)).toStrictEqual(CREATED_USER_ID);
-//     expect(JSON.parse(updateUserValues?.newRole)).toStrictEqual(
-//       UserRole.STANDARD,
-//     );
+    const additionAuditEntry = await getAuditEntry(additionActionType);
+    expect(JSON.parse(additionAuditEntry?.groupId)).toStrictEqual(
+      CREATED_GROUP_ID,
+    );
+    expect(JSON.parse(additionAuditEntry?.userIds)).toStrictEqual([user.id]);
 
-//     await dbService.query("DELETE FROM users WHERE id=$1", [user.id]);
-//   });
-//   it("user group user addition and removal", async () => {
-//     const TEST_GROUP_NAME = "Koopalings" + Math.random() * 1000;
+    await removeUsersFromGroup(CREATED_GROUP_ID, [user.id]);
+    const deleteActionType = "removeUsersFromGroup";
+    const deletionAuditEntry = await getAuditEntry(deleteActionType);
+    expect(JSON.parse(deletionAuditEntry?.groupId)).toStrictEqual(
+      CREATED_GROUP_ID,
+    );
+    expect(JSON.parse(deletionAuditEntry?.userIds)).toStrictEqual([user.id]);
 
-//     const { items } = await createUserGroup(TEST_GROUP_NAME);
-//     const CREATED_GROUP_ID = items[0].id;
-//     const randomUsername = TEST_USER.user.username + Math.random() * 1000;
-//     const randomId = randomUUID();
-//     const randomUserToken = {
-//       id: randomId,
-//       username: randomUsername,
-//       email: TEST_USER.user.id,
-//       firstName: TEST_USER.user.id,
-//       lastName: TEST_USER.user.id,
-//       qcRole: UserRole.STANDARD,
-//     };
+    await deleteUserGroup(CREATED_GROUP_ID);
+    await dbService.query("DELETE FROM users WHERE id=$1", [user.id]);
+  });
+  it("user group query addition and removal", async () => {
+    const TEST_GROUP_NAME = "Koopalings" + Math.random() * 1000;
 
-//     const { user } = await addUserIfNotExists(randomUserToken);
-//     await addUsersToGroup(CREATED_GROUP_ID, [user.id]);
-//     const additionActionType = "addUsersToGroup";
+    const { items } = await createUserGroup(TEST_GROUP_NAME);
+    const CREATED_GROUP_ID = items[0].id;
 
-//     const additionAuditEntry = await getAuditEntry(additionActionType);
-//     const additionAuditValues = additionAuditEntry?.auditMessage;
-//     expect(JSON.parse(additionAuditValues?.groupId)).toStrictEqual(
-//       CREATED_GROUP_ID,
-//     );
-//     expect(JSON.parse(additionAuditValues?.userIds)).toStrictEqual([user.id]);
+    const queries = await getQueryList();
+    const queryIds = queries.map((q) => q.queryId);
+    const actionTypeToCheck = "addQueriesToGroup";
+    await addQueriesToGroup(CREATED_GROUP_ID, queryIds);
+    const auditEntry = await getAuditEntry(actionTypeToCheck);
+    expect(JSON.parse(auditEntry?.groupId)).toStrictEqual(CREATED_GROUP_ID);
+    expect(JSON.parse(auditEntry?.queryIds)).toStrictEqual(queryIds);
 
-//     await removeUsersFromGroup(CREATED_GROUP_ID, [user.id]);
-//     const deleteActionType = "removeUsersFromGroup";
-//     const deletionAuditEntry = await getAuditEntry(deleteActionType);
-
-//     const deleteAuditValues = deletionAuditEntry?.auditMessage;
-//     expect(JSON.parse(deleteAuditValues?.groupId)).toStrictEqual(
-//       CREATED_GROUP_ID,
-//     );
-//     expect(JSON.parse(deleteAuditValues?.userIds)).toStrictEqual([user.id]);
-
-//     await deleteUserGroup(CREATED_GROUP_ID);
-//     await dbService.query("DELETE FROM users WHERE id=$1", [user.id]);
-//   });
-//   it("user group query addition and removal", async () => {
-//     const TEST_GROUP_NAME = "Koopalings" + Math.random() * 1000;
-
-//     const { items } = await createUserGroup(TEST_GROUP_NAME);
-//     const CREATED_GROUP_ID = items[0].id;
-
-//     const queries = await getQueryList();
-//     const queryIds = queries.map((q) => q.queryId);
-//     const actionTypeToCheck = "addQueriesToGroup";
-//     await addQueriesToGroup(CREATED_GROUP_ID, queryIds);
-//     const auditEntry = await getAuditEntry(actionTypeToCheck);
-//     const auditAuditValues = auditEntry?.auditMessage;
-
-//     expect(JSON.parse(auditAuditValues?.groupId)).toStrictEqual(
-//       CREATED_GROUP_ID,
-//     );
-//     expect(JSON.parse(auditAuditValues?.queryIds)).toStrictEqual(queryIds);
-
-//     await removeUsersFromGroup(CREATED_GROUP_ID, queryIds);
-//     const removeUsersAction = await getAuditEntry(actionTypeToCheck);
-//     const removeAuditValues = removeUsersAction?.auditMessage;
-
-//     expect(JSON.parse(removeAuditValues?.groupId)).toStrictEqual(
-//       CREATED_GROUP_ID,
-//     );
-//     expect(JSON.parse(removeAuditValues?.queryIds)).toStrictEqual(queryIds);
-//   });
-// });
+    await removeUsersFromGroup(CREATED_GROUP_ID, queryIds);
+    const removeUsersAction = await getAuditEntry(actionTypeToCheck);
+    expect(JSON.parse(removeUsersAction?.groupId)).toStrictEqual(
+      CREATED_GROUP_ID,
+    );
+    expect(JSON.parse(removeUsersAction?.queryIds)).toStrictEqual(queryIds);
+  });
+});

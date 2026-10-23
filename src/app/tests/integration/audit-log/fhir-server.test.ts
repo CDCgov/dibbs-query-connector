@@ -1,83 +1,89 @@
-// import dbService from "@/app/backend/db/service";
-// import { getAuditEntry, TEST_USER } from "./utils";
-// import {
-//   insertFhirServer,
-//   updateFhirServer,
-//   deleteFhirServer,
-// } from "@/app/backend/fhir-servers/service";
-// import { auth } from "@/auth";
-// import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/db/decorators/util");
+(auth as jest.Mock).mockResolvedValue(TEST_USER);
 
-// jest.mock("@/app/backend/db/decorators/auth");
-// (auth as jest.Mock).mockResolvedValue(TEST_USER);
+import { getAuditEntry, TEST_USER } from "./utils";
+import { auth } from "@/auth";
+import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
+import {
+  insertFhirServer,
+  updateFhirServer,
+  deleteFhirServer,
+} from "@/app/backend/fhir-servers/service";
+import { suppressConsoleLogs } from "../fixtures";
+import { resetMocksToDefault } from "../mocks";
 
-// describe("fhir server", () => {
-//   beforeAll(() => {
-//     // suppressConsoleLogs();
-//   });
+const TEST_FHIR_SERVER = {
+  id: "jolly-roger-bay",
+  name: "Jolly Roger Bay",
+  hostname: "http://sunken-ship.boats/fhir",
+  headers: undefined,
+  lastConnectionSuccessful: true,
+  disableCertValidation: false,
+  defaultServer: false,
+  authType: "none",
+} as FhirServerConfig;
 
-//   beforeEach(async () => {
-//     await dbService.query("TRUNCATE TABLE audit_logs RESTART IDENTITY CASCADE");
-//   });
+describe("fhir server", () => {
+  let insertionId = "";
+  beforeAll(() => {
+    suppressConsoleLogs();
+  });
 
-//   it("fhir server addition / deletion / update", async () => {
-//     const TEST_FHIR_SERVER = {
-//       id: "jolly-roger-bay",
-//       name: "Jolly Roger Bay",
-//       hostname: "http://sunken-ship.boats/fhir",
-//       headers: undefined,
-//       lastConnectionSuccessful: true,
-//       disableCertValidation: false,
-//       defaultServer: false,
-//       authType: "none",
-//     } as FhirServerConfig;
+  beforeEach(() => {
+    resetMocksToDefault();
+    jest.clearAllMocks();
+  });
 
-//     // insert
-//     const result = await insertFhirServer(
-//       TEST_FHIR_SERVER.name,
-//       TEST_FHIR_SERVER.hostname,
-//       TEST_FHIR_SERVER.disableCertValidation,
-//       TEST_FHIR_SERVER.defaultServer,
-//       TEST_FHIR_SERVER.lastConnectionSuccessful,
-//     );
-//     const actionTypeToCheck = "insertFhirServer";
+  it("addition", async () => {
+    // insert
+    const result = await insertFhirServer(
+      TEST_FHIR_SERVER.name,
+      TEST_FHIR_SERVER.hostname,
+      TEST_FHIR_SERVER.disableCertValidation,
+      TEST_FHIR_SERVER.defaultServer,
+      TEST_FHIR_SERVER.lastConnectionSuccessful,
+    );
 
-//     const auditEntry = await getAuditEntry(actionTypeToCheck);
-//     expect(auditEntry?.actionType).toBe(actionTypeToCheck);
+    expect(result.success).toBe(true);
+    insertionId = result.server.id;
+    const actionTypeToCheck = "insertFhirServer";
+    const auditEntry = await getAuditEntry(actionTypeToCheck);
 
-//     const auditValues = auditEntry?.auditMessage;
-//     expect(JSON.parse(auditValues.name)).toBe(TEST_FHIR_SERVER.name);
-//     expect(JSON.parse(auditValues.hostname)).toBe(TEST_FHIR_SERVER.hostname);
-//     expect(JSON.parse(auditValues.lastConnectionSuccessful)).toBe(
-//       TEST_FHIR_SERVER.lastConnectionSuccessful,
-//     );
+    expect(JSON.parse(auditEntry.name)).toBe(TEST_FHIR_SERVER.name);
+    expect(JSON.parse(auditEntry.hostname)).toBe(TEST_FHIR_SERVER.hostname);
+    expect(JSON.parse(auditEntry.lastConnectionSuccessful)).toBe(
+      TEST_FHIR_SERVER.lastConnectionSuccessful,
+    );
+  }, 10000);
 
-//     const updateName = "Dire Dire Docks";
-//     await updateFhirServer({
-//       id: result.server.id,
-//       name: updateName,
-//       hostname: TEST_FHIR_SERVER.hostname,
-//       defaultServer: false,
-//       disableCertValidation: TEST_FHIR_SERVER.disableCertValidation,
-//       lastConnectionSuccessful: false,
-//       authData: {
-//         authType: "none",
-//       },
-//     });
-//     const updateTypeToCheck = "updateFhirServer";
-//     const updateAuditEntry = await getAuditEntry(updateTypeToCheck);
+  it("update", async () => {
+    const updateName = "Dire Dire Docks";
+    const updateResult = await updateFhirServer({
+      id: insertionId,
+      name: updateName,
+      hostname: TEST_FHIR_SERVER.hostname,
+      defaultServer: false,
+      disableCertValidation: TEST_FHIR_SERVER.disableCertValidation,
+      lastConnectionSuccessful: false,
+      authData: {
+        authType: "none",
+      },
+    });
+    const updateTypeToCheck = "updateFhirServer";
 
-//     expect(updateAuditEntry?.actionType).toBe(actionTypeToCheck);
+    expect(updateResult.success).toBe(true);
 
-//     const updateAuditValues = updateAuditEntry?.auditMessage;
-//     expect(JSON.parse(updateAuditValues.updateDetails).name).toBe(updateName);
+    const updateAuditEntry = await getAuditEntry(updateTypeToCheck);
+    expect(JSON.parse(updateAuditEntry.updateDetails).name).toBe(updateName);
+  }, 10000);
 
-//     await deleteFhirServer(result.server.id);
-//     const finalTypeToCheck = "deleteFhirServer";
+  it("delete", async () => {
+    const deleteResult = await deleteFhirServer(insertionId);
+    expect(deleteResult.success).toBe(true);
 
-//     const finalEntry = await getAuditEntry(finalTypeToCheck);
-//     const finalAuditValues = finalEntry?.auditMessage;
-
-//     expect(JSON.parse(finalAuditValues.id)).toBe(result.server.id);
-//   });
-// });
+    const deleteTypeToCheck = "deleteFhirServer";
+    const finalEntry = await getAuditEntry(deleteTypeToCheck);
+    expect(JSON.parse(finalEntry.id)).toBe(insertionId);
+  }, 10000);
+});

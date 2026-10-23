@@ -1,3 +1,6 @@
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/audit-logs/decorator");
+
 import {
   updateUserRole,
   getAllUsers,
@@ -27,9 +30,6 @@ import {
 import { resetMocksToDefault } from "../mocks";
 
 const dbClient = dontUseOutsideConfigOrTests_getDbPool();
-
-jest.mock("@/app/backend/db/decorators/auth");
-jest.mock("@/app/backend/audit-logs/decorator");
 
 describe("User Management Integration Tests", () => {
   beforeAll(async () => {

@@ -70,8 +70,8 @@ class QueryBuildingService {
    * @param queryId - The unique identifier of the query to delete.
    * @returns A success or error response indicating the result.
    */
-  @adminRequired
   @transaction
+  @adminRequired
   @auditable
   static async deleteQueryById(queryId: string) {
     return deleteQueryByIdHelp(queryId, dbService);

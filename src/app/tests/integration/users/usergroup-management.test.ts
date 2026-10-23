@@ -1,3 +1,7 @@
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/audit-logs/decorator");
+const mockSpy = auth as jest.Mock;
+
 import {
   addUsersToGroup,
   addQueriesToGroup,
@@ -29,9 +33,6 @@ import { CustomUserQuery } from "@/app/models/entities/query";
 import { auth } from "@/auth";
 
 const dbClient = dontUseOutsideConfigOrTests_getDbPool();
-
-jest.mock("@/app/backend/db/decorators/auth");
-jest.mock("@/app/backend/audit-logs/decorator");
 
 const TEST_GROUP_ID = "16991d55-5a8a-4463-9c9d-2097a99dd5f1";
 const TEST_QUERY_1_ID = "8977d3db-7d72-4613-8901-7a5227cd3fb1";
@@ -90,7 +91,7 @@ describe("User Group and Query Membership Tests", () => {
 
   beforeEach(() => {
     resetMocksToDefault();
-    // suppressConsoleLogs();
+    suppressConsoleLogs();
   });
 
   afterAll(async () => {
@@ -396,7 +397,7 @@ describe("User Group and Query Membership Tests", () => {
   });
 
   test("should add multiple queries to a group", async () => {
-    (auth as jest.Mock).mockResolvedValue({ user: TEST_USER_ADMIN });
+    mockSpy.mockResolvedValue({ user: TEST_USER_ADMIN });
 
     setMockAccessAllowed({
       auth: true,
@@ -454,17 +455,17 @@ describe("User Group and Query Membership Tests", () => {
 
   test("should restrict query summaries for a standard user to their group's queries", async () => {
     // have the admin user add the standard user to the group in question
-    (auth as jest.Mock).mockResolvedValue({ user: TEST_USER_ADMIN });
+    mockSpy.mockResolvedValue({ user: TEST_USER_ADMIN });
     setMockAccessAllowed({
       auth: true,
       admin: true,
       super: false,
     });
 
-    await addUsersToGroup(TEST_GROUP_ID, [TEST_USER_STANDARD_FIVE.id]);
+    await addUsersToGroup(TEST_GROUP_ID, [TEST_USER_STANDARD_THREE.id]);
 
     // query the group using the standard user
-    (auth as jest.Mock).mockResolvedValue({ user: TEST_USER_STANDARD_FIVE });
+    mockSpy.mockResolvedValue({ user: TEST_USER_STANDARD_THREE });
     setMockAccessAllowed({
       auth: true,
       admin: false,
@@ -482,7 +483,7 @@ describe("User Group and Query Membership Tests", () => {
   });
 
   test("should return all queries in summaries for a super admin", async () => {
-    (auth as jest.Mock).mockResolvedValue({ user: TEST_USER_SUPER_TWO });
+    mockSpy.mockResolvedValue({ user: TEST_USER_SUPER_TWO });
 
     setMockAccessAllowed({
       auth: true,
