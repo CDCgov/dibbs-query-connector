@@ -1,6 +1,6 @@
 import { Concept } from "@/app/models/entities/concepts";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
-import { CUSTOM_CONDITION_ID } from "@/app/constants";
+import { CUSTOM_CONDITION_ID } from "@/constants";
 import {
   batchToggleConcepts,
   CategoryToConditionArrayMap,

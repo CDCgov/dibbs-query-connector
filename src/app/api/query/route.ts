@@ -12,7 +12,7 @@ import {
   INVALID_QUERY,
   INVALID_MESSAGE_FORMAT,
   INSUFFICIENT_PATIENT_IDENTIFIERS,
-} from "@/app/constants";
+} from "@/constants";
 import {
   mapDeprecatedUseCaseToId,
   mapHL7EthnicGroupToCode,

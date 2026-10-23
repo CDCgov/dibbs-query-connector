@@ -1,3 +1,7 @@
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/db/decorators/util");
+jest.mock("@/app/backend/audit-logs/decorator");
+
 import {
   insertCustomValueSet,
   insertCustomValuesetsIntoQuery,
@@ -5,18 +9,20 @@ import {
 } from "@/app/backend/custom-code-service";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { randomUUID } from "crypto";
-import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/app/constants";
+import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/constants";
 import { suppressConsoleLogs } from "./fixtures";
 import dbService from "@/app/backend/db/service";
-
-jest.mock("@/app/utils/auth", () => ({
-  adminAccessCheck: jest.fn().mockResolvedValue(true),
-}));
+import { resetMocksToDefault } from "./mocks";
 
 describe("UserCreatedValuesetService Integration", () => {
   beforeAll(() => {
     suppressConsoleLogs();
   });
+
+  beforeEach(() => {
+    resetMocksToDefault();
+  });
+
   const testUUID = "mock-vsid-0001";
   const vsVersion = "1.0.0";
   const vsName = "Cooties test";

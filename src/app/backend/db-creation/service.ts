@@ -28,7 +28,7 @@ import {
   VSAC_FETCH_BATCH_SIZE,
 } from "@/seed/constants";
 import { auditable } from "../audit-logs/decorator";
-import { adminRequired } from "../db/decorators";
+import { adminRequired } from "../db/decorators/auth";
 
 class SeedingService {
   /**
