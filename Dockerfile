@@ -91,6 +91,17 @@ COPY --from=installer --chown=nextjs:nodejs /app/start.sh ./start.sh
 RUN mkdir -p .next/static public && \
     chown -R nextjs:nodejs .next/static public
 
+# Fail the build if either distrusted root is left in any CA bundle, whether from
+# the OS or vendored by a Python package. Each pattern is one line of a root's
+# base64 body (emSign ECC Root CA - G3, then AAA Certificate Services), so it
+# matches however a bundle labels the certificate. grep exits 1 only when
+# nothing matched.
+RUN grep -rlF \
+    -e 'CUfvO6wIBHxcmbHtRwfSAjEAnbpV/KlK6O3t5nYBQnvI+GDZjVGLVTv7jHvrZQnD' \
+    -e 'l2D4kF501KKaU73yqWjgom7C12yxow+ev+to51byrvLjKzg6CYG1a4XXvi3tPxq3' \
+    /etc /usr /var; \
+    test $? -eq 1
+
 USER nextjs
 
 
