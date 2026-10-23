@@ -22,9 +22,8 @@ jest.mock("../../backend/db/service", () => ({
   DbClient: class {},
 }));
 
-jest.mock("@/app/utils/auth", () => ({
-  superAdminAccessCheck: jest.fn().mockReturnValue(true),
-}));
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/audit-logs/decorator");
 
 jest.mock("@/app/backend/fhir-servers/lib", () => ({
   prepareFhirClient: jest.fn(),

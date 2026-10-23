@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // State to hold active test rules
 let mockAccessAllowed = {
   auth: true,

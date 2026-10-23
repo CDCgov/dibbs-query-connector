@@ -1,12 +1,11 @@
-export const transaction = jest
-  .fn()
-  .mockImplementation(
-    <T extends { success: boolean; error?: string }>(
-      _: Object,
-      _key: string,
-      descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<T>>,
-    ) => descriptor,
-  );
+export const transaction = jest.fn().mockImplementation(
+  <T extends { success: boolean; error?: string }>(
+    _: Object,
+    _key: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<T>>,
+  ) => descriptor,
+);
 
 const actualDecorators = jest.requireActual("../util");
 

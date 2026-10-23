@@ -71,7 +71,7 @@ describe("SearchForm", () => {
   });
 
   it("renders fhir server form options on button click", async () => {
-    const { user } = renderWithUser(
+    renderWithUser(
       <RootProviderMock currentPage={"/query"}>
         <SearchForm
           setMode={jest.fn()}
@@ -229,7 +229,7 @@ describe("SearchForm", () => {
     const formattedParams = new URLSearchParams(queryParams);
     (useSearchParams as jest.Mock).mockReturnValue(formattedParams);
 
-    const { user } = renderWithUser(
+    renderWithUser(
       <RootProviderMock currentPage={`/query?${queryParams}`}>
         <SearchForm
           setMode={jest.fn()}
