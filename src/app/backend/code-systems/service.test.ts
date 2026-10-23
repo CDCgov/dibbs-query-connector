@@ -1,11 +1,7 @@
 import { OperationOutcome } from "fhir/r4";
 import { getVSACValueSet } from "./service";
 
-jest.mock("@/auth", () => ({
-  superAdminAccessCheck: jest.fn().mockResolvedValue(true),
-  adminAccessCheck: jest.fn().mockResolvedValue(true),
-  authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-}));
+jest.mock("@/app/backend/db/decorators/auth");
 
 describe("getVSACValueSet", () => {
   const originalKey = process.env.UMLS_API_KEY;
