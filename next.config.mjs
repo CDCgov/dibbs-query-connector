@@ -38,6 +38,9 @@ const nextConfig = {
   },
   basePath: "",
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
+  experimental: {
+    agentUpgrade: "security",
+  },
 };
 
 const withMDX = createMDX({
