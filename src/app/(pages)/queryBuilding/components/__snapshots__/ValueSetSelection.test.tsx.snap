@@ -254,6 +254,7 @@ exports[`tests the value set selection page highlights the active tab to the sid
   </div>
   <div
     aria-describedby="warning-confirmation-modal-modal-description"
+    aria-hidden="true"
     aria-labelledby="warning-confirmation-modal-modal-heading"
     class="usa-modal-wrapper is-hidden"
     data-force-action="false"
@@ -638,6 +639,7 @@ exports[`tests the value set selection page highlights the active tab to the sid
   </div>
   <div
     aria-describedby="warning-confirmation-modal-modal-description"
+    aria-hidden="true"
     aria-labelledby="warning-confirmation-modal-modal-heading"
     class="usa-modal-wrapper is-hidden"
     data-force-action="false"
@@ -1006,9 +1008,7 @@ exports[`tests the value set selection page highlights the active tab to the sid
                           class="conditionDrawerHeader"
                         >
                           <span>
-                            <span
-                              class=""
-                            >
+                            <span>
                               Cancer
                             </span>
                           </span>
@@ -1022,9 +1022,7 @@ exports[`tests the value set selection page highlights the active tab to the sid
                           >
                             <span>
                               <span>
-                                <span
-                                  class=""
-                                >
+                                <span>
                                   Malignant neoplastic disease
                                 </span>
                               </span>
@@ -1044,9 +1042,7 @@ exports[`tests the value set selection page highlights the active tab to the sid
                           >
                             <span>
                               <span>
-                                <span
-                                  class=""
-                                >
+                                <span>
                                   Cancer (Leukemia)
                                 </span>
                               </span>
@@ -1067,9 +1063,7 @@ exports[`tests the value set selection page highlights the active tab to the sid
                           class="conditionDrawerHeader"
                         >
                           <span>
-                            <span
-                              class=""
-                            >
+                            <span>
                               Sexually Transmitted Diseases (STI)
                             </span>
                           </span>
@@ -1083,9 +1077,7 @@ exports[`tests the value set selection page highlights the active tab to the sid
                           >
                             <span>
                               <span>
-                                <span
-                                  class=""
-                                >
+                                <span>
                                   Syphilis
                                 </span>
                               </span>
@@ -1105,9 +1097,7 @@ exports[`tests the value set selection page highlights the active tab to the sid
                           >
                             <span>
                               <span>
-                                <span
-                                  class=""
-                                >
+                                <span>
                                   Chlamydia trachomatis infection
                                 </span>
                               </span>
@@ -1127,9 +1117,7 @@ exports[`tests the value set selection page highlights the active tab to the sid
                           >
                             <span>
                               <span>
-                                <span
-                                  class=""
-                                >
+                                <span>
                                   Gonorrhea
                                 </span>
                               </span>
@@ -1178,6 +1166,7 @@ exports[`tests the value set selection page highlights the active tab to the sid
   </div>
   <div
     aria-describedby="warning-confirmation-modal-modal-description"
+    aria-hidden="true"
     aria-labelledby="warning-confirmation-modal-modal-heading"
     class="usa-modal-wrapper is-hidden"
     data-force-action="false"

@@ -337,19 +337,18 @@ describe("Code library interaction", () => {
       .getByTestId("table-valuesets-manage")
       .getElementsByClassName("valueSetTable__tableBody_row_details")[2];
 
-    await waitFor(async () => {
-      (customVsRow as HTMLElement).click();
-      const deleteButton = screen.getAllByRole("button", {
-        name: /delete value set/i,
-      })[1];
-      (deleteButton as HTMLElement).click();
+    (customVsRow as HTMLElement).click();
 
-      const modal = screen.getByTestId("modalWindow");
-      expect(modal).toBeVisible();
-      expect(modal).toHaveTextContent(
-        `Are you sure you want to delete the value set "${customValueSet.valueSetName}?"`,
-      );
+    const deleteButton = await screen.findByRole("button", {
+      name: /delete value set/i,
     });
+    (deleteButton as HTMLElement).click();
+
+    const modal = screen.getByTestId("modalWindow");
+    expect(modal).toBeVisible();
+    expect(modal).toHaveTextContent(
+      `Are you sure you want to delete the value set "${customValueSet.valueSetName}?"`,
+    );
   });
 });
 

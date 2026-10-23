@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   handleDelete,
   confirmDelete,
@@ -173,18 +173,19 @@ describe("renderModal", () => {
     setSelectedQuery: jest.Mock;
   }) => {
     const modalRef = useRef<ModalRef>(null);
-    return (
-      <>
-        {renderModal(
-          modalRef,
-          selectedQuery,
-          handleDeleteFn,
-          QUERIES,
-          jest.fn(),
-          {} as DataContextValue,
-          setSelectedQuery,
-        )}
-      </>
+    useEffect(() => {
+      // Open the modal so its buttons are accessible; closed modals have aria-hidden="true".
+      modalRef.current?.toggleModal(undefined, true);
+    }, []);
+
+    return renderModal(
+      modalRef,
+      selectedQuery,
+      handleDeleteFn,
+      QUERIES,
+      jest.fn(),
+      {} as DataContextValue,
+      setSelectedQuery,
     );
   };
 
