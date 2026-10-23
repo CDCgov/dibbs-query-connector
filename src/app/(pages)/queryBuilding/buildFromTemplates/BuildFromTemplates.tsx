@@ -23,7 +23,7 @@ import {
 } from "../utils";
 import { ConditionSelection } from "../components/ConditionSelection";
 import { ValueSetSelection } from "../components/ValueSetSelection";
-import { BuildStep } from "../../../constants";
+import { BuildStep } from "@/constants";
 import LoadingView from "../../../ui/designSystem/LoadingView";
 import classNames from "classnames";
 import {

@@ -1,0 +1,106 @@
+import { QueryResult } from "pg";
+import { translateNestedObjectKeysIntoCamelCase } from "../util";
+import dbService from "../service";
+
+/**
+ * Annotation to make a db query into a transaction. Requires all return branches
+ * to include {success: boolean}, which will control the rollback behavior,
+ * in order to compile
+ * @param _ - class prototype the annotation is hoisted into
+ * @param key - the name of the method
+ * @param descriptor - metadata for the method, which has restrictions on the
+ * return type
+ * @returns - Success information of the db transaction, as well as additional
+ * error / db result types as specified in the function body
+ */
+export function transaction<T extends { success: boolean; error?: string }>(
+  _: Object,
+  key: string,
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<T>>,
+) {
+  const method = descriptor.value;
+
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+  descriptor.value = async function (...args: any[]): Promise<T> {
+    try {
+      await dbService.query("BEGIN");
+      const result = method && (await method.apply(this, args));
+      if (result === undefined || result.success === false) {
+        throw Error(result?.error || "Transaction failed");
+      }
+      await dbService.query("COMMIT");
+
+      return result;
+    } catch (error) {
+      console.error(
+        `Database transaction ${key} failed with ${error}. Rolling back...`,
+      );
+      await dbService.query("ROLLBACK");
+
+      type ErrorResult<T extends { success: boolean }> = T & {
+        error?: string;
+      };
+
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      } as ErrorResult<T>;
+    }
+  };
+
+  return descriptor;
+}
+
+/**
+ * Annotation that camelCases any column_names coming back from DB reads
+ * @param _ - class prototype the annotation is hoisted into
+ * @param key - the name of the method
+ * @param descriptor - metadata for the method, which has restrictions on the
+ * return type
+ * @returns - objects from the database with the column names camel cased
+ */
+export function camelCaseDbColumnNames<T extends Record<string, unknown>>(
+  _: Object,
+  key: string,
+  descriptor: TypedPropertyDescriptor<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (...args: any[]) => Promise<QueryResult<any>>
+  >,
+) {
+  const method = descriptor.value;
+
+  descriptor.value = async function (
+    ...args: unknown[]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<QueryResult<any>> {
+    try {
+      const result = method && (await method.apply(this, args));
+
+      if (result === undefined || result?.rows === undefined) {
+        throw Error(
+          "Database read in camel casing formatting function returned undefined",
+        );
+      }
+
+      result.rows = result.rows.map((v) => {
+        const val = translateNestedObjectKeysIntoCamelCase(v as object);
+        return val as T;
+      });
+
+      return result;
+    } catch (error) {
+      console.error(error);
+
+      return {
+        command: "",
+        rowCount: 0,
+        oid: 0,
+        rows: [] as T[],
+        fields: [],
+      };
+    }
+  };
+
+  return descriptor;
+}

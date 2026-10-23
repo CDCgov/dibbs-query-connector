@@ -1,5 +1,5 @@
 import { Bundle, BundleEntry, Patient } from "fhir/r4";
-import { readJsonFile } from "../shared_utils/readJsonFile";
+import { readJsonFile } from "../../shared_utils/readJsonFile";
 import {
   INSUFFICIENT_PATIENT_IDENTIFIERS,
   INVALID_FHIR_SERVERS,
@@ -8,7 +8,7 @@ import {
   MISSING_PATIENT_IDENTIFIERS,
   RESPONSE_BODY_IS_NOT_PATIENT_RESOURCE,
   USE_CASE_DETAILS,
-} from "@/app/constants";
+} from "@/constants";
 import { NextRequest } from "next/server";
 import { POST } from "@/app/api/query/route";
 import { GET } from "@/app/api/route";
@@ -16,54 +16,28 @@ import {
   PATIENT_HL7_MESSAGE,
   PATIENT_HL7_MESSAGE_NO_IDENTIFIERS,
   suppressConsoleLogs,
-} from "./fixtures";
+} from "../fixtures";
 
 jest.mock("next-auth");
 jest.mock("next-auth/providers/keycloak");
+
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/audit-logs/decorator");
+jest.mock("@/app/backend/db/decorators/util");
+
+// Mock the FHIRClient to prevent real authentication requests
+jest.mock("@/app/backend/fhir-servers/fhir-client");
 
 // Mock the validateServiceToken function
 jest.mock("@/app/api/api-auth", () => ({
   validateServiceToken: jest.fn(),
 }));
 
-// Mock the FHIRClient to prevent real authentication requests
-jest.mock("@/app/backend/fhir-servers/fhir-client", () => {
-  return {
-    __esModule: true,
-    default: jest.fn().mockImplementation(() => ({
-      get: jest.fn().mockResolvedValue({
-        resourceType: "Bundle",
-        entry: [
-          {
-            resource: {
-              resourceType: "Patient",
-              id: "test-patient-123",
-              name: [{ given: ["Test"], family: "Patient" }],
-              identifier: [{ value: "MRN-12345" }],
-            },
-          },
-        ],
-      }),
-      post: jest.fn().mockResolvedValue({
-        status: 200,
-        url: "http://mock-server.com/fhir",
-        text: jest.fn().mockResolvedValue(""),
-        json: jest.fn().mockResolvedValue({
-          resourceType: "Bundle",
-          entry: [],
-        }),
-      }),
-      getAccessToken: jest.fn().mockResolvedValue("mock-token"),
-      ensureValidToken: jest.fn().mockResolvedValue(undefined),
-      getRequestLog: jest.fn().mockReturnValue([]),
-    })),
-  };
-});
-
 import { validateServiceToken } from "@/app/api/api-auth";
 import { createSmartJwt } from "@/app/backend/smart-on-fhir";
-import { E2E_SMART_TEST_CLIENT_ID } from "../../../../e2e/constants";
 import { decodeJwt, decodeProtectedHeader } from "jose";
+import { resetMocksToDefault } from "../mocks";
+import { E2E_SMART_TEST_CLIENT_ID } from "../../../../../e2e/constants";
 
 // Utility function to create a minimal NextRequest-like object
 export function createNextRequest(
@@ -81,14 +55,6 @@ export function createNextRequest(
     headers: requestHeaders,
   } as unknown as NextRequest;
 }
-
-jest.mock("@/app/utils/auth", () => {
-  return {
-    superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    adminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-  };
-});
 
 const PatientBundle = readJsonFile("./src/app/tests/assets/BundlePatient.json");
 const PatientResource: Patient | undefined = (
@@ -120,11 +86,7 @@ describe("GET Health Check", () => {
 describe("POST Query FHIR Server - Authentication", () => {
   beforeEach(() => {
     suppressConsoleLogs();
-    jest.clearAllMocks();
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
+    resetMocksToDefault();
   });
 
   const SYPHILIS_QUERY_ID = USE_CASE_DETAILS.syphilis.id;
@@ -211,18 +173,14 @@ describe("POST Query FHIR Server - Authentication", () => {
 
 describe("POST Query FHIR Server - Authorized Requests", () => {
   beforeEach(() => {
+    resetMocksToDefault();
     suppressConsoleLogs();
-    jest.clearAllMocks();
 
     // Mock successful authentication for all tests in this describe block
     (validateServiceToken as jest.Mock).mockResolvedValue({
       valid: true,
       payload: mockTokenPayload,
     });
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
   });
 
   const SYPHILIS_QUERY_ID = USE_CASE_DETAILS.syphilis.id;
@@ -312,6 +270,7 @@ describe("POST Query FHIR Server - Authorized Requests", () => {
       new URLSearchParams("use_case=syphilis&fhir_server=Aidbox"),
       { Authorization: VALID_TOKEN },
     );
+
     const response = await POST(request);
     const body = await response.json();
     expect(body.resourceType).toBe("Bundle");
@@ -390,8 +349,7 @@ describe("POST Query FHIR Server - Authorized Requests", () => {
 
 describe("Authentication with Different Providers", () => {
   beforeEach(() => {
-    suppressConsoleLogs();
-    jest.clearAllMocks();
+    resetMocksToDefault();
   });
 
   const SYPHILIS_QUERY_ID = USE_CASE_DETAILS.syphilis.id;
@@ -455,8 +413,7 @@ describe("Authentication with Different Providers", () => {
 
 describe("SMART on FHIR JWT creation", () => {
   beforeEach(() => {
-    suppressConsoleLogs();
-    jest.clearAllMocks();
+    resetMocksToDefault();
   });
 
   it("generates the correct token and signing creates the right request payload", async () => {

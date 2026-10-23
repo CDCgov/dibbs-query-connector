@@ -1,12 +1,13 @@
 import { patientRecordsQuery } from "@/app/backend/query-execution/service";
 import { suppressConsoleLogs } from "./fixtures";
 import { PatientRecordsRequest } from "@/app/models/entities/query";
-import { HYPER_UNLUCKY_DEFAULT_ID } from "@/app/constants";
+import { HYPER_UNLUCKY_DEFAULT_ID } from "@/constants";
 import { updateTimeboxSettings } from "@/app/backend/query-timefiltering";
 import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
 import { deleteQueryByIdHelp } from "@/app/backend/query-building/lib";
 import { createTestCancerQuery } from "../../../../e2e/utils";
 import { dontUseOutsideConfigOrTests_getDbPool } from "@/app/backend/db/config";
+import { resetMocksToDefault } from "./mocks";
 
 // This is the only integration test that issues real (unmocked) network queries
 // against Aidbox. The cancer query fans out across multiple value sets, so each
@@ -16,16 +17,15 @@ import { dontUseOutsideConfigOrTests_getDbPool } from "@/app/backend/db/config";
 // network-bound test and its hooks generous, explicit timeouts.
 const NETWORK_TEST_TIMEOUT_MS = 30 * 1000;
 
-jest.mock("@/app/utils/auth", () => {
-  return {
-    superAdminAccessCheck: jest.fn().mockResolvedValue(true),
-    adminAccessCheck: jest.fn().mockResolvedValue(true),
-    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-  };
-});
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/audit-logs/decorator");
 
 describe("time filtering query", () => {
   const dbClient = dontUseOutsideConfigOrTests_getDbPool();
+
+  beforeEach(() => {
+    resetMocksToDefault();
+  });
 
   beforeAll(() => {
     suppressConsoleLogs();

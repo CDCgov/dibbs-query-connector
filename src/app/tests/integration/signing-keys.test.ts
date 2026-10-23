@@ -1,3 +1,6 @@
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/audit-logs/decorator");
+
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -17,6 +20,7 @@ import {
 } from "@/app/backend/signing-keys";
 import { createSmartJwt } from "@/app/backend/smart-on-fhir";
 import { suppressConsoleLogs } from "./fixtures";
+import { resetMocksToDefault } from "./mocks";
 
 // A scratch keys dir with no key files, so tests exercise the
 // generate-in-db path rather than importing any local dev keys/ dir
@@ -31,8 +35,9 @@ async function resetKeys() {
 
 describe("signing key persistence", () => {
   beforeEach(async () => {
-    suppressConsoleLogs();
     await resetKeys();
+    resetMocksToDefault();
+    suppressConsoleLogs();
   });
 
   afterAll(async () => {

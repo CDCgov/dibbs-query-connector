@@ -1,62 +1,32 @@
-import dbService from "@/app/backend/db/service";
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/db/decorators/util");
+(auth as jest.Mock).mockResolvedValue(TEST_USER);
+
 import { signOut } from "@/app/backend/session-management";
 import { logSignInToAuditTable } from "@/app/backend/auth/sign-in-audit";
-import {
-  GET_ALL_AUDIT_ROWS,
-  waitForAuditSuccess,
-  getAuditEntry,
-  TEST_USER,
-} from "./utils";
-import * as AuditableDecorators from "@/app/backend/audit-logs/lib";
+import { getAuditEntry, TEST_USER } from "./utils";
 import { auth } from "@/auth";
 import { suppressConsoleLogs } from "../fixtures";
-
-jest.mock("@/app/utils/auth", () => {
-  return {
-    superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    adminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-  };
-});
-
-jest.mock("@/app/backend/audit-logs/lib", () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual("@/app/backend/audit-logs/lib"),
-  };
-});
-
-const auditCompletionSpy = jest.spyOn(
-  AuditableDecorators,
-  "generateAuditSuccessMessage",
-);
-
-(auth as jest.Mock).mockResolvedValue(TEST_USER);
 
 describe("sign in and out", () => {
   beforeAll(() => {
     suppressConsoleLogs();
   });
+
   it("sign out should generate an audit entry", async () => {
-    const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
-      (r) => r.id,
-    );
     const actionTypeToCheck = "auditableSignOut";
 
     await signOut();
-    await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
-    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
 
-    const userInfo = JSON.parse(auditEntry?.sessionParams).session.user;
+    const auditEntry = await getAuditEntry(actionTypeToCheck);
+
+    const userInfo = JSON.parse(auditEntry.sessionParams).session.user;
     expect(userInfo.username).toBe(TEST_USER.user.username);
     expect(userInfo.firstName).toBe(TEST_USER.user.firstName);
     expect(userInfo.lastName).toBe(TEST_USER.user.lastName);
   });
 
   it("sign in should generate an audit entry", async () => {
-    const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
-      (r) => r.id,
-    );
     const actionTypeToCheck = "auditableSignIn";
 
     await logSignInToAuditTable({
@@ -64,10 +34,10 @@ describe("sign in and out", () => {
       given_name: TEST_USER.user.firstName,
       family_name: TEST_USER.user.lastName,
     });
-    await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
-    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
 
-    const userInfo = JSON.parse(auditEntry?.profile);
+    const auditEntry = await getAuditEntry(actionTypeToCheck);
+
+    const userInfo = JSON.parse(auditEntry.profile);
     expect(userInfo.preferredUsername).toBe(TEST_USER.user.username);
     expect(userInfo.givenName).toBe(TEST_USER.user.firstName);
     expect(userInfo.familyName).toBe(TEST_USER.user.lastName);

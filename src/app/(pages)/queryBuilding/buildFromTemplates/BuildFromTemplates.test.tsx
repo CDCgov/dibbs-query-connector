@@ -7,7 +7,7 @@ import {
   cancerValueSets,
 } from "@/app/(pages)/queryBuilding/fixtures";
 import { formatDiseaseDisplay } from "@/app/(pages)/queryBuilding/utils";
-import { USE_CASE_DETAILS } from "@/app/constants";
+import { USE_CASE_DETAILS } from "@/constants";
 import { renderWithUser, RootProviderMock } from "@/app/tests/unit/setup";
 import { screen, waitFor, within } from "@testing-library/dom";
 import {

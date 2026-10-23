@@ -3,7 +3,7 @@
 
 import { Concept } from "@/app/models/entities/concepts";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
-import { ErsdConceptType, ersdToDibbsConceptMap } from "../../constants";
+import { ErsdConceptType, ersdToDibbsConceptMap } from "@/constants";
 import { BundleEntry, ValueSet as FhirValueSet, ValueSet } from "fhir/r4";
 import { insertValuesetToConceptSql, insertConceptSql } from "./seedSqlStructs";
 import { DbClient } from "../db/service";

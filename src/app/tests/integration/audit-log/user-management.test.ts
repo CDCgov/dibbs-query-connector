@@ -1,4 +1,8 @@
-import { GET_ALL_AUDIT_ROWS, getAuditEntry, TEST_USER } from "./utils";
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/db/decorators/util");
+(auth as jest.Mock).mockResolvedValue(TEST_USER);
+
+import { getAuditEntry, TEST_USER } from "./utils";
 import { auth } from "@/auth";
 import {
   addQueriesToGroup,
@@ -18,83 +22,37 @@ import { UserRole } from "@/app/models/entities/users";
 import { randomUUID } from "crypto";
 import { getQueryList } from "@/app/backend/query-building/service";
 import { suppressConsoleLogs } from "../fixtures";
-import { waitFor } from "@testing-library/dom";
-
-jest.mock("@/app/utils/auth", () => {
-  return {
-    superAdminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    adminAccessCheck: jest.fn(() => Promise.resolve(true)),
-    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-  };
-});
-
-jest.mock("@/app/backend/audit-logs/lib", () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual("@/app/backend/audit-logs/lib"),
-  };
-});
-
-(auth as jest.Mock).mockResolvedValue(TEST_USER);
-const consoleInfoSpy = jest.spyOn(console, "info");
 
 describe("user management tests", () => {
   beforeAll(() => {
     suppressConsoleLogs();
   });
 
-  afterEach(() => {
-    consoleInfoSpy.mockReset();
-  });
-
   it("user group creation, update, deletion", async () => {
-    const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
-      (r) => r.id,
-    );
     const actionTypeToCheck = "createUserGroup";
     const TEST_GROUP_NAME = "Koopalings" + Math.random() * 1000;
 
     const { items } = await createUserGroup(TEST_GROUP_NAME);
 
-    await waitFor(() => {
-      expect(consoleInfoSpy).toHaveBeenLastCalledWith(
-        expect.stringContaining(`${actionTypeToCheck} audit action with`),
-      );
-    });
-
-    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
-    expect(JSON.parse(auditEntry?.groupName)).toBe(TEST_GROUP_NAME);
+    const auditEntry = await getAuditEntry(actionTypeToCheck);
+    expect(JSON.parse(auditEntry.groupName)).toBe(TEST_GROUP_NAME);
 
     const NEW_GROUP_NAME = "Koopa Troopas";
     await updateUserGroup(items[0].id, NEW_GROUP_NAME);
     const updateGroupAction = "updateUserGroup";
 
-    await waitFor(() => {
-      expect(consoleInfoSpy).toHaveBeenLastCalledWith(
-        expect.stringContaining(`${updateGroupAction} audit action with`),
-      );
-    });
+    const updateEntry = await getAuditEntry(updateGroupAction);
 
-    const updateEntry = await getAuditEntry(updateGroupAction, oldAuditIds);
     expect(JSON.parse(updateEntry?.id)).toBe(items[0].id);
     expect(JSON.parse(updateEntry?.newName)).toBe(NEW_GROUP_NAME);
 
     await deleteUserGroup(items[0].id);
     const deletionAction = "deleteUserGroup";
 
-    await waitFor(() => {
-      expect(consoleInfoSpy).toHaveBeenLastCalledWith(
-        expect.stringContaining(`${deletionAction} audit action with`),
-      );
-    });
-    const deleteEntry = await getAuditEntry(deletionAction, oldAuditIds);
+    const deleteEntry = await getAuditEntry(deletionAction);
     expect(JSON.parse(deleteEntry?.id)).toBe(items[0].id);
   });
   it("user addition and detail and role update", async () => {
-    const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
-      (r) => r.id,
-    );
-
     const randomUsername = TEST_USER.user.username + Math.random() * 1000;
     const randomUserToken = {
       id: TEST_USER.user.id,
@@ -107,13 +65,7 @@ describe("user management tests", () => {
     const actionTypeToCheck = "addUserIfNotExists";
     const { user } = await addUserIfNotExists(randomUserToken);
 
-    await waitFor(() => {
-      expect(consoleInfoSpy).toHaveBeenLastCalledWith(
-        expect.stringContaining(`${actionTypeToCheck} audit action with`),
-      );
-    });
-
-    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
+    const auditEntry = await getAuditEntry(actionTypeToCheck);
     expect(JSON.parse(auditEntry?.userToken)).toStrictEqual(randomUserToken);
     const CREATED_USER_ID = user.id;
 
@@ -128,16 +80,7 @@ describe("user management tests", () => {
       UserRole.SUPER_ADMIN,
     );
 
-    await waitFor(() => {
-      expect(consoleInfoSpy).toHaveBeenLastCalledWith(
-        expect.stringContaining(`${updateActionType} audit action with`),
-      );
-    });
-
-    const updateUserDetailsEntry = await getAuditEntry(
-      updateActionType,
-      oldAuditIds,
-    );
+    const updateUserDetailsEntry = await getAuditEntry(updateActionType);
     expect(JSON.parse(updateUserDetailsEntry?.userId)).toStrictEqual(
       CREATED_USER_ID,
     );
@@ -150,10 +93,7 @@ describe("user management tests", () => {
 
     await updateUserRole(CREATED_USER_ID, UserRole.STANDARD);
     const updateRoleActionType = "updateUserRole";
-    const updateUserRoleEntry = await getAuditEntry(
-      updateRoleActionType,
-      oldAuditIds,
-    );
+    const updateUserRoleEntry = await getAuditEntry(updateRoleActionType);
     expect(JSON.parse(updateUserRoleEntry?.userId)).toStrictEqual(
       CREATED_USER_ID,
     );
@@ -164,9 +104,6 @@ describe("user management tests", () => {
     await dbService.query("DELETE FROM users WHERE id=$1", [user.id]);
   });
   it("user group user addition and removal", async () => {
-    const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
-      (r) => r.id,
-    );
     const TEST_GROUP_NAME = "Koopalings" + Math.random() * 1000;
 
     const { items } = await createUserGroup(TEST_GROUP_NAME);
@@ -186,16 +123,7 @@ describe("user management tests", () => {
     await addUsersToGroup(CREATED_GROUP_ID, [user.id]);
     const additionActionType = "addUsersToGroup";
 
-    await waitFor(() => {
-      expect(consoleInfoSpy).toHaveBeenLastCalledWith(
-        expect.stringContaining(`${additionActionType} audit action with`),
-      );
-    });
-
-    const additionAuditEntry = await getAuditEntry(
-      additionActionType,
-      oldAuditIds,
-    );
+    const additionAuditEntry = await getAuditEntry(additionActionType);
     expect(JSON.parse(additionAuditEntry?.groupId)).toStrictEqual(
       CREATED_GROUP_ID,
     );
@@ -203,10 +131,7 @@ describe("user management tests", () => {
 
     await removeUsersFromGroup(CREATED_GROUP_ID, [user.id]);
     const deleteActionType = "removeUsersFromGroup";
-    const deletionAuditEntry = await getAuditEntry(
-      deleteActionType,
-      oldAuditIds,
-    );
+    const deletionAuditEntry = await getAuditEntry(deleteActionType);
     expect(JSON.parse(deletionAuditEntry?.groupId)).toStrictEqual(
       CREATED_GROUP_ID,
     );
@@ -216,9 +141,6 @@ describe("user management tests", () => {
     await dbService.query("DELETE FROM users WHERE id=$1", [user.id]);
   });
   it("user group query addition and removal", async () => {
-    const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
-      (r) => r.id,
-    );
     const TEST_GROUP_NAME = "Koopalings" + Math.random() * 1000;
 
     const { items } = await createUserGroup(TEST_GROUP_NAME);
@@ -228,15 +150,12 @@ describe("user management tests", () => {
     const queryIds = queries.map((q) => q.queryId);
     const actionTypeToCheck = "addQueriesToGroup";
     await addQueriesToGroup(CREATED_GROUP_ID, queryIds);
-    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
+    const auditEntry = await getAuditEntry(actionTypeToCheck);
     expect(JSON.parse(auditEntry?.groupId)).toStrictEqual(CREATED_GROUP_ID);
     expect(JSON.parse(auditEntry?.queryIds)).toStrictEqual(queryIds);
 
     await removeUsersFromGroup(CREATED_GROUP_ID, queryIds);
-    const removeUsersAction = await getAuditEntry(
-      actionTypeToCheck,
-      oldAuditIds,
-    );
+    const removeUsersAction = await getAuditEntry(actionTypeToCheck);
     expect(JSON.parse(removeUsersAction?.groupId)).toStrictEqual(
       CREATED_GROUP_ID,
     );
