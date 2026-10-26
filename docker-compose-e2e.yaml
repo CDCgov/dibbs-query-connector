@@ -46,6 +46,7 @@ services:
       dockerfile: Dockerfile.aidbox
     image: healthsamurai/aidboxone:stable
     attach: false
+    pull_policy: always
     depends_on:
       - aidbox_db
     ports:
