@@ -234,7 +234,6 @@ export async function checkDBForData() {
       WHERE relname = 'valuesets';
     `;
   const result = await dbService.query(query);
-  console.log(result);
 
   // Return true if the estimated count > 0, otherwise false
   return (

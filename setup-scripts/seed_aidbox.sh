@@ -109,16 +109,6 @@ fi
 
 echo "Access token obtained."
 
-# Post the GoldenSickPatient data to Aidbox
-echo "Loading GoldenSickPatient data into Aidbox..."
-load_or_fail "Loading GoldenSickPatient data" -X POST \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -d @"/data/GoldenSickPatient.json" \
-  ${NETWORK_URL}/fhir
-
-echo "GoldenSickPatient data loaded successfully."
-
 # Client information for the SMART on FHIR test
 echo "Loading client information into Aidbox..."
 load_or_fail "Loading client information" -X PUT \
