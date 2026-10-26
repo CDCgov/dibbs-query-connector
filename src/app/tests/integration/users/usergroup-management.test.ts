@@ -109,7 +109,6 @@ describe("User Group and Query Membership Tests", () => {
       WHERE id IN ($1, $2, $3);
     `;
     await dbClient.query(deleteQueriesQuery, [
-      TEST_QUERY_1_ID,
       TEST_QUERY_2_ID,
       TEST_QUERY_3_ID,
     ]);

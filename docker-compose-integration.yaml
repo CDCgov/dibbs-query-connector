@@ -47,6 +47,7 @@ services:
       context: .
       dockerfile: Dockerfile.aidbox
     image: healthsamurai/aidboxone:stable
+    pull_policy: build
     attach: false
     depends_on:
       - aidbox_db
