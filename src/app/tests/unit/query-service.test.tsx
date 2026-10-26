@@ -17,9 +17,7 @@ jest.mock("../../backend/db/service", () => ({
   DbClient: class {},
 }));
 
-jest.mock("@/auth", () => ({
-  superAdminAccessCheck: jest.fn().mockReturnValue(true),
-}));
+jest.mock("@/app/backend/db/decorators/auth");
 
 // Test case for processResponse
 describe("process response", () => {

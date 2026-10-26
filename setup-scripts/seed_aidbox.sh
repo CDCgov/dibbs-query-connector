@@ -109,16 +109,6 @@ fi
 
 echo "Access token obtained."
 
-# Post the GoldenSickPatient data to Aidbox
-echo "Loading GoldenSickPatient data into Aidbox..."
-load_or_fail "Loading GoldenSickPatient data" -X POST \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -d @"/data/GoldenSickPatient.json" \
-  ${NETWORK_URL}/fhir
-
-echo "GoldenSickPatient data loaded successfully."
-
 # Client information for the SMART on FHIR test
 echo "Loading client information into Aidbox..."
 load_or_fail "Loading client information" -X PUT \
@@ -190,7 +180,8 @@ INSERT INTO fhir_servers (
   auth_type,
   client_id,
   scopes,
-  default_server
+  default_server,
+  headers
 ) VALUES (
   'Aidbox',
   '${BASE_URL}/fhir',
@@ -200,7 +191,8 @@ INSERT INTO fhir_servers (
   'SMART',
   'query-connector',
   'system/*.read',
-  true
+  true,
+  '{"Authorization": "Bearer ${TOKEN}"}'::jsonb
 )
 ON CONFLICT(name)
 DO UPDATE SET
