@@ -33,6 +33,7 @@ services:
   # Aidbox
   aidbox_db:
     image: healthsamurai/aidboxdb:17
+    attach: false
     volumes:
       - aidbox_pg_data:/var/lib/postgresql/data:delegated
     environment:
@@ -42,14 +43,17 @@ services:
       POSTGRES_PASSWORD: gOxAmiyiz4
 
   aidbox:
+    build:
+      context: .
+      dockerfile: Dockerfile.aidbox
     image: healthsamurai/aidboxone:stable
-    pull_policy: always
+    attach: false
     depends_on:
       - aidbox_db
     ports:
       - 8080:8080
     env_file:
-      - .env
+      - .env.integration
     environment:
       AIDBOX_TERMINOLOGY_SERVICE_BASE_URL: https://tx.fhir.org/r4
       AIDBOX_FHIR_PACKAGES: hl7.fhir.r4.core#4.0.1
@@ -70,6 +74,7 @@ services:
       PGPASSWORD: gOxAmiyiz4
       PGPORT: "5432"
       BOX_SEARCH_INCLUDE_CONFORMANT: true
+      BOX_INIT_BUNDLE: "file:///data/GoldenSickPatient.json"
     healthcheck:
       test:
         [
@@ -86,12 +91,9 @@ services:
       context: .
       dockerfile: Dockerfile.aidbox-seeder
     volumes:
-      - ./src/app/tests/assets/GoldenSickPatient.json:/data/GoldenSickPatient.json
       - ./logs:/var/log
-    environment:
-      - AIDBOX_BASE_URL=http://localhost:8080
-      - APP_HOSTNAME=http://query-connector:3000
-    attach: false
+    env_file:
+      - .env.integration
     depends_on:
       db:
         condition: service_healthy

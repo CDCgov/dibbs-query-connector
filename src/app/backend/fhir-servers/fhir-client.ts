@@ -428,7 +428,7 @@ class FHIRClient {
   private async discoverTokenEndpoint(): Promise<string> {
     try {
       const wellKnownUrl = `${this.hostname}/.well-known/smart-configuration`;
-
+      console.log(wellKnownUrl);
       // Prepare the request options
       const requestInit: RequestInit = {
         method: "GET",
@@ -440,6 +440,7 @@ class FHIRClient {
       // type. fetch() has no "agent" option, so there's nothing to add here.
 
       const response = await this.fetch(wellKnownUrl, requestInit);
+      console.log(response);
 
       if (!response.ok) {
         throw new Error(

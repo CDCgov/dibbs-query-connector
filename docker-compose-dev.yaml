@@ -92,6 +92,7 @@ services:
       JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:-}
     env_file:
       - .env
+
   aidbox-seeder:
     build:
       context: .

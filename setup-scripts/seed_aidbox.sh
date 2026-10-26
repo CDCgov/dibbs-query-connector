@@ -180,7 +180,8 @@ INSERT INTO fhir_servers (
   auth_type,
   client_id,
   scopes,
-  default_server
+  default_server,
+  headers
 ) VALUES (
   'Aidbox',
   '${BASE_URL}/fhir',
@@ -190,7 +191,8 @@ INSERT INTO fhir_servers (
   'SMART',
   'query-connector',
   'system/*.read',
-  true
+  true,
+  '{"Authorization": "Bearer ${TOKEN}"}'::jsonb
 )
 ON CONFLICT(name)
 DO UPDATE SET

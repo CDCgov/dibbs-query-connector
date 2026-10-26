@@ -28,7 +28,7 @@ describe("time filtering query", () => {
   });
 
   beforeAll(() => {
-    suppressConsoleLogs();
+    // suppressConsoleLogs();
   });
 
   let subjectQuery: QueryTableResult;
