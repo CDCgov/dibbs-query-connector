@@ -1,5 +1,4 @@
 import { patientRecordsQuery } from "@/app/backend/query-execution/service";
-import { suppressConsoleLogs } from "./fixtures";
 import { PatientRecordsRequest } from "@/app/models/entities/query";
 import { HYPER_UNLUCKY_DEFAULT_ID } from "@/constants";
 import { updateTimeboxSettings } from "@/app/backend/query-timefiltering";
