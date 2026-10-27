@@ -18,6 +18,8 @@ chmod +x ./setup-scripts/setup_tests.sh
 bash ./setup-scripts/setup_tests.sh
 
 echo "AUTH_DISABLED=true" >> .env.test
+echo "NODE_ENV=production" >> .env.test
+
 npx playwright install --with-deps
 
 docker compose down --volumes --remove-orphans

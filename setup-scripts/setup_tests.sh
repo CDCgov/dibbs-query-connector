@@ -15,7 +15,6 @@ set_default_env "DATABASE_URL" "postgresql://postgres:pw@localhost:5432/tefca_db
 set_default_env "AUTH_SECRET" "UbYPIMJwuiUrb+kK7gO6+aSb46iYf1rKgWcOTIve9EplWV8YU45vufLQTB8="
 set_default_env "DEMO_MODE" "true"
 set_default_env "RUN_FETCH_INTERCEPTOR" "true"
-set_default_env "NODE_ENV" "production"
 set_default_env "NEXT_PUBLIC_AUTH_PROVIDER" "keycloak"
 set_default_env "LOCAL_DB_CLIENT_TIMEOUT" "10000"
 set_default_env "ERSD_API_KEY" "blah"
