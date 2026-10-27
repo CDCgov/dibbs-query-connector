@@ -10,7 +10,6 @@ import {
   updateFhirServer,
   deleteFhirServer,
 } from "@/app/backend/fhir-servers/service";
-import { suppressConsoleLogs } from "../fixtures";
 import { resetMocksToDefault } from "../mocks";
 
 const TEST_FHIR_SERVER = {
