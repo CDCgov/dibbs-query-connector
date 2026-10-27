@@ -2,7 +2,6 @@ services:
   # PostgreSQL DB for custom query and value set storage
   db:
     image: "postgres:alpine"
-    attach: false
     ports:
       - "5432:5432"
     environment:
@@ -19,7 +18,6 @@ services:
 
   flyway:
     image: flyway/flyway:11-alpine
-    attach: false
     command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
     volumes:
       - ./flyway/sql:/flyway/sql
@@ -45,7 +43,6 @@ services:
       context: .
       dockerfile: Dockerfile.aidbox
     image: healthsamurai/aidboxone:stable
-    attach: false
     pull_policy: always
     depends_on:
       - aidbox_db
@@ -75,14 +72,10 @@ services:
       BOX_SEARCH_INCLUDE_CONFORMANT: true
       BOX_INIT_BUNDLE: "file:///data/GoldenSickPatient.json"
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          'wget -qO- http://localhost:8080/health | grep -q ''"status":"pass"'' || exit 1',
-        ]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 5s
       timeout: 5s
-      retries: 60
+      retries: 5
       start_period: 30s
 
   aidbox-seeder:

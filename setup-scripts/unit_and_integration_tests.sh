@@ -26,10 +26,6 @@ docker compose -f docker-compose-integration.yaml up -d
 # wait for Aidbox to finish running before...
 docker compose -f docker-compose-integration.yaml logs aidbox-seeder | grep -q "Finished configuring Aidbox and database"
 
-# uncomment these and the corresponding block in ci.yaml to get logs in CI. Make sure also to comment the set -e command at the top of this file too!
-# mkdir test-results
-# docker compose -f docker-compose-integration.yaml logs > test-results/logs-before-tests.txtn
-
 BASE_CMD="npx dotenv run -q -f .env.test -- jest"
 
 # running our integration tests
@@ -42,9 +38,6 @@ fi
 eval $JEST_CMD
 JEST_EXIT_CODE=$?
 
-# uncomment these and the corresponding block in ci.yaml to get logs in CI
-# docker compose -f docker-compose-e2e.yaml logs query-connector >> test-results/logs-after-tests.txt
-# docker compose -f docker-compose-e2e.yaml logs aidbox >> test-results/logs-after-tests.txt
 
 # Teardown containers
 docker compose -f docker-compose-integration.yaml down
