@@ -32,6 +32,11 @@ jobs:
 
   unit-and-integration-tests:
     runs-on: ubuntu-latest
+    env:
+      AIDBOX_LICENSE: ${{ secrets.AIDBOX_LICENSE }}
+      MTLS_CERT_B64: ${{ secrets.MTLS_CERT_B64 }}
+      MTLS_KEY_B64: ${{ secrets.MTLS_KEY_B64 }}
+      IS_CI: "true"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -39,20 +44,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: Create .env
-        env:
-          AIDBOX_LICENSE: ${{ secrets.AIDBOX_LICENSE }}
-          MTLS_CERT_B64: ${{ secrets.MTLS_CERT_B64 }}
-          MTLS_KEY_B64: ${{ secrets.MTLS_KEY_B64 }}
-        run: |
-          {
-            echo "AIDBOX_LICENSE=$AIDBOX_LICENSE"
-            echo "MTLS_CERT=$MTLS_CERT_B64"
-            echo "MTLS_KEY=$MTLS_KEY_B64"
-            echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak"
-            echo "RUN_FETCH_INTERCEPTOR=true"
-            echo "IS_CI=true"
-          } > .env.test
       - name: Install dependencies
         run: |
           npm ci
@@ -69,10 +60,15 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: CDCgov/dibbs-query-connector
-
   end-to-end-tests:
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    env:
+      AIDBOX_LICENSE: ${{ secrets.AIDBOX_LICENSE }}
+      MTLS_CERT_B64: ${{ secrets.MTLS_CERT_B64 }}
+      MTLS_KEY_B64: ${{ secrets.MTLS_KEY_B64 }}
+      RUN_FETCH_INTERCEPTOR: "true"
+      IS_CI: "true"
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -84,21 +80,6 @@ jobs:
         run: npm ci
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
-
-      - name: Create .env
-        env:
-          AIDBOX_LICENSE: ${{ secrets.AIDBOX_LICENSE }}
-          MTLS_CERT_B64: ${{ secrets.MTLS_CERT_B64 }}
-          MTLS_KEY_B64: ${{ secrets.MTLS_KEY_B64 }}
-        run: |
-          {
-            echo "AIDBOX_LICENSE=$AIDBOX_LICENSE"
-            echo "MTLS_CERT=$MTLS_CERT_B64"
-            echo "MTLS_KEY=$MTLS_KEY_B64"
-            echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak"
-            echo "RUN_FETCH_INTERCEPTOR=true"
-            echo "IS_CI=true"
-          } > .env.test
       - name: Build Query Connector and Run Playwright Tests
         id: run_e2e_tests
         run: |

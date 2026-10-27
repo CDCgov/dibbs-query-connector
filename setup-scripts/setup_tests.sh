@@ -1,31 +1,22 @@
 #!/bin/bash
 set -e  # Fail loudly instead of letting setup errors slip through
 
-touch .env.test
-
-set_default_env() {
-  local key="$1"
-  local val="$2"
-  if ! grep -q "^${key}=" .env.test 2>/dev/null; then
-    echo "${key}=${val}" >> .env.test
-  fi
-}
-
-set_default_env "DATABASE_URL" "postgresql://postgres:pw@localhost:5432/tefca_db"
-set_default_env "AUTH_SECRET" "UbYPIMJwuiUrb+kK7gO6+aSb46iYf1rKgWcOTIve9EplWV8YU45vufLQTB8="
-set_default_env "DEMO_MODE" "true"
-set_default_env "RUN_FETCH_INTERCEPTOR" "true"
-set_default_env "NEXT_PUBLIC_AUTH_PROVIDER" "keycloak"
-set_default_env "LOCAL_DB_CLIENT_TIMEOUT" "10000"
-set_default_env "ERSD_API_KEY" "blah"
-set_default_env "UMLS_API_KEY" "bleh"
+# setup needed .env values
+> .env.test
+echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.test
+echo "AUTH_SECRET=UbYPIMJwuiUrb+kK7gO6+aSb46iYf1rKgWcOTIve9EplWV8YU45vufLQTB8=" >> .env.test
+echo "DEMO_MODE=true" >> .env.test
+echo NEXT_PUBLIC_AUTH_PROVIDER=keycloak >> .env.test
+echo LOCAL_DB_CLIENT_TIMEOUT="10000" >> .env.test
+echo ERSD_API_KEY="blah" >> .env.test
+echo UMLS_API_KEY="bleh" >> .env.test
 
 if [ "$IS_CI" = "true" ]; then
-  set_default_env "APP_HOSTNAME" "http://query-connector:3000"
-  set_default_env "AIDBOX_BASE_URL" "http://aidbox:8080"
+  echo APP_HOSTNAME="http://query-connector:3000" >> .env.test
+  echo AIDBOX_BASE_URL="http://aidbox:8080" >> .env.test
 else
-  set_default_env "APP_HOSTNAME" "http://localhost:3000"
-  set_default_env "AIDBOX_BASE_URL" "http://localhost:8080"
+  echo APP_HOSTNAME="http://localhost:3000" >> .env.test
+  echo AIDBOX_BASE_URL="http://localhost:8080" >> .env.test
 fi
 
 if grep -q "^AIDBOX_LICENSE=" .env.test 2>/dev/null && [ -n "$(grep "^AIDBOX_LICENSE=" .env.test | cut -d '=' -f2-)" ]; then
