@@ -21,14 +21,19 @@ else
   echo AIDBOX_BASE_URL="http://localhost:8080" >> .env.test
 fi
 
-value=$(grep -h "^AIDBOX_LICENSE=" .env .env.test 2>/dev/null | head -n 1 | cut -d '=' -f2- || true)
-
-# Check if the value was found
-if [ -n "$value" ]; then
-     echo "AIDBOX_LICENSE=$value" >> .env.test
-  echo "Aidbox license key copied successfully from local env file"
+if grep -q "^AIDBOX_LICENSE=" .env.test 2>/dev/null && [ -n "$(grep "^AIDBOX_LICENSE=" .env.test | cut -d '=' -f2-)" ]; then
+  echo "Aidbox license key already present in .env.test"
 else
-  echo "Aidbox license key not found in local env file"
+  value=$(grep -h "^AIDBOX_LICENSE=" .env 2>/dev/null | head -n 1 | cut -d '=' -f2- || true)
+  value="${value:-$AIDBOX_LICENSE}"
+
+  if [ -n "$value" ]; then
+    echo "AIDBOX_LICENSE=$value" >> .env.test
+    echo "Aidbox license key copied successfully"
+  else
+    echo "Aidbox license key not found in local env file or environment"
+    exit 1
+  fi
 fi
 
 # Node >= 22.18 runs TypeScript directly via type stripping (ts-node 10 is
