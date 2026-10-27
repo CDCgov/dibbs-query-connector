@@ -51,7 +51,8 @@ jobs:
             echo "MTLS_KEY=$MTLS_KEY_B64"
             echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak"
             echo "RUN_FETCH_INTERCEPTOR=true"
-          } > .env.integration
+            echo "IS_CI=true"
+          } > .env.test
       - name: Install dependencies
         run: |
           npm ci
@@ -96,8 +97,9 @@ jobs:
             echo "MTLS_KEY=$MTLS_KEY_B64"
             echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak"
             echo "RUN_FETCH_INTERCEPTOR=true"
-          } > .env.e2e
+            echo "IS_CI=true"
+          } > .env.test
       - name: Build Query Connector and Run Playwright Tests
         id: run_e2e_tests
         run: |
-          bash ./setup-scripts/e2e_tests.sh
+          npm run test:playwright

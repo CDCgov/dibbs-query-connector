@@ -51,7 +51,7 @@ services:
     ports:
       - 8080:8080
     env_file:
-      - .env.integration
+      - .env.test
     environment:
       AIDBOX_TERMINOLOGY_SERVICE_BASE_URL: https://tx.fhir.org/r4
       AIDBOX_FHIR_PACKAGES: hl7.fhir.r4.core#4.0.1
@@ -73,12 +73,9 @@ services:
       PGPORT: "5432"
       BOX_SEARCH_INCLUDE_CONFORMANT: true
       BOX_INIT_BUNDLE: "file:///data/GoldenSickPatient.json"
+      BOX_WEB_PORT: "8080"
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          'wget -qO- http://localhost:8080/health | grep -q ''"status":"pass"'' || exit 1',
-        ]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 5s
       timeout: 5s
       retries: 60
@@ -91,7 +88,7 @@ services:
     volumes:
       - ./logs:/var/log
     env_file:
-      - .env.integration
+      - .env.test
     depends_on:
       db:
         condition: service_healthy
@@ -108,7 +105,7 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - .env.integration
+      - .env.test
     volumes:
       - ./keys:/app/keys
     depends_on:

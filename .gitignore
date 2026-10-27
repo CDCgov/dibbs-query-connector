@@ -77,12 +77,7 @@ build/
 
 ## query-connector playwright tests
 /test-results/
-
-
-.env
-.local.env 
-.env.e2e
-.env.integration
+.env*
 
 tmp_remote_image_*
 
