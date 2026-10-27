@@ -17,6 +17,9 @@ trap dump_logs_on_failure ERR
 chmod +x ./setup-scripts/setup_tests.sh
 bash ./setup-scripts/setup_tests.sh
 
+echo "AUTH_DISABLED=true" >> .env.test
+npx playwright install --with-deps
+
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-e2e.yaml --env-file .env.test up -d --build
 

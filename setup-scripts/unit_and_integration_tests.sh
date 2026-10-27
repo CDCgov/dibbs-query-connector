@@ -19,6 +19,9 @@ trap dump_logs_on_failure ERR
 chmod +x ./setup-scripts/setup_tests.sh
 bash ./setup-scripts/setup_tests.sh
 
+echo TEST_TYPE="integration" >> .env.test
+
+
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-integration.yaml build aidbox
 docker compose -f docker-compose-integration.yaml up -d
