@@ -53,6 +53,16 @@ jobs:
             echo "RUN_FETCH_INTERCEPTOR=true"
             echo "IS_CI=true"
           } > .env.test
+      - name: Verify Secret Presence
+        env:
+          KEY: ${{ secrets.AIDBOX_LICENSE }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo "::error::AIDBOX_LICENSE secret is empty or unset!"
+            exit 1
+          else
+            echo "AIDBOX_LICENSE is present (${#KEY} characters long)"
+          fi
       - name: Install dependencies
         run: |
           npm ci
