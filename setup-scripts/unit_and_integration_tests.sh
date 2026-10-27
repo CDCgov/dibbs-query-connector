@@ -19,26 +19,42 @@ trap dump_logs_on_failure ERR
 # make an env file
 touch .env.integration
 echo DATABASE_URL="postgresql://postgres:pw@localhost:5432/tefca_db" > .env.integration
+echo NODE_ENV=production >> .env.integration
 echo DEMO_MODE="true" >> .env.integration
 echo RUN_FETCH_INTERCEPTOR="true" >> .env.integration
 echo TEST_TYPE="integration" >> .env.integration
 echo NEXT_PUBLIC_AUTH_PROVIDER=keycloak >> .env.integration
-echo APP_HOSTNAME=http://query-connector:3000 >> .env.integration
 echo LOCAL_DB_CLIENT_TIMEOUT="10000" >> .env.integration
 echo ERSD_API_KEY="blah" >> .env.integration
 echo UMLS_API_KEY="bleh" >> .env.integration
-echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env.integration
+echo APP_HOSTNAME="http://query-connector:3000" >> .env.integration
+echo AIDBOX_BASE_URL="http://localhost:8080" >> .env.integration
+
+value=$(grep -h "^AIDBOX_LICENSE=" .env .env.integration 2>/dev/null | head -n 1 | cut -d '=' -f2- || true)
+
+# Check if the value was found
+if [ -n "$value" ]; then
+     echo "AIDBOX_LICENSE=$value" >> .env.integration
+  echo "Aidbox license key copied successfully from local env file"
+else
+  echo "Aidbox license key not found in local env file"
+fi
+
+# Node >= 22.18 runs TypeScript directly via type stripping (ts-node 10 is
+# incompatible with TypeScript 6 and fails to resolve @types/node).
+node ./setup-scripts/gen-keys.ts
+
 
 docker compose down --volumes --remove-orphans
-docker compose -f docker-compose-integration.yaml build aidbox
-docker compose -f docker-compose-integration.yaml up -d
-
-# wait for Aidbox to finish running before...
-docker compose -f docker-compose-integration.yaml logs aidbox-seeder | grep -q "Finished configuring Aidbox and database"
-
-# uncomment these and the corresponding block in ci.yaml to get logs in CI. Make sure also to comment the set -e command at the top of this file too!
-# mkdir test-results
-# docker compose -f docker-compose-integration.yaml logs > test-results/logs-before-tests.txtn
+docker compose -f docker-compose-integration.yaml up -d || {
+  echo "=== Startup failed. Container states: ==="
+  docker compose -f docker-compose-integration.yaml ps -a
+  echo "=== Aidbox Logs ==="
+  docker compose -f docker-compose-integration.yaml logs aidbox
+  echo "=== Aidbox DB Logs ==="
+  docker compose -f docker-compose-integration.yaml logs aidbox_db
+  exit 1
+}
 
 BASE_CMD="npx dotenv run -q -f .env.integration -- jest"
 
@@ -52,9 +68,6 @@ fi
 eval $JEST_CMD
 JEST_EXIT_CODE=$?
 
-# uncomment these and the corresponding block in ci.yaml to get logs in CI
-# docker compose -f docker-compose-e2e.yaml logs query-connector >> test-results/logs-after-tests.txt
-# docker compose -f docker-compose-e2e.yaml logs aidbox >> test-results/logs-after-tests.txt
 
 # Teardown containers
 docker compose -f docker-compose-integration.yaml down

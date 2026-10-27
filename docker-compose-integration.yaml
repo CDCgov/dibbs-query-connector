@@ -22,7 +22,6 @@ services:
     image: flyway/flyway:10.16-alpine
     command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
     platform: linux/amd64
-    attach: false
     volumes:
       - ./flyway/sql:/flyway/sql
       - ./flyway/conf/flyway.conf:/flyway/conf/flyway.conf
@@ -33,7 +32,6 @@ services:
   # Aidbox
   aidbox_db:
     image: healthsamurai/aidboxdb:17
-    attach: false
     volumes:
       - aidbox_pg_data:/var/lib/postgresql/data:delegated
     environment:
@@ -47,7 +45,7 @@ services:
       context: .
       dockerfile: Dockerfile.aidbox
     image: healthsamurai/aidboxone:stable
-    attach: false
+    pull_policy: build
     depends_on:
       - aidbox_db
     ports:
@@ -109,9 +107,8 @@ services:
     tty: true
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgres://postgres:pw@db:5432/tefca_db
+    env_file:
+      - .env.integration
     volumes:
       - ./keys:/app/keys
     depends_on:

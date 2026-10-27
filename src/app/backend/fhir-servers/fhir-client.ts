@@ -439,7 +439,6 @@ class FHIRClient {
       // type. fetch() has no "agent" option, so there's nothing to add here.
 
       const response = await this.fetch(wellKnownUrl, requestInit);
-      console.log(response);
 
       if (!response.ok) {
         throw new Error(

@@ -29,17 +29,6 @@ docker compose -f docker-compose-e2e.yaml --env-file .env.e2e up -d --build
 # docker compose -f docker-compose-e2e.yaml logs query-connector >> test-results/logs-before-tests.txt
 # docker compose -f docker-compose-e2e.yaml logs query-aidbox >> test-results/logs-before-tests.txt
 
-# wait for Aidbox seeder to finish running before running the e2e tests
-echo "Waiting for Aidbox seeder to complete..."
-
-# poll the logs to find the exit message for Aidbox
-while ! docker compose -f docker-compose-e2e.yaml --env-file .env.e2e logs aidbox-seeder 2>/dev/null | grep -q "Finished configuring Aidbox and database."; do
-    echo -n "."
-    sleep 2
-done
-
-echo "Aidbox seeder finished!"
-
 npx dotenv run -q -f ./.env.e2e -- npx playwright test --reporter=list
 E2E_EXIT_CODE=$?
 

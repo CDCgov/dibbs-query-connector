@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "docker compose -f docker-compose-dev.yaml up -d && next dev --turbopack; docker compose -f docker-compose-dev.yaml down --remove-orphans",
     "dev-win": "start docker compose -f docker-compose-dev.yaml up && next dev",
+    "dev-wsl": "HOST_IP=\"$(hostname -I | awk '{print $1}')\" npm run dev",
     "dev:db": "docker compose -f docker-compose-dev.yaml up",
     "dev:next": "npx dotenv run -q -f ./.env -- next dev",
     "setup-local-env": "./setup-env.sh",
@@ -100,7 +101,6 @@
     "supertest": "^7.3.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.23.15",
-    "testcontainers": "^12.2.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.2"
   }

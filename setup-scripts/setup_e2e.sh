@@ -9,7 +9,7 @@ echo "AUTH_SECRET=UbYPIMJwuiUrb+kK7gO6+aSb46iYf1rKgWcOTIve9EplWV8YU45vufLQTB8=" 
 echo "DEMO_MODE=true" >> .env.e2e
 echo "RUN_FETCH_INTERCEPTOR=true" >> .env.e2e
 
-value=$(grep "^AIDBOX_LICENSE=" .env | cut -d '=' -f2 || true)
+value=$(grep -h "^AIDBOX_LICENSE=" .env .env.e2e 2>/dev/null | head -n 1 | cut -d '=' -f2- || true)
 
 # Check if the value was found
 if [ -n "$value" ]; then

@@ -97,11 +97,12 @@ describe("User Group and Query Membership Tests", () => {
   afterAll(async () => {
     const deleteUsergroupToQueriesQuery = `
       DELETE FROM usergroup_to_query 
-      WHERE query_id IN ($1, $2);
+      WHERE query_id IN ($1, $2, $3);
     `;
     await dbClient.query(deleteUsergroupToQueriesQuery, [
-      TEST_QUERY_3_ID,
+      TEST_QUERY_1_ID,
       TEST_QUERY_2_ID,
+      TEST_QUERY_3_ID,
     ]);
 
     const deleteQueriesQuery = `
