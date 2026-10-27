@@ -27,7 +27,7 @@ const TEST_FHIR_SERVER = {
 describe("fhir server", () => {
   let insertionId = "";
   beforeAll(() => {
-    suppressConsoleLogs();
+    // suppressConsoleLogs();
   });
 
   beforeEach(() => {

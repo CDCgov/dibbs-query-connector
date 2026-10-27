@@ -10,22 +10,23 @@ set_default_env() {
     echo "${key}=${val}" >> .env.test
   fi
 }
-set_default_env "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.test
-set_default_env "AUTH_SECRET=UbYPIMJwuiUrb+kK7gO6+aSb46iYf1rKgWcOTIve9EplWV8YU45vufLQTB8=" >> .env.test
-set_default_env "DEMO_MODE=true" >> .env.test
-set_default_env "RUN_FETCH_INTERCEPTOR=true" >> .env.test
-set_default_env NODE_ENV=production >> .env.test
-set_default_env NEXT_PUBLIC_AUTH_PROVIDER=keycloak >> .env.test
-set_default_env LOCAL_DB_CLIENT_TIMEOUT="10000" >> .env.test
-set_default_env ERSD_API_KEY="blah" >> .env.test
-set_default_env UMLS_API_KEY="bleh" >> .env.test
+
+set_default_env "DATABASE_URL" "postgresql://postgres:pw@localhost:5432/tefca_db"
+set_default_env "AUTH_SECRET" "UbYPIMJwuiUrb+kK7gO6+aSb46iYf1rKgWcOTIve9EplWV8YU45vufLQTB8="
+set_default_env "DEMO_MODE" "true"
+set_default_env "RUN_FETCH_INTERCEPTOR" "true"
+set_default_env "NODE_ENV" "production"
+set_default_env "NEXT_PUBLIC_AUTH_PROVIDER" "keycloak"
+set_default_env "LOCAL_DB_CLIENT_TIMEOUT" "10000"
+set_default_env "ERSD_API_KEY" "blah"
+set_default_env "UMLS_API_KEY" "bleh"
 
 if [ "$IS_CI" = "true" ]; then
-  set_default_env APP_HOSTNAME="http://query-connector:3000" >> .env.test
-  set_default_env AIDBOX_BASE_URL="http://aidbox:8080" >> .env.test
+  set_default_env "APP_HOSTNAME" "http://query-connector:3000"
+  set_default_env "AIDBOX_BASE_URL" "http://aidbox:8080"
 else
-  set_default_env APP_HOSTNAME="http://localhost:3000" >> .env.test
-  set_default_env AIDBOX_BASE_URL="http://localhost:8080" >> .env.test
+  set_default_env "APP_HOSTNAME" "http://localhost:3000"
+  set_default_env "AIDBOX_BASE_URL" "http://localhost:8080"
 fi
 
 if grep -q "^AIDBOX_LICENSE=" .env.test 2>/dev/null && [ -n "$(grep "^AIDBOX_LICENSE=" .env.test | cut -d '=' -f2-)" ]; then
