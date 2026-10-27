@@ -52,7 +52,7 @@ services:
     ports:
       - 8080:8080
     env_file:
-      - .env.e2e
+      - .env.test
     environment:
       AIDBOX_TERMINOLOGY_SERVICE_BASE_URL: https://tx.fhir.org/r4
       AIDBOX_FHIR_PACKAGES: hl7.fhir.r4.core#4.0.1
@@ -90,10 +90,9 @@ services:
       context: .
       dockerfile: Dockerfile.aidbox-seeder
     volumes:
-      - ./src/app/tests/assets/GoldenSickPatient.json:/data/GoldenSickPatient.json
       - ./logs:/var/log
     env_file:
-      - .env.e2e
+      - .env.test
     depends_on:
       db:
         condition: service_healthy
@@ -109,12 +108,9 @@ services:
       dockerfile: Dockerfile
     tty: true
     env_file:
-      - .env.e2e
+      - .env.test
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgres://postgres:pw@db:5432/tefca_db
     depends_on:
       db:
         condition: service_healthy

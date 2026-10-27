@@ -16,18 +16,8 @@ dump_logs_on_failure() {
 }
 trap dump_logs_on_failure ERR
 
-# make an env file
-touch .env.integration
-echo DATABASE_URL="postgresql://postgres:pw@localhost:5432/tefca_db" > .env.integration
-echo DEMO_MODE="true" >> .env.integration
-echo RUN_FETCH_INTERCEPTOR="true" >> .env.integration
-echo TEST_TYPE="integration" >> .env.integration
-echo NEXT_PUBLIC_AUTH_PROVIDER=keycloak >> .env.integration
-echo APP_HOSTNAME=http://query-connector:3000 >> .env.integration
-echo LOCAL_DB_CLIENT_TIMEOUT="10000" >> .env.integration
-echo ERSD_API_KEY="blah" >> .env.integration
-echo UMLS_API_KEY="bleh" >> .env.integration
-echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env.integration
+chmod +x ./setup-scripts/setup_tests.sh
+bash ./setup-scripts/setup_tests.sh
 
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose-integration.yaml build aidbox
@@ -40,7 +30,7 @@ docker compose -f docker-compose-integration.yaml logs aidbox-seeder | grep -q "
 # mkdir test-results
 # docker compose -f docker-compose-integration.yaml logs > test-results/logs-before-tests.txtn
 
-BASE_CMD="npx dotenv run -q -f .env.integration -- jest"
+BASE_CMD="npx dotenv run -q -f .env.test -- jest"
 
 # running our integration tests
 if [ "$JUST_INTEGRATION" = "true" ]; then 
