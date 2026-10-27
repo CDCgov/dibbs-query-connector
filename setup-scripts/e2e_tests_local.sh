@@ -1,11 +1,17 @@
 #!/bin/bash
 set -e  # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
 
-chmod +x ./setup-scripts/setup_test.sh
-bash ./setup-scripts/setup_test.sh
+chmod +x ./setup-scripts/setup_tests.sh
+bash ./setup-scripts/setup_tests.sh
 npx playwright install --with-deps
 
-echo "APP_HOSTNAME=http://host.docker.internal:3000" >> .env.test
+echo "APP_HOSTNAME=http://localhost:3000" >> .env.test
+echo AIDBOX_BASE_URL="http://localhost:8080" >> .env.test
+echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.test
+
+echo "AUTH_DISABLED=true" >> .env.test
+echo "NODE_ENV=production" >> .env.test
+echo "RUN_FETCH_INTERCEPTOR=true" >> .env.test
 
 # pull down any exisiting docker volumes to make sure we're starting fresh
 docker compose down --volumes --remove-orphans

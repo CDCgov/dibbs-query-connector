@@ -364,8 +364,6 @@ class FHIRClient {
         body: formData,
       };
 
-      console.log(formData);
-
       // TLS configuration (mTLS certs / disabled cert validation) is handled
       // by this.fetch, which the constructor set up for this server's auth
       // type. fetch() has no "agent" option, so there's nothing to add here.
@@ -449,7 +447,6 @@ class FHIRClient {
       }
 
       const config = (await response.json()) as { token_endpoint?: string };
-      console.log(config);
 
       if (!config.token_endpoint) {
         throw new Error("Token endpoint not found in SMART configuration");

@@ -17,6 +17,10 @@ trap dump_logs_on_failure ERR
 chmod +x ./setup-scripts/setup_tests.sh
 bash ./setup-scripts/setup_tests.sh
 
+echo APP_HOSTNAME="http://query-connector:3000" >> .env.test
+echo AIDBOX_BASE_URL="http://aidbox:8080" >> .env.test
+echo "DATABASE_URL=postgresql://postgres:pw@db:5432/tefca_db" >> .env.test
+
 echo "AUTH_DISABLED=true" >> .env.test
 echo "NODE_ENV=production" >> .env.test
 echo "RUN_FETCH_INTERCEPTOR=true" >> .env.test

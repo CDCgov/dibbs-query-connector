@@ -30,17 +30,6 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
-    },
-
-    /* Test against branded browsers. */
-    {
-      name: "Microsoft Edge",
-      use: { ...devices["Desktop Edge"], channel: "msedge" },
-    },
-
-    {
       name: "Google Chrome",
       use: { ...devices["Desktop Chrome"], channel: "chrome" },
     },

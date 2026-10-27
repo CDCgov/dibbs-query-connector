@@ -3,21 +3,12 @@ set -e  # Fail loudly instead of letting setup errors slip through
 
 # setup needed .env values
 > .env.test
-echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.test
 echo "AUTH_SECRET=UbYPIMJwuiUrb+kK7gO6+aSb46iYf1rKgWcOTIve9EplWV8YU45vufLQTB8=" >> .env.test
 echo "DEMO_MODE=true" >> .env.test
 echo NEXT_PUBLIC_AUTH_PROVIDER=keycloak >> .env.test
 echo LOCAL_DB_CLIENT_TIMEOUT="10000" >> .env.test
 echo ERSD_API_KEY="blah" >> .env.test
 echo UMLS_API_KEY="bleh" >> .env.test
-
-if [ "$IS_CI" = "true" ]; then
-  echo APP_HOSTNAME="http://query-connector:3000" >> .env.test
-  echo AIDBOX_BASE_URL="http://aidbox:8080" >> .env.test
-else
-  echo APP_HOSTNAME="http://localhost:3000" >> .env.test
-  echo AIDBOX_BASE_URL="http://localhost:8080" >> .env.test
-fi
 
 if grep -q "^AIDBOX_LICENSE=" .env.test 2>/dev/null && [ -n "$(grep "^AIDBOX_LICENSE=" .env.test | cut -d '=' -f2-)" ]; then
   echo "Aidbox license key already present in .env.test"
