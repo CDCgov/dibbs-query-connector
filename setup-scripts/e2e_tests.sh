@@ -19,6 +19,7 @@ bash ./setup-scripts/setup_tests.sh
 
 echo "AUTH_DISABLED=true" >> .env.test
 echo "NODE_ENV=production" >> .env.test
+echo "RUN_FETCH_INTERCEPTOR=true" >> .env.test
 
 npx playwright install --with-deps
 

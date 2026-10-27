@@ -11,6 +11,7 @@ import {
   deleteFhirServer,
 } from "@/app/backend/fhir-servers/service";
 import { resetMocksToDefault } from "../mocks";
+import { suppressConsoleLogs } from "../fixtures";
 
 const TEST_FHIR_SERVER = {
   id: "jolly-roger-bay",
