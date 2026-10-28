@@ -35,6 +35,11 @@ services:
 
   aidbox:
     image: healthsamurai/aidboxone:stable
+    build:
+      context: .
+      dockerfile: Dockerfile.aidbox
+      no_cache: true
+    pull_policy: build
     ports:
       - "8080:8080"
     depends_on:
@@ -59,17 +64,12 @@ services:
       PGPASSWORD: gOxAmiyiz4
       PGPORT: "5432"
       BOX_SEARCH_INCLUDE_CONFORMANT: "true"
+      BOX_INIT_BUNDLE: "file:///data/GoldenSickPatient.json"
 
   aidbox-seeder:
     build:
       context: .
       dockerfile: Dockerfile.aidbox-seeder
-    environment:
-      # AIDBOX_BASE_URL here needs to match the value configured in the application
-      # for the JWT signing used in the SMART on FHIR tests to pass.
-      # This is different than the NETWORK_URL used by the seeder to cURL into
-      # Aidbox, so set it separately here.
-      AIDBOX_BASE_URL: http://localhost:8080
     depends_on:
       db:
         condition: service_healthy

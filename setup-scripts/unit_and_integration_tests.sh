@@ -9,7 +9,7 @@ dump_logs_on_failure() {
   local code=$?
   if [ $code -ne 0 ]; then
     echo "=== docker compose logs (failure dump) ==="
-    docker compose -f docker-compose.yml -f docker-compose.test.yml logs --no-color || true
+    docker compose -f docker-compose.yaml -f docker-compose.test.yaml logs --no-color || true
     echo "=== end docker compose logs ==="
   fi
   return $code
@@ -20,10 +20,11 @@ chmod +x ./setup-scripts/setup_tests.sh
 bash ./setup-scripts/setup_tests.sh
 
 echo TEST_TYPE="integration" >> .env.test
+echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.test
+echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env.test
 
 docker compose down --volumes --remove-orphans
-docker compose -f docker-compose.yaml -f docker-compose.test.yaml build aidbox
-docker compose -f docker-compose.yaml -f docker-compose.test.yaml up -d
+docker compose -f docker-compose.yaml -f docker-compose.test.yaml --env-file .env.test up -d
 
 BASE_CMD="npx dotenv run -q -f .env.test -- jest"
 

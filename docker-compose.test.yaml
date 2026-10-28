@@ -13,14 +13,9 @@ services:
     attach: false
 
   aidbox:
-    build:
-      context: .
-      dockerfile: Dockerfile.aidbox
     attach: false
     env_file:
       - .env.test
-    environment:
-      BOX_INIT_BUNDLE: "file:///data/GoldenSickPatient.json"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 5s
@@ -33,6 +28,8 @@ services:
       - ./logs:/var/log
     environment:
       APP_HOSTNAME: http://query-connector:3000
+    env_file:
+      - .env.test
     depends_on:
       aidbox:
         condition: service_healthy
@@ -47,6 +44,8 @@ services:
     environment:
       NODE_ENV: production
       DATABASE_URL: postgres://postgres:pw@db:5432/tefca_db
+    env_file:
+      - .env.test
     volumes:
       - ./keys:/app/keys
     depends_on:

@@ -6,7 +6,7 @@ bash ./setup-scripts/setup_tests.sh
 npx playwright install --with-deps
 
 echo "APP_HOSTNAME=http://localhost:3000" >> .env.test
-echo AIDBOX_BASE_URL="http://localhost:8080" >> .env.test
+echo AIDBOX_BASE_URL="http://aidbox:8080" >> .env.test
 
 echo "AUTH_DISABLED=true" >> .env.test
 echo "NODE_ENV=production" >> .env.test
@@ -17,6 +17,14 @@ docker compose down --volumes --remove-orphans
 
 # use the dev docker compose setup to allow for hot-reloading locally 
 docker compose --env-file .env.test up -d 
+
+# # wait for Aidbox seeder to finish
+# echo -n "Seeding Aidbox"
+# while ! docker compose --env-file .env.test logs aidbox-seeder 2>/dev/null | grep -q "Finished configuring Aidbox and database."; do
+#     echo -n "."
+#     sleep 2
+# done
+# echo -n "Done!"
 
 # Run Next dev without auth to allow the test's to work
 npx dotenv run -q -f ./.env.test -- next dev --turbopack &

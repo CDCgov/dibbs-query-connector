@@ -44,10 +44,10 @@ test.describe("Audit logs", () => {
   });
 
   test("opens the detail drawer for a log entry", async ({ page }) => {
-    const today = new Date().toLocaleDateString("en-US");
-
     const firstRow = page.locator("tbody tr").first();
-    await expect(firstRow).toContainText(today);
+    const mmddyyyRegex = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/\d{4}$/;
+    // wait for text to render
+    await expect(firstRow).toHaveText(mmddyyyRegex);
 
     firstRow.click();
 

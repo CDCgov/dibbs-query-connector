@@ -4,7 +4,8 @@
   "version": "1.2.5",
   "private": true,
   "scripts": {
-    "dev": "docker compose up -d && next dev --turbopack",
+    "aidbox": "docker compose build aidbox --no-cache",
+    "dev": "npm run aidbox && docker compose up -d && next dev --turbopack",
     "dev-win": "start docker compose up && next dev",
     "dev-wsl": "HOST_IP=\"$(hostname -I | awk '{print $1}')\" npm run dev",
     "dev:next": "npx dotenv run -q -f ./.env -- next dev",

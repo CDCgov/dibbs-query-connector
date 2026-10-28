@@ -21,15 +21,12 @@ services:
       - --import-realm
 
   aidbox:
-    pull_policy: always
     env_file:
       - .env
     environment:
       JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:-}
 
   aidbox-seeder:
-    volumes:
-      - ./src/app/tests/assets/GoldenSickPatient.json:/data/GoldenSickPatient.json
     environment:
       APP_HOSTNAME: http://host.docker.internal:3000
 
