@@ -9,7 +9,7 @@ dump_logs_on_failure() {
   local code=$?
   if [ $code -ne 0 ]; then
     echo "=== docker compose logs (failure dump) ==="
-    docker compose -f docker-compose.test.yaml logs --no-color || true
+    docker compose -f docker-compose.yml -f docker-compose.test.yml logs --no-color || true
     echo "=== end docker compose logs ==="
   fi
   return $code
