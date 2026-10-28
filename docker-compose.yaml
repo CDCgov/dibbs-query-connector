@@ -1,54 +1,82 @@
 services:
-  # PostgreSQL DB for custom query and value set storage
   db:
-    image: "postgres:alpine"
+    image: postgres:alpine
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=pw
-      - POSTGRES_DB=tefca_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pw
+      POSTGRES_DB: tefca_db
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 2s
       timeout: 5s
       retries: 20
 
-  # Keycloak for authentication
-  keycloak:
-    build:
-      context: .
-      dockerfile: Dockerfile.keycloak
-    ports:
-      - 8080:8080
-    restart: always
-    command:
-      - start-dev
-      - --import-realm
+  flyway:
+    image: flyway/flyway:11-alpine
+    command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
+    volumes:
+      - ./flyway/sql:/flyway/sql
+      - ./flyway/conf/flyway.conf:/flyway/conf/flyway.conf
+    depends_on:
+      db:
+        condition: service_started
 
-  # Next.js app with Flyway
-  query-connector:
+  aidbox_db:
+    image: healthsamurai/aidboxdb:17
+    volumes:
+      - aidbox_pg_data:/var/lib/postgresql/data:delegated
+    environment:
+      POSTGRES_USER: aidbox
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: aidbox
+      POSTGRES_PASSWORD: gOxAmiyiz4
+
+  aidbox:
+    image: healthsamurai/aidboxone:stable
+    ports:
+      - "8080:8080"
+    depends_on:
+      - aidbox_db
+    environment:
+      AIDBOX_TERMINOLOGY_SERVICE_BASE_URL: https://tx.fhir.org/r4
+      AIDBOX_FHIR_PACKAGES: hl7.fhir.r4.core#4.0.1
+      AIDBOX_FHIR_SCHEMA_VALIDATION: "true"
+      AIDBOX_CREATED_AT_URL: https://aidbox.app/ex/createdAt
+      AIDBOX_CLIENT_SECRET: L6AGe_5V2O
+      AIDBOX_CORRECT_AIDBOX_FORMAT: "true"
+      AIDBOX_ADMIN_PASSWORD: OC1MzJ5QNV
+      AIDBOX_COMPLIANCE: enabled
+      AIDBOX_SECURITY_AUDIT__LOG_ENABLED: "true"
+      BOX_SEARCH_FHIR__COMPARISONS: "true"
+      PGHOST: aidbox_db
+      BOX_COMPATIBILITY_VALIDATION_JSON__SCHEMA_REGEX: "#{:fhir-datetime}"
+      BOX_SEARCH_AUTHORIZE_INLINE_REQUESTS: "true"
+      PGUSER: aidbox
+      AIDBOX_PORT: "8080"
+      PGDATABASE: aidbox
+      PGPASSWORD: gOxAmiyiz4
+      PGPORT: "5432"
+      BOX_SEARCH_INCLUDE_CONFORMANT: "true"
+
+  aidbox-seeder:
     build:
       context: .
-      dockerfile: Dockerfile
-    tty: true
-    ports:
-      - "3000:3000"
+      dockerfile: Dockerfile.aidbox-seeder
     environment:
-      - NODE_ENV=production
-      # - NODE_OPTIONS=--enable-source-maps --trace-uncaught
-      - AUTH_DISABLED=false
-      - AUTH_SECRET="ido5D/uybeAB3AmMQwn+ubw2zYC4t2h7RJlW2R79598="
-      - AUTH_URL=http://localhost:3000
-      - LOCAL_KEYCLOAK=http://localhost:8080/realms/master
-      - NAMED_KEYCLOAK=http://keycloak:8080/realms/master
-      - AUTH_KEYCLOAK_ID=query-connector
-      - AUTH_KEYCLOAK_SECRET=ZG3f7R1J3qIwBaw8QtttJnJMinpERQKs
-      - DATABASE_URL=postgres://postgres:pw@db:5432/tefca_db
-      # Note: you must have a local .env file with the ERSD_API_KEY set to a key
-      # obtained from the ERSD API at https://ersd.aimsplatform.org/#/api-keys
+      # AIDBOX_BASE_URL here needs to match the value configured in the application
+      # for the JWT signing used in the SMART on FHIR tests to pass.
+      # This is different than the NETWORK_URL used by the seeder to cURL into
+      # Aidbox, so set it separately here.
+      AIDBOX_BASE_URL: http://localhost:8080
     depends_on:
       db:
         condition: service_healthy
-      keycloak:
+      aidbox:
         condition: service_started
+      flyway:
+        condition: service_completed_successfully
+
+volumes:
+  aidbox_pg_data:

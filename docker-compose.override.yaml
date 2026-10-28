@@ -1,0 +1,37 @@
+services:
+  db:
+    volumes:
+      - db-data:/var/lib/postgresql
+
+  flyway:
+    environment:
+      JAVA_OPTS_APPEND: "-XX:UseSVE=0"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+    environment:
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:-}
+    restart: always
+    command:
+      - start-dev
+      - --import-realm
+
+  aidbox:
+    pull_policy: always
+    env_file:
+      - .env
+    environment:
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:-}
+
+  aidbox-seeder:
+    volumes:
+      - ./src/app/tests/assets/GoldenSickPatient.json:/data/GoldenSickPatient.json
+    environment:
+      APP_HOSTNAME: http://host.docker.internal:3000
+
+volumes:
+  db-data:

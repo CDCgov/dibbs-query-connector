@@ -3,8 +3,9 @@ set -e  # Fail loudly instead of letting setup errors slip through
 
 # setup needed .env values
 > .env.test
+
+echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.test
 echo "AUTH_SECRET=UbYPIMJwuiUrb+kK7gO6+aSb46iYf1rKgWcOTIve9EplWV8YU45vufLQTB8=" >> .env.test
-echo "DEMO_MODE=true" >> .env.test
 echo NEXT_PUBLIC_AUTH_PROVIDER=keycloak >> .env.test
 echo LOCAL_DB_CLIENT_TIMEOUT="10000" >> .env.test
 echo ERSD_API_KEY="blah" >> .env.test

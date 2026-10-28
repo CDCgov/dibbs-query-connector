@@ -9,7 +9,7 @@ dump_logs_on_failure() {
   local code=$?
   if [ $code -ne 0 ]; then
     echo "=== docker compose logs (failure dump) ==="
-    docker compose -f docker-compose-integration.yaml logs --no-color || true
+    docker compose -f docker-compose.test.yaml logs --no-color || true
     echo "=== end docker compose logs ==="
   fi
   return $code
@@ -20,16 +20,10 @@ chmod +x ./setup-scripts/setup_tests.sh
 bash ./setup-scripts/setup_tests.sh
 
 echo TEST_TYPE="integration" >> .env.test
-echo APP_HOSTNAME="http://localhost:3000" >> .env.test
-echo AIDBOX_BASE_URL="http://localhost:8080" >> .env.test
-echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.test
 
 docker compose down --volumes --remove-orphans
-docker compose -f docker-compose-integration.yaml build aidbox
-docker compose -f docker-compose-integration.yaml up -d
-
-# wait for Aidbox to finish running before...
-docker compose -f docker-compose-integration.yaml logs aidbox-seeder | grep -q "Finished configuring Aidbox and database"
+docker compose -f docker-compose.yaml -f docker-compose.test.yaml build aidbox
+docker compose -f docker-compose.yaml -f docker-compose.test.yaml up -d
 
 BASE_CMD="npx dotenv run -q -f .env.test -- jest"
 
@@ -43,9 +37,8 @@ fi
 eval $JEST_CMD
 JEST_EXIT_CODE=$?
 
-
 # Teardown containers
-docker compose -f docker-compose-integration.yaml down
+docker compose -f docker-compose.yaml -f docker-compose.test.yaml down
 
 # Exit with the Jest exit code
 exit $JEST_EXIT_CODE

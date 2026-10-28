@@ -7,7 +7,6 @@ npx playwright install --with-deps
 
 echo "APP_HOSTNAME=http://localhost:3000" >> .env.test
 echo AIDBOX_BASE_URL="http://localhost:8080" >> .env.test
-echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.test
 
 echo "AUTH_DISABLED=true" >> .env.test
 echo "NODE_ENV=production" >> .env.test
@@ -17,7 +16,7 @@ echo "RUN_FETCH_INTERCEPTOR=true" >> .env.test
 docker compose down --volumes --remove-orphans
 
 # use the dev docker compose setup to allow for hot-reloading locally 
-docker compose -f docker-compose-dev.yaml --env-file .env.test up -d 
+docker compose --env-file .env.test up -d 
 
 # Run Next dev without auth to allow the test's to work
 npx dotenv run -q -f ./.env.test -- next dev --turbopack &

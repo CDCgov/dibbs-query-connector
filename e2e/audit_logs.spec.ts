@@ -44,7 +44,12 @@ test.describe("Audit logs", () => {
   });
 
   test("opens the detail drawer for a log entry", async ({ page }) => {
-    await page.locator("tbody tr").first().click();
+    const today = new Date().toLocaleDateString("en-US");
+
+    const firstRow = page.locator("tbody tr").first();
+    await expect(firstRow).toContainText(today);
+
+    firstRow.click();
 
     const drawer = page.getByTestId("drawer-title");
     await expect(drawer).toBeVisible();

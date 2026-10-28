@@ -1,0 +1,56 @@
+services:
+  db:
+    attach: false
+    volumes:
+      - ./vs_dump.sql:/docker-entrypoint-initdb.d/vs_dump.sql
+
+  flyway:
+    image: flyway/flyway:10.16-alpine
+    platform: linux/amd64
+    attach: false
+
+  aidbox_db:
+    attach: false
+
+  aidbox:
+    build:
+      context: .
+      dockerfile: Dockerfile.aidbox
+    attach: false
+    env_file:
+      - .env.test
+    environment:
+      BOX_INIT_BUNDLE: "file:///data/GoldenSickPatient.json"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  aidbox-seeder:
+    volumes:
+      - ./logs:/var/log
+    environment:
+      APP_HOSTNAME: http://query-connector:3000
+    depends_on:
+      aidbox:
+        condition: service_healthy
+
+  query-connector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://postgres:pw@db:5432/tefca_db
+    volumes:
+      - ./keys:/app/keys
+    depends_on:
+      db:
+        condition: service_healthy
+      aidbox-seeder:
+        condition: service_completed_successfully
