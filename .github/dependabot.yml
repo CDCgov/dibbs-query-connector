@@ -105,7 +105,8 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "12:00"
-    open-pull-requests-limit: 5
+    # The limit applies per directory, so keep it low for long directory lists.
+    open-pull-requests-limit: 2
     cooldown:
       default-days: 5
     commit-message:
@@ -115,3 +116,10 @@ updates:
       terraform-minor-and-patch:
         applies-to: version-updates
         update-types: ["minor", "patch"]
+      terraform-per-dependency:
+        # Everything the group above doesn't take (majors, and constraint-only
+        # updates Dependabot can't classify): one PR per dependency, covering
+        # every directory that uses it.
+        applies-to: version-updates
+        patterns: ["*"]
+        group-by: dependency-name
