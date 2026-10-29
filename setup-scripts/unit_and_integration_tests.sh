@@ -9,36 +9,22 @@ dump_logs_on_failure() {
   local code=$?
   if [ $code -ne 0 ]; then
     echo "=== docker compose logs (failure dump) ==="
-    docker compose -f docker-compose-integration.yaml logs --no-color || true
+    docker compose -f docker-compose.yaml -f docker-compose.test.yaml logs --no-color || true
     echo "=== end docker compose logs ==="
   fi
   return $code
 }
 trap dump_logs_on_failure ERR
 
+chmod +x ./setup-scripts/setup_tests.sh
+bash ./setup-scripts/setup_tests.sh
+
+echo TEST_TYPE="integration" >> .env.test
+
 docker compose down --volumes --remove-orphans
-docker compose -f docker-compose-integration.yaml up -d
+docker compose -f docker-compose.yaml -f docker-compose.test.yaml --env-file .env.test up -d
 
-# wait for Aidbox to finish running before...
-docker compose -f docker-compose-integration.yaml logs aidbox-seeder | grep -q "Finished configuring Aidbox and database"
-
-# uncomment these and the corresponding block in ci.yaml to get logs in CI. Make sure also to comment the set -e command at the top of this file too!
-# mkdir test-results
-# docker compose -f docker-compose-integration.yaml logs > test-results/logs-before-tests.txt
-
-# make an env file
-touch .env.integration
-echo DATABASE_URL="postgresql://postgres:pw@localhost:5432/tefca_db" > .env.integration
-echo DEMO_MODE="true" >> .env.integration
-echo RUN_FETCH_INTERCEPTOR="true" >> .env.integration
-echo TEST_TYPE="integration" >> .env.integration
-echo NEXT_PUBLIC_AUTH_PROVIDER=keycloak >> .env.integration
-echo APP_HOSTNAME=http://query-connector:3000 >> .env.integration
-echo LOCAL_DB_CLIENT_TIMEOUT="10000" >> .env.integration
-echo ERSD_API_KEY="blah" >> .env.integration
-echo UMLS_API_KEY="bleh" >> .env.integration
-
-BASE_CMD="npx dotenv run -q -f .env.integration -- jest"
+BASE_CMD="npx dotenv run -q -f .env.test -- jest"
 
 # running our integration tests
 if [ "$JUST_INTEGRATION" = "true" ]; then 
@@ -50,12 +36,8 @@ fi
 eval $JEST_CMD
 JEST_EXIT_CODE=$?
 
-# uncomment these and the corresponding block in ci.yaml to get logs in CI
-# docker compose -f docker-compose-e2e.yaml logs query-connector >> test-results/logs-after-tests.txt
-# docker compose -f docker-compose-e2e.yaml logs aidbox >> test-results/logs-after-tests.txt
-
 # Teardown containers
-docker compose -f docker-compose-integration.yaml down
+docker compose -f docker-compose.yaml -f docker-compose.test.yaml down
 
 # Exit with the Jest exit code
 exit $JEST_EXIT_CODE

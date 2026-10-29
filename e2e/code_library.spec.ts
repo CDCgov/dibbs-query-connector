@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { TEST_URL } from "../playwright-setup";
 import { runAxeAccessibilityChecks } from "./utils";
+import { TEST_URL } from "./constants";
 
 // The Code library page opens in "manage" mode when navigated to directly
 // (no query context), which renders the "Manage codes" heading and the
