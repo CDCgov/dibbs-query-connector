@@ -607,6 +607,7 @@ class FHIRClient {
       }
 
       const client = new FHIRClient(testConfig);
+      console.log(client);
       await client.ensureValidToken();
 
       const response = await client.fetch(client.hostname + "/metadata", {
