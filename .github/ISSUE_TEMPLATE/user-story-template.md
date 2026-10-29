@@ -1,26 +1,38 @@
 ---
-name: Streamline User Story Template
-about: Create a new frontend user story for the Streamline eCR team
-title: ''
-labels: needs design review, Streamline eCR
-assignees: ''
-
+name: 👤💭 User Story Template
+about: Create a new user story
+title: "[USER STORY] <title>"
+labels: dibbs-query-connector
+assignees: ""
 ---
 
-## User Story
+## 👤💭 User Story
 
+<!--
 As a [user/persona], I want to [do a thing], so that I can [achieve a goal/outcome]
+-->
 
+## 🏗️ Acceptance Criteria
 
-## Acceptance Criteria
+<!--
+List out all expected functionality/requirements
 
-_list out all expected functionality/requirements_
+- [ ] Page numbers display correctly for all search result sets
+- [ ] "Next" and "Previous" buttons function properly
+- [ ] Current page is visually highlighted in the pagination controls
+- [ ] User remains on current page when applying search filters
+- [ ] Page size selector (10/25/50 results) works correctly
+- [ ] URL parameters update to reflect current page and filters
+- [ ] Pagination controls are properly aligned on mobile devices
+- [ ] Screen readers can interpret pagination controls correctly
+-->
 
-- 
+- [ ] ..
 
-## Scenarios
+## 🎬 Scenarios
 
-_Write out scenarios that will help to ensure the functionality works as expected_
+<!--
+Write out scenarios that will help to ensure the functionality works as expected
 
 For example, this could look like:
 - I click on the Score filter and a dropdown appears showing a slider.
@@ -29,20 +41,29 @@ For example, this could look like:
 - The text input below updates to display “6” and submit button is now active.
 - I click submit and the dropdown closes.
 - My search results are now updated.
+-->
 
+- ...
 
-## Design Notes
+## 🎨 Design Notes
 
-_Owned by design team - Attach link to design in dev mode and/or prototype, as well as any notes on visual details, interaction expectations, accessibility considerations, copy requirements_
+<!--
+Owned by design team - Attach link to design in dev mode and/or prototype, as well as any notes on visual details, interaction expectations, accessibility considerations, copy requirements
 
 [Link to Figma design in Dev mode]()
 [Link to Figma prototype]()
+-->
 
-- 
+- ...
 
-_Screenshots below should not be used for working on this ticket - always refer to Figma design for most up-to-date designs:_
+<!--
+Screenshots below should not be used for working on this ticket - always refer to Figma design for most up-to-date designs:
+-->
 
-## Additional context
+## 📜 Additional context
 
-[OPTIONAL, delete if not needed] 
-_Include any additional context or information here that doesn't fit into other parts of the template_
+<!--
+Optional, delete if not needed
+
+Include any additional context or information here that doesn't fit into other parts of the template
+-->

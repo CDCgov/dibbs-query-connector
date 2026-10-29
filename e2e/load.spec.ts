@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { TEST_URL } from "../playwright-setup";
+import { TEST_URL } from "./constants";
 import { showSiteAlert } from "./constants";
 import { checkForSiteAlert } from "./utils";
 import { PAGE_TITLES } from "../src/app/(pages)/query/components/stepIndicator/StepIndicator";

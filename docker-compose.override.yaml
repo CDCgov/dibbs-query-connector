@@ -1,0 +1,61 @@
+services:
+  db:
+    volumes:
+      - db-data:/var/lib/postgresql
+
+  flyway:
+    environment:
+      JAVA_OPTS_APPEND: "-XX:UseSVE=0"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+    env_file:
+      - ${ENV_FILE:-.env}
+    environment:
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:-}
+    restart: always
+    command:
+      - start-dev
+      - --import-realm
+
+  aidbox:
+    env_file:
+      - ${ENV_FILE:-.env}
+    environment:
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:-}
+      AIDBOX_BASE_URL: http://aidbox:8080
+
+  aidbox-seeder:
+    env_file:
+      - ${ENV_FILE:-.env}
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgres://postgres:pw@db:5432/tefca_db
+    env_file:
+      - ${ENV_FILE:-.env}
+    volumes:
+      - ./keys:/app/keys
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      db:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+      aidbox-seeder:
+        condition: service_completed_successfully
+
+volumes:
+  db-data:

@@ -7,48 +7,32 @@ dump_logs_on_failure() {
   local code=$?
   if [ $code -ne 0 ]; then
     echo "=== docker compose logs (failure dump) ==="
-    docker compose -f docker-compose-e2e.yaml logs --no-color || true
+    docker compose -f docker-compose.yaml -f docker-compose.test.yaml logs --no-color || true
     echo "=== end docker compose logs ==="
   fi
   return $code
 }
 trap dump_logs_on_failure ERR
 
-chmod +x ./setup-scripts/setup_e2e.sh
-bash ./setup-scripts/setup_e2e.sh
+chmod +x ./setup-scripts/setup_tests.sh
+bash ./setup-scripts/setup_tests.sh
 
-echo "AIDBOX_BASE_URL=http://aidbox:8080" >> .env.e2e
-echo "APP_HOSTNAME=http://query-connector:3000" >> .env.e2e
-echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak" >> .env.e2e
+echo "AUTH_DISABLED=true" >> .env.test
+echo "RUN_FETCH_INTERCEPTOR=true" >> .env.test
+echo "DEMO_MODE=true" >> .env.test
+echo "NEXT_PUBLIC_AUTH_PROVIDER=keycloak"  >> .env.test
+echo "AIDBOX_BASE_URL=http://aidbox:8080" >> .env.test
+
+npx playwright install --with-deps
 
 docker compose down --volumes --remove-orphans
-docker compose -f docker-compose-e2e.yaml --env-file .env.e2e up -d --build
+docker compose -f docker-compose.yaml -f docker-compose.test.yaml --env-file .env.test up -d --build
+npx dotenv run -q -f ./.env.test -- npx playwright test --reporter=list
 
-# uncomment these and the corresponding block in ci.yaml to get logs in CI. Make sure also to comment the set -e command at the top of this file too!
-# mkdir test-results
-# docker compose -f docker-compose-e2e.yaml logs query-connector >> test-results/logs-before-tests.txt
-# docker compose -f docker-compose-e2e.yaml logs query-aidbox >> test-results/logs-before-tests.txt
-
-# wait for Aidbox seeder to finish running before running the e2e tests
-echo "Waiting for Aidbox seeder to complete..."
-
-# poll the logs to find the exit message for Aidbox
-while ! docker compose -f docker-compose-e2e.yaml --env-file .env.e2e logs aidbox-seeder 2>/dev/null | grep -q "Finished configuring Aidbox and database."; do
-    echo -n "."
-    sleep 2
-done
-
-echo "Aidbox seeder finished!"
-
-npx dotenv run -q -f ./.env.e2e -- npx playwright test --reporter=list
 E2E_EXIT_CODE=$?
 
-# uncomment these and the corresponding block in the ci.yaml to get the CI logs
-# docker compose -f docker-compose-e2e.yaml logs query-connector >> test-results/logs-after-tests.txt
-# docker compose -f docker-compose-e2e.yaml logs aidbox >> test-results/logs-after-tests.txt
-
 # Teardown containers
-docker compose -f docker-compose-e2e.yaml down
+docker compose -f docker-compose.yaml -f docker-compose.test.yaml down
 
 exit $E2E_EXIT_CODE
 

@@ -439,7 +439,6 @@ class FHIRClient {
       // type. fetch() has no "agent" option, so there's nothing to add here.
 
       const response = await this.fetch(wellKnownUrl, requestInit);
-
       if (!response.ok) {
         throw new Error(
           `Failed to fetch SMART configuration: ${response.status}`,
@@ -447,6 +446,7 @@ class FHIRClient {
       }
 
       const config = (await response.json()) as { token_endpoint?: string };
+
       if (!config.token_endpoint) {
         throw new Error("Token endpoint not found in SMART configuration");
       }
@@ -606,6 +606,7 @@ class FHIRClient {
       }
 
       const client = new FHIRClient(testConfig);
+      console.log(client);
       await client.ensureValidToken();
 
       const response = await client.fetch(client.hostname + "/metadata", {
