@@ -79,4 +79,7 @@ jobs:
       - name: Build Query Connector and Run Playwright Tests
         id: run_e2e_tests
         run: |
+          sudo mkdir keys
+          sudo chmod -R 755 keys
+          sudo chown -R $USER:$USER keys
           npm run test:playwright
