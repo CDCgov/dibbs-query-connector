@@ -13,7 +13,7 @@ import {
   adminRequired,
   authenticationRequired,
   superAdminRequired,
-} from "./db/decorators";
+} from "./db/decorators/auth";
 import { auditable } from "./audit-logs/decorator";
 import {
   addUserIfNotExists as provisionUser,

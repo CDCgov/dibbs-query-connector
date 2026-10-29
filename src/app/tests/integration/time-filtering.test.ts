@@ -1,6 +1,6 @@
 import { patientRecordsQuery } from "@/app/backend/query-execution/service";
 import { PatientRecordsRequest } from "@/app/models/entities/query";
-import { HYPER_UNLUCKY_DEFAULT_ID } from "@/constants";
+import { HYPER_UNLUCKY_DEFAULT_ID } from "@/app/constants";
 import { updateTimeboxSettings } from "@/app/backend/query-timefiltering";
 import { QueryTableResult } from "@/app/(pages)/queryBuilding/utils";
 import { deleteQueryByIdHelp } from "@/app/backend/query-building/lib";

@@ -5,8 +5,7 @@ import dbService from "../db/service";
 import {
   authenticationRequired,
   superAdminRequired,
-  transaction,
-} from "../db/decorators";
+} from "../db/decorators/auth";
 import {
   clearFhirServerConfigCache,
   getFhirServerConfigs as getAllFhirServerConfigs,
@@ -18,6 +17,7 @@ import {
   EndpointType,
   QueryStrategy,
 } from "@/app/(pages)/fhirServers/page";
+import { transaction } from "../db/decorators/util";
 
 // Define an interface for authentication data
 export interface AuthData {

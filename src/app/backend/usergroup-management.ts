@@ -5,7 +5,7 @@ import { getSingleUserWithGroupMemberships } from "./user-management";
 import { QCResponse } from "../models/responses/collections";
 import { CustomUserQuery } from "../models/entities/query";
 import dbService from "./db/service";
-import { adminRequired } from "./db/decorators";
+import { adminRequired } from "./db/decorators/auth";
 import { auditable } from "./audit-logs/decorator";
 import { getQueryById } from "./query-building/service";
 

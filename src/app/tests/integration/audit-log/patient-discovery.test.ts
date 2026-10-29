@@ -3,7 +3,7 @@ jest.mock("@/app/backend/db/decorators/auth");
 jest.mock("@/app/backend/db/decorators/util");
 (auth as jest.Mock).mockResolvedValue(TEST_USER);
 
-import { hyperUnluckyPatient, USE_CASE_DETAILS } from "@/constants";
+import { hyperUnluckyPatient, USE_CASE_DETAILS } from "@/app/constants";
 import {
   patientDiscoveryQuery,
   patientRecordsQuery,

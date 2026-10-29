@@ -31,7 +31,7 @@ import {
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { DbClient } from "../db/service";
 import { auditable } from "../audit-logs/decorator";
-import { adminRequired } from "../db/decorators";
+import { adminRequired } from "../db/decorators/auth";
 import { translateVSACToInternalValueSet } from "./utils";
 
 // Number of retry attempts for a single VSAC condition lookup that fails with a

@@ -3,7 +3,7 @@ import {
   authenticatedAccessCheck,
   superAdminAccessCheck,
 } from "@/app/utils/auth";
-import { UNAUTHORIZED_LITERAL } from "@/constants";
+import { UNAUTHORIZED_LITERAL } from "@/app/constants";
 
 /**
  * Annotation to protect a super admin method

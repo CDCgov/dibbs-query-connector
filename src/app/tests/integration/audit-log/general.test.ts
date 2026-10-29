@@ -18,7 +18,7 @@ import {
 } from "@/app/backend/audit-logs/decorator";
 import { patientDiscoveryQuery } from "@/app/backend/query-execution/service";
 import { PatientDiscoveryRequest } from "@/app/models/entities/query";
-import { hyperUnluckyPatient } from "@/constants";
+import { hyperUnluckyPatient } from "@/app/constants";
 import * as DecoratorUtils from "@/app/backend/audit-logs/lib";
 import { suppressConsoleLogs } from "../fixtures";
 import { auth } from "@/auth";
