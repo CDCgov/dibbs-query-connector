@@ -490,6 +490,7 @@ exports[`Code library interaction renders action buttons for custom value sets o
   </div>
   <div
     aria-describedby="delete-vs-modal-modal-description"
+    aria-hidden="true"
     aria-labelledby="delete-vs-modal-modal-heading"
     class="usa-modal-wrapper is-hidden"
     data-force-action="false"
@@ -878,6 +879,7 @@ exports[`Code library loading view renders a skeleton loading state when loading
   </div>
   <div
     aria-describedby="delete-vs-modal-modal-description"
+    aria-hidden="true"
     aria-labelledby="delete-vs-modal-modal-heading"
     class="usa-modal-wrapper is-hidden"
     data-force-action="false"
@@ -1389,6 +1391,7 @@ exports[`Code library rendered view renders concept codes for the value set when
   </div>
   <div
     aria-describedby="delete-vs-modal-modal-description"
+    aria-hidden="true"
     aria-labelledby="delete-vs-modal-modal-heading"
     class="usa-modal-wrapper is-hidden"
     data-force-action="false"
@@ -1900,6 +1903,7 @@ exports[`Code library rendered view renders the correct content 1`] = `
   </div>
   <div
     aria-describedby="delete-vs-modal-modal-description"
+    aria-hidden="true"
     aria-labelledby="delete-vs-modal-modal-heading"
     class="usa-modal-wrapper is-hidden"
     data-force-action="false"

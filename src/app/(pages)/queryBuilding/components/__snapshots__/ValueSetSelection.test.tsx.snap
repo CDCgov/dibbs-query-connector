@@ -254,6 +254,7 @@ exports[`tests the value set selection page highlights the active tab to the sid
   </div>
   <div
     aria-describedby="warning-confirmation-modal-modal-description"
+    aria-hidden="true"
     aria-labelledby="warning-confirmation-modal-modal-heading"
     class="usa-modal-wrapper is-hidden"
     data-force-action="false"
@@ -638,6 +639,7 @@ exports[`tests the value set selection page highlights the active tab to the sid
   </div>
   <div
     aria-describedby="warning-confirmation-modal-modal-description"
+    aria-hidden="true"
     aria-labelledby="warning-confirmation-modal-modal-heading"
     class="usa-modal-wrapper is-hidden"
     data-force-action="false"
@@ -1178,6 +1180,7 @@ exports[`tests the value set selection page highlights the active tab to the sid
   </div>
   <div
     aria-describedby="warning-confirmation-modal-modal-description"
+    aria-hidden="true"
     aria-labelledby="warning-confirmation-modal-modal-heading"
     class="usa-modal-wrapper is-hidden"
     data-force-action="false"
