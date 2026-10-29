@@ -68,7 +68,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
       start_period: 30s
 
   aidbox-seeder:

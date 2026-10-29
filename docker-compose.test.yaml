@@ -13,7 +13,6 @@ services:
     attach: false
 
   aidbox:
-    attach: false
     env_file:
       - .env.test
 
