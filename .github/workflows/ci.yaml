@@ -36,7 +36,6 @@ jobs:
       AIDBOX_LICENSE: ${{ secrets.AIDBOX_LICENSE }}
       MTLS_CERT_B64: ${{ secrets.MTLS_CERT_B64 }}
       MTLS_KEY_B64: ${{ secrets.MTLS_KEY_B64 }}
-      IS_CI: "true"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -50,9 +49,6 @@ jobs:
       - name: Run tests
         id: run_unit_and_integration_tests
         run: |
-          sudo mkdir keys
-          sudo chmod -R 755 keys
-          sudo chown -R $USER:$USER keys
           npm run test:ci
 
       - name: Upload coverage reports to Codecov
@@ -60,6 +56,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: CDCgov/dibbs-query-connector
+
   end-to-end-tests:
     timeout-minutes: 15
     runs-on: ubuntu-latest
@@ -68,7 +65,6 @@ jobs:
       MTLS_CERT_B64: ${{ secrets.MTLS_CERT_B64 }}
       MTLS_KEY_B64: ${{ secrets.MTLS_KEY_B64 }}
       RUN_FETCH_INTERCEPTOR: "true"
-      IS_CI: "true"
     steps:
       - name: Checkout code
         uses: actions/checkout@v7

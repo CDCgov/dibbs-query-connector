@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e  # Exit immediately if a command exits with a non-zero status. Comment this if debugging in CI
 
+cleanup() {
+  echo "Tearing down Docker environment..."
+  docker compose down
+}
+
+# run cleanup after the script exits when the Playwright UI is closed
+trap cleanup EXIT
+
 chmod +x ./setup-scripts/setup_tests.sh
 bash ./setup-scripts/setup_tests.sh
 npx playwright install --with-deps
