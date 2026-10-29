@@ -22,4 +22,3 @@ echo "Next.js server is up!"
 
 npx dotenv run -q -f ./.env.test -- npx playwright test --ui
 
-docker compose down --volumes --remove-orphans
