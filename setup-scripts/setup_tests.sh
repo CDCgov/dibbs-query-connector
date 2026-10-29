@@ -12,6 +12,8 @@ echo UMLS_API_KEY="bleh" >> .env.test
 echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env.test
 echo "APP_HOSTNAME=http://app:3000" >> .env.test
 echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.test
+echo "MTLS_CERT=$MTLS_CERT" >> .env.test
+echo "MTLS_KEY=$MTLS_KEY" >> .env.test
 
 if grep -q "^AIDBOX_LICENSE=" .env.test 2>/dev/null && [ -n "$(grep "^AIDBOX_LICENSE=" .env.test | cut -d '=' -f2-)" ]; then
   echo "Aidbox license key already present in .env.test"
