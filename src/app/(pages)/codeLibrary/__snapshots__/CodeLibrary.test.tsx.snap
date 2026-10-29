@@ -154,18 +154,14 @@ exports[`Code library interaction renders action buttons for custom value sets o
                             <span
                               class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Cancer (Leukemia) Lab Result
                               </span>
                             </span>
                             <span
                               class="valueSetTable__tableBody_row_valueSetDetails"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Cancer (Leukemia)  •   Lab  •  ECC
                               </span>
                             </span>
@@ -200,18 +196,14 @@ exports[`Code library interaction renders action buttons for custom value sets o
                             <span
                               class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Gonorrhea Medication
                               </span>
                             </span>
                             <span
                               class="valueSetTable__tableBody_row_valueSetDetails"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Gonorrhea  •   Medication  •  RXNORM
                               </span>
                             </span>
@@ -246,27 +238,21 @@ exports[`Code library interaction renders action buttons for custom value sets o
                             <span
                               class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Fruits
                               </span>
                             </span>
                             <span
                               class="valueSetTable__tableBody_row_valueSetDetails"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Custom Code Condition  •   Medication  •  SNOMED
                               </span>
                             </span>
                             <span
                               class="valueSetTable__tableBody_row_customValueSet"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Created by QC Admin
                               </span>
                             </span>
@@ -350,18 +336,14 @@ exports[`Code library interaction renders action buttons for custom value sets o
                         class="valueSetCode"
                       >
                         <span>
-                          <span
-                            class=""
-                          >
+                          <span>
                             1A
                           </span>
                         </span>
                       </td>
                       <td>
                         <span>
-                          <span
-                            class=""
-                          >
+                          <span>
                             Apple
                           </span>
                         </span>
@@ -375,18 +357,14 @@ exports[`Code library interaction renders action buttons for custom value sets o
                         class="valueSetCode"
                       >
                         <span>
-                          <span
-                            class=""
-                          >
+                          <span>
                             1B
                           </span>
                         </span>
                       </td>
                       <td>
                         <span>
-                          <span
-                            class=""
-                          >
+                          <span>
                             Banana
                           </span>
                         </span>
@@ -400,18 +378,14 @@ exports[`Code library interaction renders action buttons for custom value sets o
                         class="valueSetCode"
                       >
                         <span>
-                          <span
-                            class=""
-                          >
+                          <span>
                             1C
                           </span>
                         </span>
                       </td>
                       <td>
                         <span>
-                          <span
-                            class=""
-                          >
+                          <span>
                             Coconut
                           </span>
                         </span>
@@ -1133,18 +1107,14 @@ exports[`Code library rendered view renders concept codes for the value set when
                             <span
                               class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Cancer (Leukemia) Lab Result
                               </span>
                             </span>
                             <span
                               class="valueSetTable__tableBody_row_valueSetDetails"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Cancer (Leukemia)  •   Lab  •  ECC
                               </span>
                             </span>
@@ -1179,18 +1149,14 @@ exports[`Code library rendered view renders concept codes for the value set when
                             <span
                               class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Gonorrhea Medication
                               </span>
                             </span>
                             <span
                               class="valueSetTable__tableBody_row_valueSetDetails"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Gonorrhea  •   Medication  •  RXNORM
                               </span>
                             </span>
@@ -1225,27 +1191,21 @@ exports[`Code library rendered view renders concept codes for the value set when
                             <span
                               class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Fruits
                               </span>
                             </span>
                             <span
                               class="valueSetTable__tableBody_row_valueSetDetails"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Custom Code Condition  •   Medication  •  SNOMED
                               </span>
                             </span>
                             <span
                               class="valueSetTable__tableBody_row_customValueSet"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Created by QC Admin
                               </span>
                             </span>
@@ -1645,18 +1605,14 @@ exports[`Code library rendered view renders the correct content 1`] = `
                             <span
                               class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Cancer (Leukemia) Lab Result
                               </span>
                             </span>
                             <span
                               class="valueSetTable__tableBody_row_valueSetDetails"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Cancer (Leukemia)  •   Lab  •  ECC
                               </span>
                             </span>
@@ -1691,18 +1647,14 @@ exports[`Code library rendered view renders the correct content 1`] = `
                             <span
                               class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Gonorrhea Medication
                               </span>
                             </span>
                             <span
                               class="valueSetTable__tableBody_row_valueSetDetails"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Gonorrhea  •   Medication  •  RXNORM
                               </span>
                             </span>
@@ -1737,27 +1689,21 @@ exports[`Code library rendered view renders the correct content 1`] = `
                             <span
                               class="valueSetTable__tableBody_row_valueSetName"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Fruits
                               </span>
                             </span>
                             <span
                               class="valueSetTable__tableBody_row_valueSetDetails"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Custom Code Condition  •   Medication  •  SNOMED
                               </span>
                             </span>
                             <span
                               class="valueSetTable__tableBody_row_customValueSet"
                             >
-                              <span
-                                class=""
-                              >
+                              <span>
                                 Created by QC Admin
                               </span>
                             </span>
