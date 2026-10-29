@@ -53,7 +53,7 @@ services:
 
   # Aidbox
   aidbox_db:
-    image: healthsamurai/aidboxdb:17
+    image: healthsamurai/aidboxdb:18
     volumes:
       - aidbox_pg_data:/var/lib/postgresql/data:delegated
     environment:
