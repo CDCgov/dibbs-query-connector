@@ -20,7 +20,7 @@ echo "RUN_FETCH_INTERCEPTOR=true" >> .env.test
 docker compose down --volumes --remove-orphans
 
 # use the dev docker compose setup to allow for hot-reloading locally 
-ENV_FILE=.env.test docker compose up -d
+ENV_FILE=.env.test npm run dev
 
 echo "Waiting Next server to be healthy..."
 while ! nc -z localhost 3000; do

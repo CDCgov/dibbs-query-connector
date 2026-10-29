@@ -34,8 +34,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AIDBOX_LICENSE: ${{ secrets.AIDBOX_LICENSE }}
-      MTLS_CERT_B64: ${{ secrets.MTLS_CERT_B64 }}
-      MTLS_KEY_B64: ${{ secrets.MTLS_KEY_B64 }}
+      MTLS_CERT: ${{ secrets.MTLS_CERT_B64 }}
+      MTLS_KEY: ${{ secrets.MTLS_KEY_B64 }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -62,8 +62,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AIDBOX_LICENSE: ${{ secrets.AIDBOX_LICENSE }}
-      MTLS_CERT_B64: ${{ secrets.MTLS_CERT_B64 }}
-      MTLS_KEY_B64: ${{ secrets.MTLS_KEY_B64 }}
+      MTLS_CERT: ${{ secrets.MTLS_CERT_B64 }}
+      MTLS_KEY: ${{ secrets.MTLS_KEY_B64 }}
       RUN_FETCH_INTERCEPTOR: "true"
     steps:
       - name: Checkout code
