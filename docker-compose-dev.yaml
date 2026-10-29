@@ -24,7 +24,7 @@ services:
 
   # Flyway migrations and DB version control
   flyway:
-    image: flyway/flyway:11-alpine
+    image: flyway/flyway:13-alpine
     environment:
       - JAVA_OPTS_APPEND="-XX:UseSVE=0"
     command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
@@ -39,7 +39,7 @@ services:
   # Note: you must have a local .env file with a parameter AUTH_DISABLED.
   # You may set it to true or false depending on what you'd like to test.
   keycloak:
-    image: quay.io/keycloak/keycloak:26.6
+    image: quay.io/keycloak/keycloak:26.8
     ports:
       - 8081:8080
     volumes:
@@ -53,7 +53,7 @@ services:
 
   # Aidbox
   aidbox_db:
-    image: healthsamurai/aidboxdb:17
+    image: healthsamurai/aidboxdb:18
     volumes:
       - aidbox_pg_data:/var/lib/postgresql/data:delegated
     environment:

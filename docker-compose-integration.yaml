@@ -19,7 +19,7 @@ services:
 
   # Flyway migrations and DB version control
   flyway:
-    image: flyway/flyway:10.16-alpine
+    image: flyway/flyway:13.11-alpine
     command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
     platform: linux/amd64
     volumes:
@@ -31,7 +31,7 @@ services:
 
   # Aidbox
   aidbox_db:
-    image: healthsamurai/aidboxdb:17
+    image: healthsamurai/aidboxdb:18
     volumes:
       - aidbox_pg_data:/var/lib/postgresql/data:delegated
     environment:
