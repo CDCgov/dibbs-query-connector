@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { getFhirServerSummaries } from "@/app/backend/fhir-servers/service";
 import { getConditionsData } from "@/app/backend/query-building/service";
 import { patientDiscoveryQuery } from "@/app/backend/query-execution/actions";
-import { hyperUnluckyPatient } from "@/app/constants";
+import { hyperUnluckyPatient } from "@/constants";
 
 jest.mock("next/navigation");
 
@@ -71,7 +71,7 @@ describe("SearchForm", () => {
   });
 
   it("renders fhir server form options on button click", async () => {
-    const { user } = renderWithUser(
+    renderWithUser(
       <RootProviderMock currentPage={"/query"}>
         <SearchForm
           setMode={jest.fn()}
@@ -229,7 +229,7 @@ describe("SearchForm", () => {
     const formattedParams = new URLSearchParams(queryParams);
     (useSearchParams as jest.Mock).mockReturnValue(formattedParams);
 
-    const { user } = renderWithUser(
+    renderWithUser(
       <RootProviderMock currentPage={`/query?${queryParams}`}>
         <SearchForm
           setMode={jest.fn()}

@@ -3,7 +3,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Button, Icon } from "@trussworks/react-uswds";
 import styles from "./header.module.scss";
-import { metadata } from "@/app/constants";
+import { metadata } from "@/constants";
 import classNames from "classnames";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";

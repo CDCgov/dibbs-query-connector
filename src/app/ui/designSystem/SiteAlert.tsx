@@ -1,4 +1,4 @@
-import { Mode, PageType } from "@/app/constants";
+import { Mode, PageType } from "@/constants";
 import { Alert, AlertText } from "@trussworks/react-uswds";
 
 export const CONTACT_US_DISCLAIMER_TEXT =

@@ -1,6 +1,5 @@
 "use server";
 
-import { adminRequired, transaction } from "@/app/backend/db/decorators";
 import { auditable } from "@/app/backend/audit-logs/decorator";
 import {
   insertValueSetSql,
@@ -22,8 +21,10 @@ import crypto from "crypto";
 
 import { formatCodeSystemPrefix } from "../utils/format-service";
 
-import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/app/constants";
+import { CUSTOM_CONDITION_ID, CUSTOM_VALUESET_ARRAY_ID } from "@/constants";
 import dbService from "./db/service";
+import { adminRequired } from "./db/decorators/auth";
+import { transaction } from "./db/decorators/util";
 
 class CustomCodeService {
   // This may not be needed since these are user-created valuesets
@@ -87,8 +88,8 @@ class CustomCodeService {
     }
   }
 
-  @adminRequired
   @transaction
+  @adminRequired
   @auditable
   static async insertCustomValueSet(
     vs: DibbsValueSet,
@@ -255,8 +256,8 @@ class CustomCodeService {
 
   // insert or update query_data with a "custom" key containing these valuesets
   // if queryId is undefined, this creates a new query record with custom only
-  @adminRequired
   @transaction
+  @adminRequired
   @auditable
   static async insertCustomValuesetsIntoQuery(
     userId: string,

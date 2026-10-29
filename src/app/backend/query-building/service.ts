@@ -6,11 +6,7 @@ import type {
   MedicalRecordSections,
   NestedQuery,
 } from "@/app/(pages)/queryBuilding/utils";
-import {
-  adminRequired,
-  authenticationRequired,
-  transaction,
-} from "../db/decorators";
+
 import {
   deleteQueryByIdHelp,
   getSavedQueryByIdHelp,
@@ -26,6 +22,8 @@ import { getLoggedInUser, isAuthDisabledServerCheck } from "@/app/utils/auth";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { auditable } from "../audit-logs/decorator";
 import { getValueSetsByConditionIdsSql } from "../db-creation/seedSqlStructs";
+import { adminRequired, authenticationRequired } from "../db/decorators/auth";
+import { transaction } from "../db/decorators/util";
 
 class QueryBuildingService {
   /**
@@ -71,8 +69,8 @@ class QueryBuildingService {
    * @param queryId - The unique identifier of the query to delete.
    * @returns A success or error response indicating the result.
    */
-  @adminRequired
   @transaction
+  @adminRequired
   @auditable
   static async deleteQueryById(queryId: string) {
     return deleteQueryByIdHelp(queryId, dbService);
@@ -208,6 +206,7 @@ class QueryBuildingService {
       const user = await getLoggedInUser();
       username = user?.username ?? "";
       const role = await getUserRole(username);
+
       unrestricted = role === UserRole.SUPER_ADMIN || role === UserRole.ADMIN;
     }
 

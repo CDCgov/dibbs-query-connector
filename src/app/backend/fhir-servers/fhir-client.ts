@@ -448,6 +448,7 @@ class FHIRClient {
       }
 
       const config = (await response.json()) as { token_endpoint?: string };
+
       if (!config.token_endpoint) {
         throw new Error("Token endpoint not found in SMART configuration");
       }

@@ -5,7 +5,7 @@ import type {
   QCPagedResponse,
 } from "@/app/models/responses/collections";
 import dbService from "../db/service";
-import { superAdminRequired } from "../db/decorators";
+import { superAdminRequired } from "../db/decorators/auth";
 
 export type LogEntry = {
   actionType: string;
