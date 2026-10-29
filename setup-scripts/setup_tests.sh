@@ -12,6 +12,9 @@ echo UMLS_API_KEY="bleh" >> .env.test
 echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env.test
 echo "APP_HOSTNAME=http://app:3000" >> .env.test
 echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.test
+
+# in our CI, we pass in this information into the running env from the GitHub key vault. We'll need
+# to pass them through into the test file in order for the app to pick them up
 echo "MTLS_CERT=$MTLS_CERT" >> .env.test
 echo "MTLS_KEY=$MTLS_KEY" >> .env.test
 
