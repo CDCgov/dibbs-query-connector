@@ -38,7 +38,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.aidbox
-      no_cache: true
     pull_policy: build
     ports:
       - "8080:8080"
@@ -65,6 +64,12 @@ services:
       PGPORT: "5432"
       BOX_SEARCH_INCLUDE_CONFORMANT: "true"
       BOX_INIT_BUNDLE: "file:///data/GoldenSickPatient.json"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   aidbox-seeder:
     build:
@@ -74,7 +79,7 @@ services:
       db:
         condition: service_healthy
       aidbox:
-        condition: service_started
+        condition: service_healthy
       flyway:
         condition: service_completed_successfully
 

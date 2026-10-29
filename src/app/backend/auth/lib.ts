@@ -118,6 +118,7 @@ export class KeycloakAuthStrategy implements AuthStrategy {
 
   public setUpNextAuthProvider() {
     let { NAMED_KEYCLOAK, LOCAL_KEYCLOAK } = process.env;
+    console.log(NAMED_KEYCLOAK, LOCAL_KEYCLOAK);
     if (!NAMED_KEYCLOAK || !LOCAL_KEYCLOAK) {
       const KEYCLOAK_URL =
         process.env.AUTH_ISSUER || "http://localhost:8080/realms/master";

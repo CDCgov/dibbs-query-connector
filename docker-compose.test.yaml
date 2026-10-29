@@ -16,12 +16,6 @@ services:
     attach: false
     env_file:
       - .env.test
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
 
   aidbox-seeder:
     volumes:
@@ -34,7 +28,7 @@ services:
       aidbox:
         condition: service_healthy
 
-  query-connector:
+  app:
     build:
       context: .
       dockerfile: Dockerfile

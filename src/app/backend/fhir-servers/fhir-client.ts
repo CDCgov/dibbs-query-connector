@@ -364,6 +364,8 @@ class FHIRClient {
         body: formData,
       };
 
+      console.log(formData);
+
       // TLS configuration (mTLS certs / disabled cert validation) is handled
       // by this.fetch, which the constructor set up for this server's auth
       // type. fetch() has no "agent" option, so there's nothing to add here.
