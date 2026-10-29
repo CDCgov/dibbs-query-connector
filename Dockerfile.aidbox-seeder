@@ -28,4 +28,4 @@ RUN mkdir /data
 COPY ./src/app/tests/assets/GoldenSickPatient.json /data/GoldenSickPatient.json
 
 ENTRYPOINT ["/bin/bash", "-c"]
-CMD ["/seed_aidbox.sh $AIDBOX_BASE_URL $APP_HOSTNAME"]
+CMD ["/seed_aidbox.sh"]

@@ -1,0 +1,5 @@
+FROM healthsamurai/aidboxone
+
+# Bake the fixture into the image so the image can use its init bundle flow
+# to seed Aidbox with the fixture: https://www.health-samurai.io/docs/aidbox/configuration/init-bundle
+COPY --chown=aidbox:aidbox ./src/app/tests/assets/GoldenSickPatient.json /data/GoldenSickPatient.json
