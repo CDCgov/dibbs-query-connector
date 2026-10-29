@@ -14,7 +14,7 @@ services:
     volumes:
       - ./keycloak:/opt/keycloak/data/import
     env_file:
-      - .env
+      - ${ENV_FILE:-.env}
     environment:
       JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:-}
     restart: always
@@ -24,14 +24,14 @@ services:
 
   aidbox:
     env_file:
-      - .env
+      - ${ENV_FILE:-.env}
     environment:
       JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:-}
       AIDBOX_BASE_URL: http://aidbox:8080
 
   aidbox-seeder:
     env_file:
-      - .env
+      - ${ENV_FILE:-.env}
 
   app:
     build:
@@ -43,7 +43,7 @@ services:
       NODE_ENV: development
       DATABASE_URL: postgres://postgres:pw@db:5432/tefca_db
     env_file:
-      - .env
+      - ${ENV_FILE:-.env}
     volumes:
       - ./keys:/app/keys
       - .:/app

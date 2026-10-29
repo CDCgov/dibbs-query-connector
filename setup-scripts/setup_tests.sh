@@ -9,6 +9,9 @@ echo NEXT_PUBLIC_AUTH_PROVIDER=keycloak >> .env.test
 echo LOCAL_DB_CLIENT_TIMEOUT="10000" >> .env.test
 echo ERSD_API_KEY="blah" >> .env.test
 echo UMLS_API_KEY="bleh" >> .env.test
+echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env.test
+echo "APP_HOSTNAME=http://app:3000" >> .env.test
+echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.test
 
 if grep -q "^AIDBOX_LICENSE=" .env.test 2>/dev/null && [ -n "$(grep "^AIDBOX_LICENSE=" .env.test | cut -d '=' -f2-)" ]; then
   echo "Aidbox license key already present in .env.test"

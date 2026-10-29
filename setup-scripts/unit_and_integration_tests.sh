@@ -20,8 +20,6 @@ chmod +x ./setup-scripts/setup_tests.sh
 bash ./setup-scripts/setup_tests.sh
 
 echo TEST_TYPE="integration" >> .env.test
-echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.test
-echo "AIDBOX_BASE_URL=http://localhost:8080" >> .env.test
 
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose.yaml -f docker-compose.test.yaml --env-file .env.test up -d

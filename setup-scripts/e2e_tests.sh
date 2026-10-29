@@ -27,12 +27,6 @@ npx playwright install --with-deps
 
 docker compose down --volumes --remove-orphans
 docker compose -f docker-compose.yaml -f docker-compose.test.yaml --env-file .env.test up -d --build
-
-# set DATABASE_URL after spinning up the Docker containers bc the local Playwright
-# runner executing outside the Docker network needs a different DB URL from the 
-# the app container running inside the network. That DB URL is set in the
-# docker-compose.test file
-echo "DATABASE_URL=postgresql://postgres:pw@localhost:5432/tefca_db" >> .env.test
 npx dotenv run -q -f ./.env.test -- npx playwright test --reporter=list
 
 E2E_EXIT_CODE=$?
