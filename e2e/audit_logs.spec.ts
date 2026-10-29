@@ -1,6 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
-import { TEST_URL } from "../playwright-setup";
-import { DEFAULT_FHIR_SERVER } from "./constants";
+import { DEFAULT_FHIR_SERVER, TEST_URL } from "./constants";
 import { runAxeAccessibilityChecks } from "./utils";
 
 // A patient discovery query is an audited action ("makePatientDiscoveryRequest").

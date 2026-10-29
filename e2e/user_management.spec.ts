@@ -1,5 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
-import { TEST_URL } from "../playwright-setup";
+import { TEST_URL } from "./constants";
 import { runAxeAccessibilityChecks } from "./utils";
 
 // Users/groups created here are randomized and left in place: there is no

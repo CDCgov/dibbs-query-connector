@@ -34,7 +34,4 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"], channel: "chrome" },
     },
   ],
-
-  /* Hook to ensure DB is started & migrations have run before tests start*/
-  globalSetup: "./playwright-setup",
 });
