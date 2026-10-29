@@ -19,7 +19,7 @@ services:
 
   # Flyway migrations and DB version control
   flyway:
-    image: flyway/flyway:10.16-alpine
+    image: flyway/flyway:13.11-alpine
     command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
     platform: linux/amd64
     volumes:
