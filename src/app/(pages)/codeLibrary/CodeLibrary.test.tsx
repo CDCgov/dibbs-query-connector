@@ -345,7 +345,7 @@ describe("Code library interaction", () => {
       (customVsRow as HTMLElement).click();
       const deleteButton = screen.getAllByRole("button", {
         name: /delete value set/i,
-      })[1];
+      })[0];
       (deleteButton as HTMLElement).click();
 
       const modal = screen.getByTestId("modalWindow");
