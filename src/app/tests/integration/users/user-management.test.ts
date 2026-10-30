@@ -1,3 +1,6 @@
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/audit-logs/decorator");
+
 import {
   updateUserRole,
   getAllUsers,
@@ -19,38 +22,17 @@ import {
 
 import { dontUseOutsideConfigOrTests_getDbPool } from "@/app/backend/db/config";
 import { UserRole } from "@/app/models/entities/users";
-import { suppressConsoleLogs } from "./fixtures";
+import {
+  suppressConsoleLogs,
+  TEST_USER_STANDARD,
+  TEST_USER_SUPER,
+} from "../fixtures";
+import { resetMocksToDefault } from "../mocks";
 
 const dbClient = dontUseOutsideConfigOrTests_getDbPool();
 
-jest.mock("@/app/utils/auth", () => {
-  return {
-    superAdminAccessCheck: jest.fn().mockResolvedValue(true),
-    adminAccessCheck: jest.fn().mockResolvedValue(true),
-    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-  };
-});
-
-const TEST_USER_STANDARD = {
-  id: "13e1efb2-5889-4157-8f34-78d7f02dbf84",
-  username: "yoshi",
-  firstName: "Green",
-  lastName: "Yoshi",
-  qcRole: UserRole.STANDARD,
-};
-
-const TEST_USER_SUPER = {
-  id: "7dd8b2a7-658c-4152-afcd-8b514fb5343b",
-  username: "luigi",
-  firstName: "Lugi",
-  lastName: "Mario",
-  qcRole: UserRole.SUPER_ADMIN,
-};
-
 describe("User Management Integration Tests", () => {
-  beforeEach(async () => {
-    suppressConsoleLogs();
-
+  beforeAll(async () => {
     // Insert first user as super admin
     const insertSuperUsersQuery = `
      INSERT INTO users (id, username, first_name, last_name, qc_role)
@@ -66,13 +48,15 @@ describe("User Management Integration Tests", () => {
     ]);
   });
 
-  afterEach(async () => {
+  beforeEach(() => {
+    resetMocksToDefault();
+    suppressConsoleLogs();
+  });
+
+  afterAll(async () => {
     try {
-      await dbClient.query("DELETE FROM users WHERE username = $1;", [
-        TEST_USER_STANDARD.username,
-      ]);
-      await dbClient.query("DELETE FROM users WHERE username = $1;", [
-        TEST_USER_SUPER.username,
+      await dbClient.query("DELETE FROM users WHERE id = $1;", [
+        TEST_USER_STANDARD.id,
       ]);
       await dbClient.query("DELETE FROM users WHERE id = $1;", [
         TEST_USER_SUPER.id,
@@ -80,6 +64,16 @@ describe("User Management Integration Tests", () => {
     } catch (error) {
       console.error("Rollback failed:", error);
     }
+  });
+
+  test("get user by username", async () => {
+    await addUserIfNotExists(TEST_USER_STANDARD);
+    const result = await getUserByUsername(TEST_USER_STANDARD.username);
+
+    const user = result.items[0];
+    expect(user).toHaveProperty("id");
+    expect(user).toHaveProperty("username", TEST_USER_STANDARD.username);
+    expect(user).toHaveProperty("qcRole", UserRole.STANDARD);
   });
 
   /**
@@ -100,15 +94,6 @@ describe("User Management Integration Tests", () => {
   /**
    * Tests getting a user by username.
    */
-  test("get user by username", async () => {
-    await addUserIfNotExists(TEST_USER_STANDARD);
-    const result = await getUserByUsername(TEST_USER_STANDARD.username);
-
-    const user = result.items[0];
-    expect(user).toHaveProperty("id");
-    expect(user).toHaveProperty("username", TEST_USER_STANDARD.username);
-    expect(user).toHaveProperty("qcRole", UserRole.STANDARD);
-  });
 
   /**
    * Tests updating the role of an existing user.

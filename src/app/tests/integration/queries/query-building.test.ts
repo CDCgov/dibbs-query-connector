@@ -1,22 +1,22 @@
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/db/decorators/util");
+jest.mock("@/app/backend/audit-logs/decorator");
+
 import {
   deleteQueryById,
   getCustomQueries,
   getSavedQueryById,
 } from "@/app/backend/query-building/service";
-import { createTestCancerQuery } from "../../../../e2e/utils";
-import { suppressConsoleLogs } from "./fixtures";
-jest.mock("@/app/utils/auth", () => {
-  return {
-    superAdminAccessCheck: jest.fn().mockResolvedValue(true),
-    adminAccessCheck: jest.fn().mockResolvedValue(true),
-    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-  };
-});
+import { createTestCancerQuery } from "../../../../../e2e/utils";
+import { suppressConsoleLogs } from "../fixtures";
+import { resetMocksToDefault } from "../mocks";
 
 describe("Saving a custom query", () => {
-  beforeAll(() => {
+  beforeEach(() => {
+    resetMocksToDefault();
     suppressConsoleLogs();
   });
+
   it("saving a custom query", async () => {
     const testQuery = await createTestCancerQuery();
     expect(Object.keys(testQuery.queryData)).toStrictEqual(["2"]);
@@ -25,7 +25,8 @@ describe("Saving a custom query", () => {
 
   it("deletes a query correctly", async () => {
     const testQuery = await createTestCancerQuery();
-    await deleteQueryById(testQuery.queryId);
+    const result = await deleteQueryById(testQuery.queryId);
+    expect(result.success).toBe(true);
 
     const shouldReturnEmptyArray = await getSavedQueryById(testQuery.queryId);
     expect(shouldReturnEmptyArray).toStrictEqual(undefined);

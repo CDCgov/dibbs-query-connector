@@ -85,7 +85,6 @@ export async function getSavedQueryByIdHelp(
   queryId: string,
   dbClient: DbService | Pool,
 ) {
-  const id = queryId;
   const queryString = `
       select q.query_name, q.id AS query_id, q.query_data, q.conditions_list, q.medical_record_sections
           from query q 
@@ -93,10 +92,10 @@ export async function getSavedQueryByIdHelp(
       `;
 
   try {
-    const result = await dbClient.query(queryString, [id]);
+    const result = await dbClient.query(queryString, [queryId]);
 
     if (result.rows.length === 0) {
-      console.info("No results found for query id:", id);
+      console.info("No results found for query id:", queryId);
       return undefined;
     }
     return result.rows[0] as unknown as QueryTableResult;

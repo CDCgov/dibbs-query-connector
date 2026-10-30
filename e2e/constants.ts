@@ -1,4 +1,4 @@
-import { hyperUnluckyPatient } from "@/app/constants";
+import { hyperUnluckyPatient } from "@/constants";
 
 export const TEST_PATIENT = hyperUnluckyPatient;
 export const TEST_PATIENT_NAME =
@@ -132,3 +132,5 @@ export const CANCER_FRONTEND_NESTED_INPUT = {
 // so change them there as well if you change it here
 export const E2E_SMART_TEST_CLIENT_ID = "query-connector";
 export const E2E_SMART_TEST_CLIENT_SCOPES = "system/*.read";
+
+export const TEST_URL = "http://localhost:3000";

@@ -1,4 +1,4 @@
-import { TEST_URL } from "../playwright-setup";
+import { TEST_URL } from "./constants";
 import { test, expect } from "@playwright/test";
 import { E2E_SMART_TEST_CLIENT_ID } from "./constants";
 

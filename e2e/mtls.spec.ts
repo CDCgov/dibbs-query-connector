@@ -1,4 +1,4 @@
-import { TEST_URL } from "../playwright-setup";
+import { TEST_URL } from "./constants";
 import { expect } from "@playwright/test";
 import { PAGE_TITLES } from "../src/app/(pages)/query/components/stepIndicator/StepIndicator";
 import { MockClient } from "request-mocking-protocol";
