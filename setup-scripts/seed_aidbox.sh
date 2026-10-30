@@ -45,19 +45,6 @@ load_or_fail() {
     exit 1
   fi
 
-# This step is handled in by the Aidbox init-bundle operation in every setting
-# other than the deployed demo instances. 
-
-# Post the GoldenSickPatient data to Aidbox
-if [ "${SKIP_PATIENT_SEED:-false}" != "true" ]
-  echo "Loading GoldenSickPatient data into Aidbox..."
-  load_or_fail "Loading GoldenSickPatient data" -X POST \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${TOKEN}" \
-    -d @"/data/GoldenSickPatient.json" \
-    ${NETWORK_URL}/fhir
-fi
-
   # A FHIR batch returns HTTP 200 even when individual entries fail, so the
   # overall status above isn't enough for a batch load (e.g. GoldenSickPatient).
   # Inspect each entry's response.status and fail if any is non-2xx so a
@@ -69,6 +56,7 @@ fi
     if .resourceType == "Bundle" then
       [.entry[]? | .response.status // empty | select(test("^2[0-9][0-9]") | not)]
     else [] end | join(", ")' 2>/dev/null)
+
   if [ -n "$failed_entries" ]; then
     echo "ERROR: ${description} returned a batch response with failed entries (statuses: ${failed_entries})."
     echo "This usually means Aidbox's terminology service (tx.fhir.org) rejected one or more resources."
@@ -76,6 +64,7 @@ fi
     exit 1
   fi
 }
+
 
 # Compose already gates this service on `aidbox: service_healthy`, so by the
 # time we run, /health should already be passing. The retry loop below is a
@@ -121,6 +110,23 @@ if [ -z "$TOKEN" ]; then
 fi
 
 echo "Access token obtained."
+
+# This step is handled in by the Aidbox init-bundle operation in every setting
+# other than the deployed demo instances. 
+
+# Post the GoldenSickPatient data to Aidbox
+if [ "${SKIP_PATIENT_SEED:-false}" != "true" ]; then
+  echo "Loading GoldenSickPatient data into Aidbox..."
+  
+  load_or_fail "Loading GoldenSickPatient data" -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -d @"/data/GoldenSickPatient.json" \
+  ${NETWORK_URL}/fhir
+
+  echo "GoldenSickPatient data loaded successfully."
+fi
+
 
 # Client information for the SMART on FHIR test
 echo "Loading client information into Aidbox..."

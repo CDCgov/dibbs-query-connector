@@ -24,11 +24,5 @@ docker compose down --volumes --remove-orphans
 # use the dev docker compose setup to allow for hot-reloading locally 
 ENV_FILE=.env.test npm run dev
 
-echo "Waiting Next server to be healthy..."
-while ! nc -z localhost 3000; do
-  sleep 1
-done
-echo "Next.js server is up!"
-
 npx dotenv run -q -f ./.env.test -- npx playwright test --ui
 

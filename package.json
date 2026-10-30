@@ -13,11 +13,11 @@
     "lint": "npx eslint -c eslint.config.mjs src --fix",
     "test": "npm run test:unit && npm run test:integration",
     "test:ci": " bash ./setup-scripts/unit_and_integration_tests.sh",
-    "test:unit": "TEST_TYPE='unit' jest --testPathIgnorePatterns='/e2e/' '/integration/'",
+    "test:unit": "cross-env TEST_TYPE=unit jest --testPathIgnorePatterns=\"/e2e/\" \"/integration/\"",
     "test:unit:file": "npm run test:unit -- --testPathPatterns",
     "test:unit:watch": "jest --watch",
     "test:update": "jest --updateSnapshot --testPathIgnorePatterns=/e2e/",
-    "test:integration": "JUST_INTEGRATION=true bash ./setup-scripts/unit_and_integration_tests.sh",
+    "test:integration": "cross-env JUST_INTEGRATION=true bash ./setup-scripts/unit_and_integration_tests.sh",
     "test:playwright": "bash ./setup-scripts/e2e_tests.sh",
     "test:playwright:ui": "bash ./setup-scripts/e2e_tests_local.sh"
   },
@@ -82,6 +82,7 @@
     "@types/react-highlight-words": "^0.20.1",
     "@typescript-eslint/eslint-plugin": "^8.72.0",
     "@typescript-eslint/parser": "^8.72.0",
+    "cross-env": "^10.1.0",
     "dotenv": "^18.0.9",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
@@ -97,9 +98,9 @@
     "sass": "^1.106.1",
     "sass-embedded": "^1.106.1",
     "supertest": "^7.3.1",
+    "testcontainers": "^12.2.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.23.15",
-    "testcontainers": "^12.2.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.0"
   }
