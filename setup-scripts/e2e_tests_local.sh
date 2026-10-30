@@ -15,6 +15,7 @@ npx playwright install --with-deps
 
 echo "AUTH_DISABLED=true" >> .env.test
 echo "RUN_FETCH_INTERCEPTOR=true" >> .env.test
+echo "AIDBOX_BASE_URL=http://aidbox:8080" >> .env.test
 
 # pull down any exisiting docker volumes to make sure we're starting fresh
 export COMPOSE_PROJECT_NAME=query-connector-test
