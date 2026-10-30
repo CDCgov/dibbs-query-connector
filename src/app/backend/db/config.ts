@@ -80,6 +80,7 @@ export function buildSslConfig():
  * function for Secrets Manager rotation support.
  *
  * Returns safe defaults when DATABASE_URL is not set (e.g. during next build).
+ * @returns
  */
 function parseDbUrl(): {
   host: string;
@@ -112,7 +113,6 @@ function parseDbUrl(): {
     password: url.password ? decodeURIComponent(url.password) : undefined,
   };
 }
-
 /**
  * Builds the full PoolConfig at call time so that environment variables
  * are read at runtime rather than at module-initialization / bundle time.
@@ -120,6 +120,8 @@ function parseDbUrl(): {
  * When DB_SECRET_ARN is set, the password is supplied as an async function
  * that fetches from Secrets Manager with a 5-minute cache. pg resolves this
  * via _checkPgPass() before SCRAM auth runs.
+ *
+ * @returns a PoolConfig to be consumed by the client construction
  */
 function buildDbConfig(): PoolConfig {
   const sslConfig = buildSslConfig();

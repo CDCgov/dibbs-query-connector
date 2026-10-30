@@ -18,6 +18,7 @@ import {
   insertCustomValueSet,
 } from "@/app/backend/custom-code-service";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
+import { suppressConsoleLogs } from "@/app/tests/integration/fixtures";
 
 jest.mock("next-auth/react");
 
@@ -74,6 +75,8 @@ describe("Create custom valueSet form", () => {
       items: customValueSets,
     });
     (deleteCustomConcept as jest.Mock).mockResolvedValue({ success: true });
+
+    suppressConsoleLogs();
   });
 
   beforeEach(() => {

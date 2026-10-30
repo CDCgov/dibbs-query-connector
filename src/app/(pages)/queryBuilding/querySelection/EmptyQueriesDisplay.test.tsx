@@ -3,10 +3,7 @@ import { renderWithUser } from "@/app/tests/unit/setup";
 import { EmptyQueriesDisplay } from "./EmptyQueriesDisplay";
 import { createDibbsDB } from "@/app/backend/db-creation/service";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
-import {
-  INVALID_API_KEY_LITERAL,
-  MISSING_API_KEY_LITERAL,
-} from "@/app/constants";
+import { INVALID_API_KEY_LITERAL, MISSING_API_KEY_LITERAL } from "@/constants";
 
 jest.mock("@/app/backend/db-creation/service", () => ({
   createDibbsDB: jest.fn(),

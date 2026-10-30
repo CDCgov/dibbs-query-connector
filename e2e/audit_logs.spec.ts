@@ -1,6 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
-import { TEST_URL } from "../playwright-setup";
-import { DEFAULT_FHIR_SERVER } from "./constants";
+import { DEFAULT_FHIR_SERVER, TEST_URL } from "./constants";
 import { runAxeAccessibilityChecks } from "./utils";
 
 // A patient discovery query is an audited action ("makePatientDiscoveryRequest").
@@ -26,8 +25,19 @@ test.describe("Audit logs", () => {
   test("loads the audit log table", async ({ page }) => {
     // At least one audited action is present, so the table shows rows and the
     // "Showing X - Y of Z actions" summary.
-    await expect(page.locator("tbody tr").first()).toBeVisible();
     await expect(page.getByText(/Showing/)).toBeVisible();
+    const firstRow = page.locator("tbody tr").first();
+    await expect(firstRow).toBeVisible();
+
+    firstRow.click();
+    const drawer = page.getByTestId("drawer-title");
+    await expect(drawer).toBeVisible();
+    await expect(drawer).toContainText("Full JSON request");
+    await runAxeAccessibilityChecks(page);
+
+    await page.getByRole("button", { name: "Close drawer" }).click();
+    await expect(drawer).not.toBeVisible();
+
     await runAxeAccessibilityChecks(page);
   });
 
@@ -41,17 +51,5 @@ test.describe("Audit logs", () => {
     // Clearing the filters restores the rows.
     await page.getByRole("button", { name: "Clear filters" }).click();
     await expect(page.locator("tbody tr").first()).toBeVisible();
-  });
-
-  test("opens the detail drawer for a log entry", async ({ page }) => {
-    await page.locator("tbody tr").first().click();
-
-    const drawer = page.getByTestId("drawer-title");
-    await expect(drawer).toBeVisible();
-    await expect(drawer).toContainText("Full JSON request");
-    await runAxeAccessibilityChecks(page);
-
-    await page.getByRole("button", { name: "Close drawer" }).click();
-    await expect(drawer).not.toBeVisible();
   });
 });

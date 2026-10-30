@@ -1,7 +1,7 @@
 // @ts-check
 
 import { test, expect } from "@playwright/test";
-import { TEST_URL } from "../playwright-setup";
+import { TEST_URL } from "./constants";
 import { PAGE_TITLES } from "../src/app/(pages)/query/components/stepIndicator/StepIndicator";
 import {
   CONTACT_US_DISCLAIMER_EMAIL,
@@ -14,7 +14,7 @@ import {
   showSiteAlert,
 } from "./constants";
 import { checkForSiteAlert, runAxeAccessibilityChecks } from "./utils";
-import { INSUFFICIENT_PATIENT_IDENTIFIERS } from "../src/app/constants";
+import { INSUFFICIENT_PATIENT_IDENTIFIERS } from "../src/constants";
 
 test.describe("querying with the Query Connector", () => {
   test.beforeEach(async ({ page }) => {
