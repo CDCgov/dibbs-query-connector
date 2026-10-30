@@ -45,6 +45,19 @@ load_or_fail() {
     exit 1
   fi
 
+# This step is handled in by the Aidbox init-bundle operation in every setting
+# other than the deployed demo instances. 
+
+# Post the GoldenSickPatient data to Aidbox
+if [ "${SKIP_PATIENT_SEED:-false}" != "true" ]
+  echo "Loading GoldenSickPatient data into Aidbox..."
+  load_or_fail "Loading GoldenSickPatient data" -X POST \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${TOKEN}" \
+    -d @"/data/GoldenSickPatient.json" \
+    ${NETWORK_URL}/fhir
+fi
+
   # A FHIR batch returns HTTP 200 even when individual entries fail, so the
   # overall status above isn't enough for a batch load (e.g. GoldenSickPatient).
   # Inspect each entry's response.status and fail if any is non-2xx so a

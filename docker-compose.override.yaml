@@ -31,10 +31,13 @@ services:
       AIDBOX_BASE_URL: http://aidbox:8080
 
   aidbox-seeder:
+    environment:
+      SKIP_PATIENT_SEED: "true"
     env_file:
       - ${ENV_FILE:-.env}
 
   app:
+    image: query-connector-dev
     build:
       context: .
       dockerfile: Dockerfile.dev

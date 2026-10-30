@@ -75,6 +75,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.aidbox-seeder
+    environment:
+      SKIP_PATIENT_SEED: "false"
     depends_on:
       db:
         condition: service_healthy

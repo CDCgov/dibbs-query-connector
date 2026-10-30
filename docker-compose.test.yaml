@@ -21,11 +21,15 @@ services:
       - ./logs:/var/log
     env_file:
       - .env.test
+    environment:
+      SKIP_PATIENT_SEED: "true"
+      DATABASE_URL: postgres://postgres:pw@db:5432/tefca_db
     depends_on:
       aidbox:
         condition: service_healthy
 
   app:
+    image: query-connector-test
     build:
       context: .
       dockerfile: Dockerfile
