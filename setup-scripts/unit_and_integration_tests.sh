@@ -37,6 +37,7 @@ eval $JEST_CMD
 JEST_EXIT_CODE=$?
 
 # Teardown containers
+export COMPOSE_PROJECT_NAME=query-connector-test
 docker compose -f docker-compose.yaml -f docker-compose.test.yaml down
 
 # Exit with the Jest exit code

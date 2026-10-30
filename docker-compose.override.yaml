@@ -2,6 +2,7 @@ services:
   db:
     volumes:
       - db-data:/var/lib/postgresql
+      - ./vs_dump.sql:/docker-entrypoint-initdb.d/vs_dump.sql
 
   flyway:
     environment:

@@ -17,6 +17,7 @@ echo "AUTH_DISABLED=true" >> .env.test
 echo "RUN_FETCH_INTERCEPTOR=true" >> .env.test
 
 # pull down any exisiting docker volumes to make sure we're starting fresh
+export COMPOSE_PROJECT_NAME=query-connector-test
 docker compose down --volumes --remove-orphans
 
 # use the dev docker compose setup to allow for hot-reloading locally 

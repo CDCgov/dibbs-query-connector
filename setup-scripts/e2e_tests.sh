@@ -32,6 +32,7 @@ npx dotenv run -q -f ./.env.test -- npx playwright test --reporter=list
 E2E_EXIT_CODE=$?
 
 # Teardown containers
+export COMPOSE_PROJECT_NAME=query-connector-test
 docker compose -f docker-compose.yaml -f docker-compose.test.yaml down
 
 exit $E2E_EXIT_CODE
