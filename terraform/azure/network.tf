@@ -54,32 +54,28 @@ resource "azurerm_private_dns_zone" "aca" {
 
 resource "azurerm_private_dns_a_record" "aca_wildcard" {
   name                = "*"
-  zone_name           = azurerm_private_dns_zone.aca.name
-  resource_group_name = data.azurerm_resource_group.qc.name
+  private_dns_zone_id = azurerm_private_dns_zone.aca.id
   ttl                 = 300
   records             = [azurerm_container_app_environment.qc.static_ip_address]
 }
 
 resource "azurerm_private_dns_a_record" "aca_apex" {
   name                = "@"
-  zone_name           = azurerm_private_dns_zone.aca.name
-  resource_group_name = data.azurerm_resource_group.qc.name
+  private_dns_zone_id = azurerm_private_dns_zone.aca.id
   ttl                 = 300
   records             = [azurerm_container_app_environment.qc.static_ip_address]
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "qc" {
-  name                  = "${var.resource_group_name}-link"
-  resource_group_name   = data.azurerm_resource_group.qc.name
-  private_dns_zone_name = azurerm_private_dns_zone.aca.name
-  virtual_network_id    = azurerm_virtual_network.qc.id
-  tags                  = var.tags
+  name                = "${var.resource_group_name}-link"
+  private_dns_zone_id = azurerm_private_dns_zone.aca.id
+  virtual_network_id  = azurerm_virtual_network.qc.id
+  tags                = var.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "hub" {
-  name                  = "hub-link"
-  resource_group_name   = data.azurerm_resource_group.qc.name
-  private_dns_zone_name = azurerm_private_dns_zone.aca.name
-  virtual_network_id    = data.azurerm_virtual_network.hub.id
-  tags                  = var.tags
+  name                = "hub-link"
+  private_dns_zone_id = azurerm_private_dns_zone.aca.id
+  virtual_network_id  = data.azurerm_virtual_network.hub.id
+  tags                = var.tags
 }
