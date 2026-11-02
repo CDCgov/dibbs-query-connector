@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout the commit CD deployed
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ env.RELEASE_SHA }}
           fetch-depth: 2

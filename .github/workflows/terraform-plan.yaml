@@ -43,7 +43,7 @@ jobs:
         working-directory: terraform/${{ matrix.root }}
     steps:
       - name: Check Out Changes
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v4
