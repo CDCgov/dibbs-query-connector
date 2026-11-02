@@ -5,7 +5,7 @@ services:
       - ./vs_dump.sql:/docker-entrypoint-initdb.d/vs_dump.sql
 
   flyway:
-    image: flyway/flyway:10.16-alpine
+    image: flyway/flyway:13.11-alpine
     platform: linux/amd64
     attach: false
 
