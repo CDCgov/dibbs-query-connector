@@ -39,7 +39,7 @@ jobs:
       major: ${{ steps.detect.outputs.major }}
     steps:
       - name: Check Out Changes
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
@@ -68,7 +68,7 @@ jobs:
       seeder_image: ${{ steps.refs.outputs.seeder_image }}
     steps:
       - name: Check Out Changes
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -194,7 +194,7 @@ jobs:
         working-directory: terraform/azure
     steps:
       - name: Check Out Changes
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Azure login (OIDC)
         uses: azure/login@v3
