@@ -85,7 +85,7 @@ jobs:
 
       - name: Image metadata (query-connector)
         id: meta_app
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/${{ env.REPO }}/query-connector
           tags: |
@@ -108,7 +108,7 @@ jobs:
 
       - name: Image metadata (aidbox-seeder)
         id: meta_seeder
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/${{ env.REPO }}/aidbox-seeder
           tags: |
