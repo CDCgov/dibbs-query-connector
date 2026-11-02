@@ -22,7 +22,7 @@
     "test:playwright:ui": "bash ./setup-scripts/e2e_tests_local.sh"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.1156.0",
+    "@aws-sdk/client-secrets-manager": "^3.1158.0",
     "@axe-core/playwright": "^4.14.0",
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
@@ -80,8 +80,8 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@types/react-highlight-words": "^0.20.1",
-    "@typescript-eslint/eslint-plugin": "^8.72.0",
-    "@typescript-eslint/parser": "^8.72.0",
+    "@typescript-eslint/eslint-plugin": "^8.72.1",
+    "@typescript-eslint/parser": "^8.72.1",
     "cross-env": "^10.1.0",
     "dotenv": "^18.0.9",
     "eslint": "^10.13.0",
@@ -104,6 +104,6 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.72.0"
+    "typescript-eslint": "^8.72.1"
   }
 }

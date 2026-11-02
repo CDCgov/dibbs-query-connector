@@ -67,6 +67,7 @@ resource "azurerm_container_app_environment" "qc" {
   name                               = "${var.resource_group_name}-env"
   location                           = var.location
   resource_group_name                = data.azurerm_resource_group.qc.name
+  logs_destination                   = "log-analytics"
   log_analytics_workspace_id         = azurerm_log_analytics_workspace.qc.id
   infrastructure_subnet_id           = azurerm_subnet.aca.id
   infrastructure_resource_group_name = "${var.resource_group_name}-env-infra"

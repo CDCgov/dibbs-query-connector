@@ -27,16 +27,16 @@ jobs:
           - terraform/aws/modules/tfstate
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: Checkout source code
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         name: Cache plugin dir
         with:
           path: ~/.tflint.d/plugins
           key: tflint-${{ hashFiles('.tflint.hcl') }}
 
-      - uses: terraform-linters/setup-tflint@v4
+      - uses: terraform-linters/setup-tflint@v6
         name: Setup TFLint
         with:
           tflint_version: latest

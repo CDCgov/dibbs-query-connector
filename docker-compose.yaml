@@ -14,7 +14,7 @@ services:
       retries: 20
 
   flyway:
-    image: flyway/flyway:11-alpine
+    image: flyway/flyway:12-alpine
     command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
     volumes:
       - ./flyway/sql:/flyway/sql
@@ -24,7 +24,7 @@ services:
         condition: service_started
 
   aidbox_db:
-    image: healthsamurai/aidboxdb:17
+    image: healthsamurai/aidboxdb:18
     volumes:
       - aidbox_pg_data:/var/lib/postgresql/data:delegated
     environment:
@@ -44,26 +44,33 @@ services:
     depends_on:
       - aidbox_db
     environment:
-      AIDBOX_TERMINOLOGY_SERVICE_BASE_URL: https://tx.fhir.org/r4
-      AIDBOX_FHIR_PACKAGES: hl7.fhir.r4.core#4.0.1
       AIDBOX_FHIR_SCHEMA_VALIDATION: "true"
-      AIDBOX_CREATED_AT_URL: https://aidbox.app/ex/createdAt
       AIDBOX_CLIENT_SECRET: L6AGe_5V2O
-      AIDBOX_CORRECT_AIDBOX_FORMAT: "true"
       AIDBOX_ADMIN_PASSWORD: OC1MzJ5QNV
       AIDBOX_COMPLIANCE: enabled
       AIDBOX_SECURITY_AUDIT__LOG_ENABLED: "true"
-      BOX_SEARCH_FHIR__COMPARISONS: "true"
       PGHOST: aidbox_db
-      BOX_COMPATIBILITY_VALIDATION_JSON__SCHEMA_REGEX: "#{:fhir-datetime}"
-      BOX_SEARCH_AUTHORIZE_INLINE_REQUESTS: "true"
       PGUSER: aidbox
       AIDBOX_PORT: "8080"
       PGDATABASE: aidbox
       PGPASSWORD: gOxAmiyiz4
       PGPORT: "5432"
+      BOX_BOOTSTRAP_FHIR_PACKAGES: hl7.fhir.r4.core#4.0.1
+      BOX_COMPATIBILITY_VALIDATION_JSON__SCHEMA_REGEX: "#{:fhir-datetime}"
+      BOX_FHIR_BUNDLE_EXECUTION_VALIDATION_MODE: limited
+      BOX_FHIR_CREATEDAT_URL: https://aidbox.app/ex/createdAt
+      BOX_FHIR_SEARCH_AUTHORIZE_INLINE_REQUESTS: "true"
+      BOX_FHIR_SEARCH_CHAIN_SUBSELECT: "true"
+      BOX_FHIR_CORRECT_AIDBOX_FORMAT: "true"
+      BOX_SEARCH_FHIR_COMPARISONS: "true"
       BOX_SEARCH_INCLUDE_CONFORMANT: "true"
       BOX_INIT_BUNDLE: "file:///data/GoldenSickPatient.json"
+      BOX_FHIR_TERMINOLOGY_ENGINE: hybrid
+      BOX_FHIR_TERMINOLOGY_ENGINE_HYBRID_EXTERNAL_TX_SERVER: https://tx.health-samurai.io/fhir
+      BOX_FHIR_TERMINOLOGY_SERVICE_BASE_URL: https://tx.health-samurai.io/fhir
+      BOX_MODULE_SDC_STRICT_ACCESS_CONTROL: "true"
+      BOX_SETTINGS_MODE: read-write
+
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 5s
