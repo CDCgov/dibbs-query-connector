@@ -24,7 +24,6 @@ import {
 } from "../fixtures";
 import { QueryDataColumn } from "@/app/(pages)/queryBuilding/utils";
 import { resetMocksToDefault } from "../mocks";
-import { setMockAccessAllowed } from "@/app/backend/db/decorators/__mocks__/auth";
 import {
   getQueriesForUser,
   getSavedQuerySummaries,
@@ -44,6 +43,10 @@ const TEST_QUERY_DATA: QueryDataColumn = {};
 const TEST_USER_1_ID = TEST_USER_STANDARD_FOUR.id;
 const TEST_USER_2_ID = TEST_USER_STANDARD_TWO.id;
 const TEST_USER_3_ID = TEST_USER_STANDARD_THREE.id;
+
+const mockAuth = jest.requireMock<
+  typeof import("@/app/backend/db/decorators/__mocks__/auth")
+>("@/app/backend/db/decorators/auth");
 
 describe("User Group and Query Membership Tests", () => {
   beforeAll(async () => {
@@ -399,7 +402,7 @@ describe("User Group and Query Membership Tests", () => {
   test("should add multiple queries to a group", async () => {
     mockSpy.mockResolvedValue({ user: TEST_USER_ADMIN });
 
-    setMockAccessAllowed({
+    mockAuth.setMockAccessAllowed({
       auth: true,
       admin: true,
       super: false,
@@ -456,23 +459,22 @@ describe("User Group and Query Membership Tests", () => {
   test("should restrict query summaries for a standard user to their group's queries", async () => {
     // have the admin user add the standard user to the group in question
     mockSpy.mockResolvedValue({ user: TEST_USER_ADMIN });
-    setMockAccessAllowed({
+    mockAuth.setMockAccessAllowed({
       auth: true,
       admin: true,
       super: false,
     });
 
     await addUsersToGroup(TEST_GROUP_ID, [TEST_USER_STANDARD_THREE.id]);
+    await addQueriesToGroup(TEST_GROUP_ID, [TEST_QUERY_2_ID, TEST_QUERY_3_ID]);
 
     // query the group using the standard user
     mockSpy.mockResolvedValue({ user: TEST_USER_STANDARD_THREE });
-    setMockAccessAllowed({
+    mockAuth.setMockAccessAllowed({
       auth: true,
       admin: false,
       super: false,
     });
-
-    await addQueriesToGroup(TEST_GROUP_ID, [TEST_QUERY_2_ID, TEST_QUERY_3_ID]);
 
     const summaries = await getSavedQuerySummaries();
     expect(summaries.length).toBe(2);
@@ -484,12 +486,6 @@ describe("User Group and Query Membership Tests", () => {
 
   test("should return all queries in summaries for a super admin", async () => {
     mockSpy.mockResolvedValue({ user: TEST_USER_SUPER_TWO });
-
-    setMockAccessAllowed({
-      auth: true,
-      admin: true,
-      super: true,
-    });
 
     const summaries = await getSavedQuerySummaries();
     const summaryIds = summaries.map((s) => s.queryId);

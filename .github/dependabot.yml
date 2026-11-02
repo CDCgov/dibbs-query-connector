@@ -91,13 +91,12 @@ updates:
         update-types: ["minor", "patch"]
 
   # Terraform updates only scan the listed directories, not subdirectories,
-  # so every directory with .tf files is listed explicitly.
+  # so every directory to update is listed explicitly. The rest of
+  # terraform/aws is left out on purpose: it is kept as a frozen reference that
+  # nothing applies anymore (see terraform/aws/README.md). Only its live
+  # redirect root is updated.
   - package-ecosystem: "terraform"
     directories:
-      - "/terraform/aws/implementation/ecs"
-      - "/terraform/aws/implementation/setup"
-      - "/terraform/aws/modules/oidc"
-      - "/terraform/aws/modules/tfstate"
       - "/terraform/aws/redirect"
       - "/terraform/azure"
       - "/terraform/bootstrap"
