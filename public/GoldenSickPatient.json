@@ -53,7 +53,7 @@
           {
             "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
             "code": "SS",
-            "display": "Social Security Number"
+            "display": "Social Security number"
           }
         ]
       },
@@ -67,7 +67,7 @@
           {
             "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
             "code": "MR",
-            "display": "Medical Record Number"
+            "display": "Medical record number"
           }
         ],
         "text": "Medical Record Number"
@@ -85,7 +85,7 @@
           {
             "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
             "code": "DL",
-            "display": "Driver's License"
+            "display": "Driver's license number"
           }
         ],
         "text": "Driver's License"

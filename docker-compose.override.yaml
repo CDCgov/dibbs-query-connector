@@ -9,7 +9,7 @@ services:
       JAVA_OPTS_APPEND: "-XX:UseSVE=0"
 
   keycloak:
-    image: quay.io/keycloak/keycloak:26.6
+    image: quay.io/keycloak/keycloak:26.8
     ports:
       - "8081:8080"
     volumes:
