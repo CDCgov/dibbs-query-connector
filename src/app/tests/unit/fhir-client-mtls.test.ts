@@ -4,6 +4,15 @@ import { testFhirServerConnection } from "@/app/backend/fhir-servers/test-utils"
 import { Agent, fetch as undiciFetch } from "undici";
 import * as mtlsUtils from "@/app/utils/mtls-utils";
 
+// Importing "../db/service" runs `new DbService()` at module load, which throws
+// `DATABASE_URL is not set`, and "./service" pulls in the audit log decorators.
+// Neither is exercised by the eRSD indexing under test, so both are stubbed.
+jest.mock("../../backend/db/service", () => ({
+  __esModule: true,
+  default: {},
+  DbClient: class {},
+}));
+
 // Mutual-TLS requests must go through undici's own fetch (a dispatcher is
 // only compatible with the fetch from the same undici package), so mock that
 // fetch while keeping the real Agent for dispatcher-option assertions.

@@ -16,7 +16,7 @@ import {
   validateRaceCode,
   validateEthnicityCode,
 } from "./parsers";
-import { USE_CASE_DETAILS, USE_CASES } from "@/app/constants";
+import { USE_CASE_DETAILS, USE_CASES } from "@/constants";
 
 const MR_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
 

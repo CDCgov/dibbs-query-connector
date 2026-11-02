@@ -10,11 +10,7 @@ import {
 import { useSession } from "next-auth/react";
 import EmptyQueriesDisplay from "./EmptyQueriesDisplay";
 import MyQueriesDisplay from "./QueryRepository";
-import {
-  BuildStep,
-  GENERIC_ERROR_BODY,
-  GENERIC_ERROR_HEADING,
-} from "@/app/constants";
+
 import { DataContext } from "@/app/utils/DataProvider";
 import { CustomUserQuery } from "@/app/models/entities/query";
 import {
@@ -27,6 +23,11 @@ import { getUserByUsername } from "@/app/backend/user-management";
 import { User, UserRole } from "@/app/models/entities/users";
 import { isAuthDisabledClientCheck } from "@/app/utils/client-auth";
 import { checkDBForData } from "@/app/backend/db-creation/service";
+import {
+  BuildStep,
+  GENERIC_ERROR_HEADING,
+  GENERIC_ERROR_BODY,
+} from "@/constants";
 
 type QuerySelectionProps = {
   setBuildStep: Dispatch<SetStateAction<BuildStep>>;

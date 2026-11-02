@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { FhirServersModal } from "./fhirServersModal";
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { ModalMode } from "./page";
+import { suppressConsoleLogs } from "@/app/tests/integration/fixtures";
 
 // Mock the backend services
 jest.mock("@/app/backend/fhir-servers/service", () => ({
@@ -98,6 +99,9 @@ const defaultProps = {
 };
 
 describe("FhirServersModal", () => {
+  beforeAll(() => {
+    suppressConsoleLogs();
+  });
   beforeEach(() => {
     jest.clearAllMocks();
   });

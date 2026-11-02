@@ -1,8 +1,11 @@
 FROM node:24-alpine
 
-WORKDIR /code
-COPY . .
+RUN apk add --no-cache libc6-compat
+
+WORKDIR /app 
+
+COPY package.json package-lock.json* ./
 RUN npm install
-RUN apk --no-cache add curl
+
 EXPOSE 3000
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "dev:next"]

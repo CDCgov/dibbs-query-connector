@@ -1,21 +1,19 @@
-import { suppressConsoleLogs } from "./fixtures";
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/audit-logs/decorator");
+jest.mock("@/app/backend/db/decorators/util");
+
+import { suppressConsoleLogs } from "../fixtures";
 import {
   insertFhirServer,
   updateFhirServer,
   getFhirServerConfigs,
   deleteFhirServer,
 } from "@/app/backend/fhir-servers/service";
-
-jest.mock("@/app/utils/auth", () => {
-  return {
-    superAdminAccessCheck: jest.fn().mockResolvedValue(true),
-    adminAccessCheck: jest.fn().mockResolvedValue(true),
-    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-  };
-});
+import { resetMocksToDefault } from "../mocks";
 
 describe("FHIR Servers Mutual TLS Tests", () => {
-  beforeAll(() => {
+  beforeEach(() => {
+    resetMocksToDefault();
     suppressConsoleLogs();
   });
 

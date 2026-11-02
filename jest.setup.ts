@@ -1,19 +1,14 @@
 import "@testing-library/jest-dom";
 import * as matchers from "jest-extended";
-import { Pool } from "pg";
-import { dontUseOutsideConfigOrTests_getDbPool } from "./src/app/backend/db/config";
+import dbService from "./src/app/backend/db/service";
 
 expect.extend(matchers);
 global.MessagePort = require("node:worker_threads").MessagePort;
 
 if (process.env.TEST_TYPE === "integration") {
-  let dbClient: Pool | null = null;
-  beforeAll(() => {
-    dbClient = dontUseOutsideConfigOrTests_getDbPool();
-  });
-
   afterAll(async () => {
-    await dbClient?.end();
+    // close the DB connection so Jest doesn't complain about remaining open handles
+    await dbService?.end();
   });
 
   // Code below from https://github.com/vitest-dev/vitest/issues/4043#issuecomment-2383567554

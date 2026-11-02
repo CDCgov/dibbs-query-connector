@@ -6,10 +6,7 @@ import WorkSpaceSetUpView from "./WorkspaceSetUp";
 import { createDibbsDB } from "@/app/backend/db-creation/service";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 import Link from "next/link";
-import {
-  INVALID_API_KEY_LITERAL,
-  MISSING_API_KEY_LITERAL,
-} from "@/app/constants";
+import { INVALID_API_KEY_LITERAL, MISSING_API_KEY_LITERAL } from "@/constants";
 
 type EmptyQueryProps = {
   dbSeeded: boolean;

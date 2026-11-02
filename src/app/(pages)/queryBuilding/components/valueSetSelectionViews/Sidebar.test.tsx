@@ -6,7 +6,7 @@ import {
   categoryToConditionNameArrayMap,
 } from "@/app/(pages)/queryBuilding/fixtures";
 import { NestedQuery } from "../../utils";
-import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/constants";
+import { CUSTOM_VALUESET_ARRAY_ID } from "@/constants";
 import { MEDICAL_RECORD_SECTIONS_ID } from "../utils";
 import { showToastConfirmation } from "@/app/ui/designSystem/toast/Toast";
 

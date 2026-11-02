@@ -1,5 +1,5 @@
 import { FhirResource } from "fhir/r4";
-import { DibbsConceptType } from "./models/entities/valuesets";
+import { DibbsConceptType } from "./app/models/entities/valuesets";
 
 export const MISSING_API_KEY_LITERAL = "MISSING_API_KEY";
 export const INVALID_API_KEY_LITERAL = "INVALID_API_KEY";

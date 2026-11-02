@@ -27,6 +27,7 @@ import {
   getSavedQueryById,
 } from "@/app/backend/query-building/service";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
+import { suppressConsoleLogs } from "@/app/tests/integration/fixtures";
 
 jest.mock("next-auth/react");
 
@@ -159,6 +160,9 @@ const mockConcepts = [
 ];
 
 describe("Code library loading view", () => {
+  beforeAll(() => {
+    suppressConsoleLogs();
+  });
   it("renders a skeleton loading state when loading is true", async () => {
     // Keep getValueSetsPaginated as a never-resolving promise so pagedResult stays null
     (getValueSetsPaginated as jest.Mock).mockReturnValue(new Promise(() => {}));
@@ -341,7 +345,7 @@ describe("Code library interaction", () => {
       (customVsRow as HTMLElement).click();
       const deleteButton = screen.getAllByRole("button", {
         name: /delete value set/i,
-      })[1];
+      })[0];
       (deleteButton as HTMLElement).click();
 
       const modal = screen.getByTestId("modalWindow");

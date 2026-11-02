@@ -1,5 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
-import { TEST_URL } from "../playwright-setup";
+import { TEST_URL } from "./constants";
 import { CONDITION_DRAWER_SEARCH_PLACEHOLDER } from "../src/app/(pages)/queryBuilding/components/utils";
 import {
   EMPTY_MEDICAL_RECORD_SECTIONS,

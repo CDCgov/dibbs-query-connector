@@ -1,61 +1,41 @@
-import dbService from "@/app/backend/db/service";
+jest.mock("@/app/backend/db/decorators/auth");
+jest.mock("@/app/backend/db/decorators/util");
+(auth as jest.Mock).mockResolvedValue(TEST_USER);
+
+import { getAuditEntry, TEST_USER } from "./utils";
 import { auth } from "@/auth";
-import {
-  GET_ALL_AUDIT_ROWS,
-  getAuditEntry,
-  TEST_USER,
-  waitForAuditSuccess,
-} from "./utils";
-import * as AuditableDecorators from "@/app/backend/audit-logs/lib";
-import { suppressConsoleLogs } from "../fixtures";
+import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import {
   insertFhirServer,
   updateFhirServer,
   deleteFhirServer,
 } from "@/app/backend/fhir-servers/service";
-import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
+import { resetMocksToDefault } from "../mocks";
+import { suppressConsoleLogs } from "../fixtures";
 
-jest.mock("@/app/backend/audit-logs/lib", () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual("@/app/backend/audit-logs/lib"),
-  };
-});
-
-jest.mock("@/app/utils/auth", () => {
-  return {
-    superAdminAccessCheck: jest.fn().mockResolvedValue(true),
-    adminAccessCheck: jest.fn().mockResolvedValue(true),
-    authenticatedAccessCheck: jest.fn().mockResolvedValue(true),
-  };
-});
-
-const auditCompletionSpy = jest.spyOn(
-  AuditableDecorators,
-  "generateAuditSuccessMessage",
-);
-(auth as jest.Mock).mockResolvedValue(TEST_USER);
+const TEST_FHIR_SERVER = {
+  id: "jolly-roger-bay",
+  name: "Jolly Roger Bay",
+  hostname: "http://sunken-ship.boats/fhir",
+  headers: undefined,
+  lastConnectionSuccessful: true,
+  disableCertValidation: false,
+  defaultServer: false,
+  authType: "none",
+} as FhirServerConfig;
 
 describe("fhir server", () => {
+  let insertionId = "";
   beforeAll(() => {
     suppressConsoleLogs();
   });
-  it("fhir server addition / deletion / update", async () => {
-    const TEST_FHIR_SERVER = {
-      id: "jolly-roger-bay",
-      name: "Jolly Roger Bay",
-      hostname: "http://sunken-ship.boats/fhir",
-      headers: undefined,
-      lastConnectionSuccessful: true,
-      disableCertValidation: false,
-      defaultServer: false,
-      authType: "none",
-    } as FhirServerConfig;
 
-    const oldAuditIds = (await dbService.query(GET_ALL_AUDIT_ROWS)).rows.map(
-      (r) => r.id,
-    );
+  beforeEach(() => {
+    resetMocksToDefault();
+    jest.clearAllMocks();
+  });
 
+  it("addition", async () => {
     // insert
     const result = await insertFhirServer(
       TEST_FHIR_SERVER.name,
@@ -64,21 +44,23 @@ describe("fhir server", () => {
       TEST_FHIR_SERVER.defaultServer,
       TEST_FHIR_SERVER.lastConnectionSuccessful,
     );
-    const actionTypeToCheck = "insertFhirServer";
-    await waitForAuditSuccess(actionTypeToCheck, auditCompletionSpy);
 
-    const auditEntry = await getAuditEntry(actionTypeToCheck, oldAuditIds);
+    expect(result.success).toBe(true);
+    insertionId = result.server.id;
+    const actionTypeToCheck = "insertFhirServer";
+    const auditEntry = await getAuditEntry(actionTypeToCheck);
 
     expect(JSON.parse(auditEntry.name)).toBe(TEST_FHIR_SERVER.name);
     expect(JSON.parse(auditEntry.hostname)).toBe(TEST_FHIR_SERVER.hostname);
     expect(JSON.parse(auditEntry.lastConnectionSuccessful)).toBe(
       TEST_FHIR_SERVER.lastConnectionSuccessful,
     );
+  }, 10000);
 
-    // update
+  it("update", async () => {
     const updateName = "Dire Dire Docks";
-    await updateFhirServer({
-      id: result.server.id,
+    const updateResult = await updateFhirServer({
+      id: insertionId,
       name: updateName,
       hostname: TEST_FHIR_SERVER.hostname,
       defaultServer: false,
@@ -89,20 +71,19 @@ describe("fhir server", () => {
       },
     });
     const updateTypeToCheck = "updateFhirServer";
-    await waitForAuditSuccess(updateTypeToCheck, auditCompletionSpy);
-    const updateAuditEntry = await getAuditEntry(
-      updateTypeToCheck,
-      oldAuditIds,
-    );
 
+    expect(updateResult.success).toBe(true);
+
+    const updateAuditEntry = await getAuditEntry(updateTypeToCheck);
     expect(JSON.parse(updateAuditEntry.updateDetails).name).toBe(updateName);
+  }, 10000);
 
-    // delete
-    await deleteFhirServer(result.server.id);
-    const finalTypeToCheck = "deleteFhirServer";
-    await waitForAuditSuccess(finalTypeToCheck, auditCompletionSpy);
+  it("delete", async () => {
+    const deleteResult = await deleteFhirServer(insertionId);
+    expect(deleteResult.success).toBe(true);
 
-    const finalEntry = await getAuditEntry(finalTypeToCheck, oldAuditIds);
-    expect(JSON.parse(finalEntry.id)).toBe(result.server.id);
-  });
+    const deleteTypeToCheck = "deleteFhirServer";
+    const finalEntry = await getAuditEntry(deleteTypeToCheck);
+    expect(JSON.parse(finalEntry.id)).toBe(insertionId);
+  }, 10000);
 });

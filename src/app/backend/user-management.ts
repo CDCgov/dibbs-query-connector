@@ -9,16 +9,17 @@ import {
 } from "../models/entities/users";
 import { QCResponse } from "../models/responses/collections";
 import dbService from "./db/service";
-import {
-  adminRequired,
-  authenticationRequired,
-  superAdminRequired,
-} from "./db/decorators";
+
 import { auditable } from "./audit-logs/decorator";
 import {
   addUserIfNotExists as provisionUser,
   updateUserDetails as syncUserDetails,
 } from "./auth/user-provisioning";
+import {
+  adminRequired,
+  superAdminRequired,
+  authenticationRequired,
+} from "./db/decorators/auth";
 
 export interface UserToken {
   id: string;

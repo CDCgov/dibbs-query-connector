@@ -2,11 +2,7 @@
 import { FhirServerConfig } from "@/app/models/entities/fhir-servers";
 import { auditable } from "@/app/backend/audit-logs/decorator";
 import dbService from "../db/service";
-import {
-  authenticationRequired,
-  superAdminRequired,
-  transaction,
-} from "../db/decorators";
+
 import {
   clearFhirServerConfigCache,
   getFhirServerConfigs as getAllFhirServerConfigs,
@@ -18,6 +14,11 @@ import {
   EndpointType,
   QueryStrategy,
 } from "@/app/(pages)/fhirServers/page";
+import {
+  authenticationRequired,
+  superAdminRequired,
+} from "../db/decorators/auth";
+import { transaction } from "../db/decorators/util";
 
 // Define an interface for authentication data
 export interface AuthData {

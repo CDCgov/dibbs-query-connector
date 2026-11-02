@@ -8,10 +8,8 @@ import {
 } from "./utils";
 import { fetchConditionWithRetry } from "./service";
 import { getVSACValueSet } from "@/app/backend/code-systems/service";
-import {
-  INVALID_API_KEY_LITERAL,
-  MISSING_API_KEY_LITERAL,
-} from "@/app/constants";
+import { INVALID_API_KEY_LITERAL, MISSING_API_KEY_LITERAL } from "@/constants";
+import { suppressConsoleLogs } from "@/app/tests/integration/fixtures";
 
 jest.mock("@/app/backend/code-systems/service", () => ({
   getVSACValueSet: jest.fn(),
@@ -19,6 +17,11 @@ jest.mock("@/app/backend/code-systems/service", () => ({
 
 jest.mock("@/app/utils/auth", () => ({
   adminAccessCheck: jest.fn().mockResolvedValue(true),
+}));
+
+jest.mock("@/app/backend/audit-logs/lib", () => ({
+  generateAuditSuccessMessage: jest.fn(),
+  generateAuditValues: jest.fn(),
 }));
 
 const mockGetVSACValueSet = getVSACValueSet as unknown as jest.Mock;
@@ -40,6 +43,10 @@ const EXPECTED_INTERNAL_VALUESET: DibbsValueSet = {
 };
 
 describe("VSAC FHIR response to internal application type", () => {
+  beforeEach(() => {
+    suppressConsoleLogs();
+  });
+
   it("translate to expected fixture", () => {
     const translationResult = translateVSACToInternalValueSet(
       ExampleVsacValueSet as FhirValueSet,

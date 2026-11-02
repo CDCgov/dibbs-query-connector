@@ -24,7 +24,7 @@ import {
   generateValueSetGroupingsByDibbsConceptType,
   ConceptTypeToDibbsVsMap,
 } from "@/app/utils/valueSetTranslation";
-import { CUSTOM_VALUESET_ARRAY_ID } from "@/app/constants";
+import { CUSTOM_VALUESET_ARRAY_ID } from "@/constants";
 import { useSaveQueryAndRedirect } from "../../../backend/query-building/useSaveQueryAndRedirect";
 import { useContext } from "react";
 import { DataContext } from "@/app/utils/DataProvider";

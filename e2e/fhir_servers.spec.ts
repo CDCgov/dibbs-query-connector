@@ -1,5 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
-import { TEST_URL } from "../playwright-setup";
+import { TEST_URL } from "./constants";
 
 // Covers the FHIR-server config dimensions not already exercised by
 // smart_on_fhir.spec.ts (SMART), custom_headers.spec.ts and mtls.spec.ts:

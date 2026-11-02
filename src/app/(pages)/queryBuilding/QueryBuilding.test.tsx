@@ -15,6 +15,9 @@ jest.mock("@/app/backend/db-creation/service", () => ({
   checkDBForData: jest.fn().mockResolvedValue(true),
 }));
 
+// Mock auth functions
+jest.mock("@/app/backend/db/decorators/auth");
+
 jest.mock(
   "@/app/ui/components/withAuth/WithAuth",
   () =>

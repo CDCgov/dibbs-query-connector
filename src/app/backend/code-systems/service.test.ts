@@ -1,6 +1,8 @@
 import { OperationOutcome } from "fhir/r4";
 import { getVSACValueSet } from "./service";
 
+jest.mock("@/app/backend/db/decorators/auth");
+
 describe("getVSACValueSet", () => {
   const originalKey = process.env.UMLS_API_KEY;
   const fetchSpy = jest.spyOn(global, "fetch");

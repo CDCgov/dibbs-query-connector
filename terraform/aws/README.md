@@ -23,7 +23,9 @@ to change: the ACM certificate lookup and `APP_HOSTNAME` are hard-coded to
 us-east-1 only, every secret is passed to the task definition as a plain
 environment variable, and the ECS module is pinned to a commit of
 `CDCgov/terraform-aws-dibbs-ecr-viewer`. The `implementation/ecs/README.md`
-describes an older version of the module inputs.
+describes an older version of the module inputs. Dependabot only updates
+`redirect`, so the provider and module versions in the other roots are frozen
+where they were when the environment was torn down (AWS provider 5.x).
 
 ## queryconnector.dev redirect
 

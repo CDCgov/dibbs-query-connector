@@ -2,7 +2,7 @@
 
 import { DibbsConceptType } from "../models/entities/valuesets";
 import { DateRangeInfo } from "../ui/designSystem/timeboxing/DateRangePicker";
-import { adminRequired } from "./db/decorators";
+import { adminRequired } from "./db/decorators/auth";
 import dbService from "./db/service";
 
 class QueryTimefilteringService {

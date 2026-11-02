@@ -1,7 +1,7 @@
 // @ts-check
 
 import { test, expect } from "@playwright/test";
-import { TEST_URL } from "../playwright-setup";
+import { TEST_URL } from "./constants";
 
 // consts
 const QUERY_REPOSITORY = "Query repository";

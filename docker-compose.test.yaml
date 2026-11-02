@@ -1,0 +1,49 @@
+services:
+  db:
+    attach: false
+    volumes:
+      - ./vs_dump.sql:/docker-entrypoint-initdb.d/vs_dump.sql
+
+  flyway:
+    image: flyway/flyway:10.16-alpine
+    platform: linux/amd64
+    attach: false
+
+  aidbox_db:
+    attach: false
+
+  aidbox:
+    env_file:
+      - .env.test
+
+  aidbox-seeder:
+    volumes:
+      - ./logs:/var/log
+    env_file:
+      - .env.test
+    environment:
+      SKIP_PATIENT_SEED: "true"
+      DATABASE_URL: postgres://postgres:pw@db:5432/tefca_db
+    depends_on:
+      aidbox:
+        condition: service_healthy
+
+  app:
+    image: query-connector-test
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://postgres:pw@db:5432/tefca_db
+    env_file:
+      - .env.test
+    volumes:
+      - ./keys:/app/keys
+    depends_on:
+      db:
+        condition: service_healthy
+      aidbox-seeder:
+        condition: service_completed_successfully
