@@ -27,7 +27,7 @@ jobs:
           - terraform/aws/modules/tfstate
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         name: Checkout source code
 
       - uses: actions/cache@v4
