@@ -85,9 +85,6 @@ export function isMtlsAvailable() {
     return true;
   }
 
-  console.log("cert env defined", !!process.env.MTLS_CERT);
-  console.log("cert key defined", !!process.env.MTLS_KEY);
-
   // Check if environment variables are set
   return !!(process.env.MTLS_CERT && process.env.MTLS_KEY);
 }
