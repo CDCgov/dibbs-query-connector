@@ -104,6 +104,10 @@ export async function fetchAndProcessErsdResources() {
   throw Error(ersdResponse.issue[0].diagnostics);
 }
 
+type VsacApiResponse = {
+  data: Bundle | OperationOutcome;
+  success: boolean;
+};
 /**
  * Fetches the VSAC Value Sets and supporting code systems information for a given OID
  * as a FHIR bundle. This function requires a UMLS API Key which must be obtained as a
@@ -119,7 +123,7 @@ export async function getVSACValueset(
   oid: string,
   searchStructType: string = "valueset",
   codeSystem?: string,
-): Promise<Bundle | OperationOutcome> {
+): Promise<VsacApiResponse> {
   const username: string = "apikey";
   const umlsKey = process.env.UMLS_API_KEY;
 
@@ -146,7 +150,7 @@ export async function getVSACValueset(
   });
   if (response.status === 200) {
     const data = (await response.json()) as Bundle;
-    return data;
+    return { data: data, success: true };
   } else {
     const diagnosticIssue = await response.json().then((r) => {
       try {
@@ -156,15 +160,18 @@ export async function getVSACValueset(
       }
     });
     return {
-      resourceType: "OperationOutcome",
-      issue: [
-        {
-          severity: "error",
-          code: "processing",
-          diagnostics: `${response.status}: ${diagnosticIssue}`,
-        },
-      ],
-    } as OperationOutcome;
+      data: {
+        resourceType: "OperationOutcome",
+        issue: [
+          {
+            severity: "error",
+            code: "processing",
+            diagnostics: `${response.status}: ${diagnosticIssue}`,
+          },
+        ],
+      } as OperationOutcome,
+      success: false,
+    };
   }
 }
 
@@ -199,12 +206,10 @@ export async function fetchConditionWithRetry(
       // from whatever we got (an empty version), preserving the prior
       // tolerate-and-continue behavior rather than aborting the whole seed on
       // a persistently failing condition lookup.
-      if (
-        !isSuccessfulFetch(vsacCondition) &&
-        attempt < VSAC_MAX_FETCH_RETRIES
-      ) {
+      if (!vsacCondition.success && attempt < VSAC_MAX_FETCH_RETRIES) {
         const diagnostics =
-          vsacCondition.issue?.[0]?.diagnostics ?? "unknown VSAC error";
+          (vsacCondition.data as OperationOutcome)?.issue[0]?.diagnostics ??
+          "unknown VSAC error";
 
         throw new Error(`VSAC returned an error response: ${diagnostics}`);
       }
@@ -276,7 +281,7 @@ export async function batchFetchVsacValuesets(oidsToFetch: string[]): Promise<{
 }> {
   const valuesetPromises = oidsToFetch.map(async (oid) => {
     const vs = await getVSACValueset(oid);
-    return { vs: vs, oid: oid };
+    return { vs: vs.data, oid: oid };
   });
   const resolvedPromises: { vs: FhirFetchResult; oid: string }[] = [];
   let errors: VsacErrorResult[] = [];
