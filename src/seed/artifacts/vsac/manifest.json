@@ -1,13 +1,1 @@
-{
-  "manifestVersion": 1,
-  "name": "vsac",
-  "files": {
-    "vsac-fhir_2.26.14": {
-      "version": "2.26.14",
-      "releaseDate": "2026-10-08T23:18:34-04:00",
-      "hash": "ff24b94c58c5b509c9a73ff6ddebdd577b71bef33920432702aada093fa4112a",
-      "fetchedAtUtc": "2026-10-16T17:35:20.648Z",
-      "resourceCount": 1577
-    }
-  }
-}
+{"manifestVersion":1,"name":"vsac","files":{"vsac-fhir_2.26.18":{"version":"2.26.18","releaseDate":"2026-11-03T20:43:20-05:00","hash":"2503f320a5012e1ff17fea2dcbbb33c83a5380dd66e68e9fcd52fa4b5d7d4ca4","fetchedAtUtc":"2026-11-06T18:07:41.836Z","resourceCount":1577}}}

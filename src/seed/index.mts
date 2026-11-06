@@ -12,7 +12,6 @@ import { fileURLToPath } from "url";
 import * as path from "path";
 import { createErsdPayload } from "./process-data";
 import { VSAC_FETCH_BATCH_SIZE } from "./constants";
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 

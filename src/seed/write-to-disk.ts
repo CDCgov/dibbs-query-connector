@@ -115,7 +115,9 @@ export async function writeErsdData(
     throw Error("No entry resources found in file bundle");
   }
 
-  console.log(`📡  📝 Writing ${entryResources.length} resources to disk`);
+  console.log(
+    `📝 Writing ${entryResources.length} fetched eRSD resources to disk`,
+  );
 
   await writeFile(filePath, JSON.stringify(data?.entry), "utf-8");
   const fileHash = await calculateSha256(filePath);
