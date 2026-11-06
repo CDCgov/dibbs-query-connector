@@ -7,14 +7,16 @@ jest.mock("../db/service", () => ({
   DbClient: class {},
 }));
 jest.mock("./assets", () => ({ readJsonFromRelativePath: jest.fn() }));
-jest.mock("../code-systems/service", () => ({
-  getERSD: jest.fn(),
-  getVSACValueSet: jest.fn(),
-}));
+jest.mock("@/seed/api-calls", () => {
+  return {
+    getERSD: jest.fn(),
+    getVSACValueset: jest.fn(),
+  };
+});
 
 import { Bundle, ValueSet } from "fhir/r4";
-import { getERSD } from "../code-systems/service";
-import { fetchErsdPayload } from "@/seed/fetch-external-artifacts";
+import { fetchErsdPayload } from "@/seed/service";
+import { getERSD } from "@/seed/api-calls";
 
 const mockGetERSD = getERSD as unknown as jest.Mock;
 

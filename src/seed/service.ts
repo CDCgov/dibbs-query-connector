@@ -5,9 +5,12 @@ import {
   Resource,
   ValueSet,
 } from "fhir/r4";
-import base64 from "base-64";
 import { ConditionStruct } from "@/app/backend/db-creation/seedSqlStructs";
-import { ErsdConceptType, MISSING_API_KEY_LITERAL } from "@/constants";
+import {
+  ErsdConceptType,
+  INVALID_API_KEY_LITERAL,
+  MISSING_API_KEY_LITERAL,
+} from "@/constants";
 import {
   createErsdPayload,
   translateVSACToInternalValueSet,
@@ -18,6 +21,7 @@ import {
   ErsdPayload,
   VSAC_FETCH_BATCH_SIZE,
 } from "./constants";
+import { getERSD, getVSACValueset } from "./api-calls";
 
 /**
  * Sleeps for the given number of milliseconds.
@@ -35,60 +39,6 @@ function isSuccessfulFetch(response: FhirFetchResult): response is Bundle {
 }
 
 /**
- * Fetches the eRSD Specification from the eRSD API. This function requires an API key
- * to access the eRSD API. The API key can be obtained at https://ersd.aimsplatform.org/#/api-keys.
- * @param eRSDVersion - The version of the eRSD specification to retrieve. Defaults to v2.
- * @returns The eRSD Specification as a FHIR Bundle or an OperationOutcome if an error occurs.
- */
-export async function getERSD(
-  eRSDVersion: number = 3,
-): Promise<Bundle | OperationOutcome> {
-  // Only allow specific, known-safe version numbers
-  const allowedVersions = [1, 2, 3];
-  if (!allowedVersions.includes(Number(eRSDVersion))) {
-    return {
-      resourceType: "OperationOutcome",
-      issue: [
-        {
-          severity: "error",
-          code: "invalid",
-          diagnostics: `Invalid eRSDVersion provided: ${eRSDVersion}`,
-        },
-      ],
-    } as OperationOutcome;
-  }
-  const ERSD_API_KEY = process.env.ERSD_API_KEY;
-  if (!ERSD_API_KEY) {
-    throw Error(
-      `ERSD API Key not set. Please refer to the documentation below to get your ERSD key to continue`,
-      {
-        cause: MISSING_API_KEY_LITERAL,
-      },
-    );
-  }
-
-  const eRSDUrl = `https://ersd.aimsplatform.org/api/ersd/v${Number(eRSDVersion)}specification?format=json&api-key=${ERSD_API_KEY}`;
-  const response = await fetch(eRSDUrl);
-
-  if (response.status === 200) {
-    const data = (await response.json()) as Bundle;
-
-    return data;
-  } else {
-    return {
-      resourceType: "OperationOutcome",
-      issue: [
-        {
-          severity: "error",
-          code: "processing",
-          diagnostics: `Failed to retrieve data from eRSD: ${response.status} ${response.statusText}`,
-        },
-      ],
-    } as OperationOutcome;
-  }
-}
-
-/**
  * Wrapper function to fetch the eRSD, throwing an error if the fetch is unsuccessful.
  * @returns the eRSD bundle
  * @throws an error with the OperationOutcome diagnostics if the fetch fails
@@ -102,77 +52,6 @@ export async function fetchAndProcessErsdResources() {
   }
 
   throw Error(ersdResponse.issue[0].diagnostics);
-}
-
-type VsacApiResponse = {
-  data: Bundle | OperationOutcome;
-  success: boolean;
-};
-/**
- * Fetches the VSAC Value Sets and supporting code systems information for a given OID
- * as a FHIR bundle. This function requires a UMLS API Key which must be obtained as a
- * Metathesaurus License. See https://www.nlm.nih.gov/vsac/support/usingvsac/vsacfhirapi.html
- * for authentication instructions.
- * @param oid The OID whose value sets to retrieve.
- * @param searchStructType Optionally, a flag to identify what type of
- * search to perform, since VSAC can be used for value sets as well as conditions.
- * @param codeSystem Optional parameter for use with condition querying.
- * @returns The value sets as a FHIR bundle, or an Operation Outcome if there is an error.
- */
-export async function getVSACValueset(
-  oid: string,
-  searchStructType: string = "valueset",
-  codeSystem?: string,
-): Promise<VsacApiResponse> {
-  const username: string = "apikey";
-  const umlsKey = process.env.UMLS_API_KEY;
-
-  if (!umlsKey) {
-    throw Error(
-      "UMLS API Key not set. Please refer to the documentation below on how to get your UMLS API key before continuing",
-      {
-        cause: MISSING_API_KEY_LITERAL,
-      },
-    );
-  }
-
-  const vsacUrl: string =
-    searchStructType === "valueset"
-      ? `https://cts.nlm.nih.gov/fhir/ValueSet/${oid}`
-      : `https://cts.nlm.nih.gov/fhir/CodeSystem/$lookup?system=${codeSystem}&code=${oid}`;
-
-  const response = await fetch(vsacUrl, {
-    method: "get",
-    headers: new Headers({
-      Authorization: "Basic " + base64.encode(username + ":" + umlsKey),
-      "Content-Type": "application/fhir+json",
-    }),
-  });
-  if (response.status === 200) {
-    const data = (await response.json()) as Bundle;
-    return { data: data, success: true };
-  } else {
-    const diagnosticIssue = await response.json().then((r) => {
-      try {
-        return r?.issue[0]?.diagnostics;
-      } catch {
-        return r;
-      }
-    });
-    return {
-      data: {
-        resourceType: "OperationOutcome",
-        issue: [
-          {
-            severity: "error",
-            code: "processing",
-            diagnostics: `${response.status}: ${diagnosticIssue}`,
-          },
-        ],
-      } as OperationOutcome,
-      success: false,
-    };
-  }
 }
 
 /**
@@ -206,20 +85,29 @@ export async function fetchConditionWithRetry(
       // from whatever we got (an empty version), preserving the prior
       // tolerate-and-continue behavior rather than aborting the whole seed on
       // a persistently failing condition lookup.
-      if (!vsacCondition.success && attempt < VSAC_MAX_FETCH_RETRIES) {
-        const diagnostics =
-          (vsacCondition.data as OperationOutcome)?.issue[0]?.diagnostics ??
-          "unknown VSAC error";
+      if (!vsacCondition.success) {
+        // throw the appropriate error to trigger retry correctly.
+        const issue = (vsacCondition.data as OperationOutcome)?.issue[0];
+        if (issue.code === "security") {
+          throw new Error("VSAC rejected the UMLS API key", {
+            cause: INVALID_API_KEY_LITERAL,
+          });
+        }
 
-        throw new Error(`VSAC returned an error response: ${diagnostics}`);
+        if (attempt < VSAC_MAX_FETCH_RETRIES) {
+          const diagnostics = issue?.diagnostics ?? "unknown VSAC error";
+          throw new Error(`VSAC returned an error response: ${diagnostics}`);
+        }
       }
 
-      const params = vsacCondition as unknown as Parameters;
+      const params = vsacCondition.data as unknown as Parameters;
       const versionHolder = (params.parameter || []).find(
         (p) => p.name === "version",
       );
+
       const versionArray = (versionHolder?.valueString || "").split("/");
       const version = versionArray[versionArray.length - 1];
+
       return {
         id: c[0],
         system: c[1],
@@ -230,7 +118,11 @@ export async function fetchConditionWithRetry(
     } catch (e) {
       // A missing API key (or any non-transport failure) won't be fixed by
       // retrying, so surface it immediately.
-      if (e instanceof Error && e.cause === MISSING_API_KEY_LITERAL) {
+      if (
+        e instanceof Error &&
+        (e.cause === MISSING_API_KEY_LITERAL ||
+          e.cause === INVALID_API_KEY_LITERAL)
+      ) {
         throw e;
       }
       lastError = e;
@@ -470,53 +362,3 @@ export type VsacCapabilityStatement = Resource & {
     releaseDate: string;
   };
 };
-/**
- * Capability statement fetch for manifest writing
- *
- * @returns
- */
-export async function fetchVsacCapability() {
-  const username: string = "apikey";
-  const umlsKey = process.env.UMLS_API_KEY;
-
-  if (!umlsKey) {
-    throw Error(
-      "UMLS API Key not set. Please refer to the documentation below on how to get your UMLS API key before continuing",
-      {
-        cause: MISSING_API_KEY_LITERAL,
-      },
-    );
-  }
-
-  const vsacUrl: string = "https://cts.nlm.nih.gov/fhir/metadata";
-
-  const response = await fetch(vsacUrl, {
-    method: "get",
-    headers: new Headers({
-      Authorization: "Basic " + base64.encode(username + ":" + umlsKey),
-      "Content-Type": "application/fhir+json",
-    }),
-  });
-  if (response.status === 200) {
-    const data = (await response.json()) as VsacCapabilityStatement;
-    return data;
-  } else {
-    const diagnosticIssue = await response.json().then((r) => {
-      try {
-        return r?.issue[0]?.diagnostics;
-      } catch {
-        return r;
-      }
-    });
-    return {
-      resourceType: "OperationOutcome",
-      issue: [
-        {
-          severity: "error",
-          code: "processing",
-          diagnostics: `${response.status}: ${diagnosticIssue}`,
-        },
-      ],
-    } as OperationOutcome;
-  }
-}

@@ -21,7 +21,7 @@ import {
   fetchConditionWithRetry,
   sleep,
   fetchDibbsValueSets,
-} from "@/seed/fetch-external-artifacts";
+} from "@/seed/service";
 import {
   ErsdPayload,
   VSAC_BATCH_DELAY_MS,

@@ -2,6 +2,10 @@ import { MISSING_API_KEY_LITERAL } from "@/constants";
 import base64 from "base-64";
 import { Bundle, OperationOutcome, Resource } from "fhir/r4";
 
+type VsacApiResponse = {
+  data: Bundle | OperationOutcome;
+  success: boolean;
+};
 /**
  * Fetches the VSAC Value Sets and supporting code systems information for a given OID
  * as a FHIR bundle. This function requires a UMLS API Key which must be obtained as a
@@ -13,11 +17,11 @@ import { Bundle, OperationOutcome, Resource } from "fhir/r4";
  * @param codeSystem Optional parameter for use with condition querying.
  * @returns The value sets as a FHIR bundle, or an Operation Outcome if there is an error.
  */
-export async function getVSACValueSet(
+export async function getVSACValueset(
   oid: string,
   searchStructType: string = "valueset",
   codeSystem?: string,
-): Promise<Bundle | OperationOutcome> {
+): Promise<VsacApiResponse> {
   const username: string = "apikey";
   const umlsKey = process.env.UMLS_API_KEY;
 
@@ -44,31 +48,34 @@ export async function getVSACValueSet(
   });
   if (response.status === 200) {
     const data = (await response.json()) as Bundle;
-    return data;
+    return { data: data, success: true };
   } else {
-    const diagnosticIssue = await response.text();
-    let fhirDiagnostic = "Unknown error";
+    const body = await response.text();
+    let detail = body || response.statusText;
     try {
-      const diagnosticDetails = JSON.parse(diagnosticIssue);
-      fhirDiagnostic =
-        diagnosticDetails?.issue?.[0]?.["diagnostics"] ?? diagnosticIssue;
+      detail = JSON.parse(body)?.issue?.[0]?.diagnostics ?? detail;
     } catch {
-      // use default unknown error
+      // Not JSON; keep the raw body or status text.
     }
-
     return {
-      resourceType: "OperationOutcome",
-      issue: [
-        {
-          severity: "error",
-          code: "processing",
-          diagnostics: `${response.status}: ${fhirDiagnostic}`,
-        },
-      ],
-    } as OperationOutcome;
+      data: {
+        resourceType: "OperationOutcome",
+        issue: [
+          {
+            severity: "error",
+            // "security" lets callers tell a rejected API key apart from other
+            // failures and stop instead of retrying.
+            code: response.status === 401 ? "security" : "processing",
+            diagnostics: detail
+              ? `${response.status}: ${detail}`
+              : `${response.status}`,
+          },
+        ],
+      } as OperationOutcome,
+      success: false,
+    };
   }
 }
-
 /**
  * Fetches the eRSD Specification from the eRSD API. This function requires an API key
  * to access the eRSD API. The API key can be obtained at https://ersd.aimsplatform.org/#/api-keys.
@@ -136,7 +143,7 @@ export type VsacCapabilityStatement = Resource & {
  *
  * @returns
  */
-export async function fetchVsacCapability() {
+export async function getVsacCapability() {
   const username: string = "apikey";
   const umlsKey = process.env.UMLS_API_KEY;
 
@@ -150,6 +157,7 @@ export async function fetchVsacCapability() {
   }
 
   const vsacUrl: string = "https://cts.nlm.nih.gov/fhir/metadata";
+
   const response = await fetch(vsacUrl, {
     method: "get",
     headers: new Headers({

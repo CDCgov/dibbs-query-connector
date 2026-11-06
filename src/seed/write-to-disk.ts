@@ -1,10 +1,10 @@
 import { Bundle, Resource, ValueSet } from "fhir/r4";
 import { writeFile, access, constants, readFile } from "fs/promises";
-import { fetchVsacCapability } from "./api-calls";
 import { createHash } from "crypto";
 import { createReadStream } from "fs";
 import { pipeline } from "stream/promises";
-import { VsacResult } from "./fetch-external-artifacts";
+import { VsacResult } from "./service";
+import { getVsacCapability } from "./api-calls";
 
 type ApiManifestFile = {
   version: string;
@@ -130,7 +130,7 @@ export async function writeErsdData(
 }
 
 async function generateVsacIdentificationProperties() {
-  const vsacCapabilityMetadata = await fetchVsacCapability();
+  const vsacCapabilityMetadata = await getVsacCapability();
   if (vsacCapabilityMetadata.resourceType !== "CapabilityStatement") {
     throw Error("VSAC capability fetch failed");
   }

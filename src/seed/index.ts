@@ -1,7 +1,7 @@
 import {
   fetchAndProcessErsdResources,
   fetchValueSetsFromVsac,
-} from "./fetch-external-artifacts";
+} from "./service";
 import {
   checkForCompatibleManifest,
   createManifest,
