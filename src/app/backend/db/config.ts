@@ -1,59 +1,6 @@
 import { readFileSync } from "fs";
 import { PoolConfig, Pool } from "pg";
-
-const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
-
-/**
- * Fetches the database password from AWS Secrets Manager, caches it in
- * process.env._DB_PASSWORD, and returns it. Uses a 5-minute TTL so that
- * password rotations are picked up without restarting the container.
- *
- * process.env is used for the cache (rather than a module-level variable)
- * because Next.js standalone builds can duplicate module-level state across
- * webpack bundle chunks, while process.env is process-global.
- *
- * Credentials are resolved via the AWS SDK default provider chain — no explicit
- * config is needed when running in ECS, where the task IAM role is picked up
- * automatically via the container metadata endpoint. The task role must have
- * `secretsmanager:GetSecretValue` permission on the secret ARN.
- *
- * @returns the database password string
- */
-export async function fetchDbPassword(): Promise<string> {
-  const now = Date.now();
-  const cachedTs = Number(process.env._DB_PASSWORD_TS || 0);
-  if (process.env._DB_PASSWORD && now - cachedTs < CACHE_TTL_MS) {
-    return process.env._DB_PASSWORD;
-  }
-
-  const { SecretsManagerClient, GetSecretValueCommand } =
-    await import("@aws-sdk/client-secrets-manager");
-  const g = globalThis as Record<string, unknown>;
-  if (!g._secretsManagerClient) {
-    g._secretsManagerClient = new SecretsManagerClient({});
-  }
-  const client = g._secretsManagerClient as InstanceType<
-    typeof SecretsManagerClient
-  >;
-  const resp = await client.send(
-    new GetSecretValueCommand({ SecretId: process.env.DB_SECRET_ARN }),
-  );
-
-  if (!resp.SecretString) {
-    throw new Error("AWS Secrets Manager returned empty SecretString");
-  }
-
-  const secret = JSON.parse(resp.SecretString);
-  if (typeof secret.password !== "string" || !secret.password) {
-    throw new Error(
-      "Secret JSON does not contain a valid 'password' string field",
-    );
-  }
-
-  process.env._DB_PASSWORD = secret.password;
-  process.env._DB_PASSWORD_TS = String(now);
-  return secret.password;
-}
+import { fetchDbPassword } from "./util";
 
 /**
  * Builds the SSL config for the pg Pool based on the DB_SSL_CA_PATH env var.

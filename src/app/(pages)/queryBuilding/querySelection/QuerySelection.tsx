@@ -22,12 +22,12 @@ import { getRole } from "@/app/(pages)/userManagement/utils";
 import { getUserByUsername } from "@/app/backend/user-management";
 import { User, UserRole } from "@/app/models/entities/users";
 import { isAuthDisabledClientCheck } from "@/app/utils/client-auth";
-import { checkDBForData } from "@/app/backend/db-creation/service";
 import {
   BuildStep,
   GENERIC_ERROR_HEADING,
   GENERIC_ERROR_BODY,
 } from "@/constants";
+import { checkDBForData } from "@/app/backend/db-creation/lib";
 
 type QuerySelectionProps = {
   setBuildStep: Dispatch<SetStateAction<BuildStep>>;
