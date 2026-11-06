@@ -9,7 +9,7 @@ import {
   updateNewbornScreeningCategorySql,
 } from "./seedSqlStructs";
 import {
-  checkDBForData as checkDBForDataInternal,
+  checkDBForDataInternal,
   checkValueSetInsertion,
   insertDBStructArray,
   insertSeedDbStructs,
@@ -270,3 +270,4 @@ class SeedingService {
 }
 
 export const createDibbsDB = SeedingService.createDibbsDB;
+export const checkDBForData = SeedingService.checkDBForData;

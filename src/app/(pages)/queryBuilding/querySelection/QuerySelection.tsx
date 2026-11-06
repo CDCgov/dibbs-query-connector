@@ -27,7 +27,7 @@ import {
   GENERIC_ERROR_HEADING,
   GENERIC_ERROR_BODY,
 } from "@/constants";
-import { checkDBForData } from "@/app/backend/db-creation/lib";
+import { checkDBForData } from "@/app/backend/db-creation/service";
 
 type QuerySelectionProps = {
   setBuildStep: Dispatch<SetStateAction<BuildStep>>;
