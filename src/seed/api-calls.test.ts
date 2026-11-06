@@ -1,5 +1,5 @@
 import { OperationOutcome } from "fhir/r4";
-import { getVSACValueSet } from "./service";
+import { getVSACValueset } from "./api-calls";
 
 jest.mock("@/app/backend/db/decorators/auth");
 
@@ -21,7 +21,7 @@ describe("getVSACValueSet", () => {
     // VSAC answers over HTTP/2, so there's no status text either.
     fetchSpy.mockResolvedValue(new Response(null, { status: 401 }));
 
-    const result = (await getVSACValueSet("1.2.3")) as OperationOutcome;
+    const result = (await getVSACValueset("1.2.3")).data as OperationOutcome;
 
     expect(result.resourceType).toBe("OperationOutcome");
     expect(result.issue[0].code).toBe("security");
@@ -39,7 +39,7 @@ describe("getVSACValueSet", () => {
       ),
     );
 
-    const result = (await getVSACValueSet("1.2.3")) as OperationOutcome;
+    const result = (await getVSACValueset("1.2.3")).data as OperationOutcome;
 
     expect(result.issue[0].code).toBe("processing");
     expect(result.issue[0].diagnostics).toBe("404: Value set not found");
@@ -50,7 +50,7 @@ describe("getVSACValueSet", () => {
       new Response("Service Unavailable", { status: 503 }),
     );
 
-    const result = (await getVSACValueSet("1.2.3")) as OperationOutcome;
+    const result = (await getVSACValueset("1.2.3")).data as OperationOutcome;
 
     expect(result.issue[0].code).toBe("processing");
     expect(result.issue[0].diagnostics).toBe("503: Service Unavailable");

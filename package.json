@@ -19,7 +19,9 @@
     "test:update": "jest --updateSnapshot --testPathIgnorePatterns=/e2e/",
     "test:integration": "cross-env JUST_INTEGRATION=true bash ./setup-scripts/unit_and_integration_tests.sh",
     "test:playwright": "bash ./setup-scripts/e2e_tests.sh",
-    "test:playwright:ui": "bash ./setup-scripts/e2e_tests_local.sh"
+    "test:playwright:ui": "bash ./setup-scripts/e2e_tests_local.sh",
+    "db:refresh": "bash ./setup-scripts/reset_db.sh",
+    "gen-api-artifacts": " npx tsx --env-file=.env src/seed/index.mts"
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.1158.0",

@@ -1,30 +1,28 @@
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import ExampleVsacValueSet from "../../tests/assets/VSACValueSet.json";
 import { ValueSet as FhirValueSet } from "fhir/r4";
-import {
-  isUmbrellaErsdId,
-  stripErsdVersionSuffix,
-  translateVSACToInternalValueSet,
-} from "./utils";
-import { fetchConditionWithRetry } from "./service";
-import { getVSACValueSet } from "@/app/backend/code-systems/service";
 import { INVALID_API_KEY_LITERAL, MISSING_API_KEY_LITERAL } from "@/constants";
 import { suppressConsoleLogs } from "@/app/tests/integration/fixtures";
+import { fetchConditionWithRetry } from "@/seed/service";
+import {
+  translateVSACToInternalValueSet,
+  stripErsdVersionSuffix,
+  isUmbrellaErsdId,
+} from "@/seed/process-data";
+import { getVSACValueset } from "@/seed/api-calls";
 
-jest.mock("@/app/backend/code-systems/service", () => ({
-  getVSACValueSet: jest.fn(),
+jest.mock("@/seed/api-calls", () => ({
+  getVSACValueset: jest.fn(),
 }));
 
-jest.mock("@/app/utils/auth", () => ({
-  adminAccessCheck: jest.fn().mockResolvedValue(true),
-}));
+jest.mock("@/app/utils/auth", () => ({}));
 
 jest.mock("@/app/backend/audit-logs/lib", () => ({
   generateAuditSuccessMessage: jest.fn(),
   generateAuditValues: jest.fn(),
 }));
 
-const mockGetVSACValueSet = getVSACValueSet as unknown as jest.Mock;
+const mockGetVSACValueSet = getVSACValueset as unknown as jest.Mock;
 
 const EXPECTED_INTERNAL_VALUESET: DibbsValueSet = {
   valueSetId: `${ExampleVsacValueSet.id}_${ExampleVsacValueSet.version}`,
@@ -106,14 +104,20 @@ describe("isUmbrellaErsdId", () => {
 describe("fetchConditionWithRetry", () => {
   const CONDITION = "code1*system1*Condition One";
   const PARAMS_RESPONSE = {
-    resourceType: "Parameters",
-    parameter: [{ name: "version", valueString: "http://vsac/version/2024" }],
+    data: {
+      resourceType: "Parameters",
+      parameter: [{ name: "version", valueString: "http://vsac/version/2024" }],
+    },
+    success: true,
   };
   const OPERATION_OUTCOME = {
-    resourceType: "OperationOutcome",
-    issue: [
-      { severity: "error", code: "processing", diagnostics: "503: down" },
-    ],
+    data: {
+      resourceType: "OperationOutcome",
+      issue: [
+        { severity: "error", code: "processing", diagnostics: "503: down" },
+      ],
+    },
+    success: false,
   };
 
   beforeEach(() => {
@@ -188,14 +192,17 @@ describe("fetchConditionWithRetry", () => {
 
   it("throws immediately without retrying when VSAC rejects the API key", async () => {
     mockGetVSACValueSet.mockResolvedValue({
-      resourceType: "OperationOutcome",
-      issue: [
-        {
-          severity: "error",
-          code: "security",
-          diagnostics: "401: Unauthorized",
-        },
-      ],
+      data: {
+        resourceType: "OperationOutcome",
+        issue: [
+          {
+            severity: "error",
+            code: "security",
+            diagnostics: "401: Unauthorized",
+          },
+        ],
+      },
+      success: false,
     });
 
     await expect(fetchConditionWithRetry(CONDITION)).rejects.toMatchObject({

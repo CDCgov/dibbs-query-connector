@@ -85,7 +85,7 @@ describe("GET Health Check", () => {
 
 describe("POST Query FHIR Server - Authentication", () => {
   beforeEach(() => {
-    // suppressConsoleLogs();
+    suppressConsoleLogs();
     resetMocksToDefault();
   });
 
