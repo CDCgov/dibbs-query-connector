@@ -1,10 +1,10 @@
 import { Bundle, Resource, ValueSet } from "fhir/r4";
 import { writeFile, access, constants, readFile } from "fs/promises";
-import { fetchVsacCapability } from "./fetch/api-calls";
+import { fetchVsacCapability } from "./api-calls";
 import { createHash } from "crypto";
 import { createReadStream } from "fs";
 import { pipeline } from "stream/promises";
-import { VsacResult } from "./fetch/fetch-external-artifacts";
+import { VsacResult } from "./fetch-external-artifacts";
 
 type ApiManifestFile = {
   version: string;

@@ -3,19 +3,20 @@
 // it, so we stub the module with a bare class.
 jest.mock("../db/service", () => ({ DbClient: class {} }));
 
-import { BundleEntry, ValueSet as FhirValueSet } from "fhir/r4";
+import { ValueSet as FhirValueSet } from "fhir/r4";
 import { insertConceptSql, insertValuesetToConceptSql } from "./seedSqlStructs";
 import {
-  isUmbrellaErsdId,
-  isVsacOid,
-  stripErsdVersionSuffix,
-  stripProtocolAndTLDFromSystemUrl,
-  translateVSACToInternalValueSet,
-  indexErsdByOid,
   generateValuesetConceptJoinSqlPromises,
   generateConceptSqlPromises,
 } from "./utils";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
+import {
+  isUmbrellaErsdId,
+  stripErsdVersionSuffix,
+  isVsacOid,
+  stripProtocolAndTLDFromSystemUrl,
+  translateVSACToInternalValueSet,
+} from "@/seed/process-data";
 
 type MockDbClient = { query: jest.Mock };
 
@@ -163,121 +164,6 @@ describe("translateVSACToInternalValueSet", () => {
     delete fhir.compose!.include[0].concept;
     const result = translateVSACToInternalValueSet(fhir, "dxtc");
     expect(result.concepts).toBeUndefined();
-  });
-});
-
-describe("indexErsdByOid", () => {
-  it("returns empty structures for undefined input", () => {
-    const result = indexErsdByOid(undefined);
-    expect(result.oidToErsdType.size).toBe(0);
-    expect(result.nonUmbrellaValueSets).toEqual([]);
-  });
-
-  it("indexes referenced oids by umbrella type and strips |version suffixes", () => {
-    const entries: BundleEntry<FhirValueSet>[] = [
-      {
-        resource: {
-          resourceType: "ValueSet",
-          id: "dxtc",
-          status: "active",
-          compose: {
-            include: [
-              // v3-style: one include entry per referenced value set,
-              // each canonical URL carries a `|version` suffix.
-              {
-                valueSet: ["http://example.org/ValueSet/oid-A|20230602"],
-              },
-              {
-                valueSet: ["http://example.org/ValueSet/oid-B|20230602"],
-              },
-            ],
-          },
-        },
-      },
-      {
-        resource: {
-          resourceType: "ValueSet",
-          id: "mrtc",
-          status: "active",
-          compose: {
-            // v2-style: multiple refs packed into a single include entry.
-            include: [
-              {
-                valueSet: [
-                  "http://example.org/ValueSet/oid-C",
-                  "http://example.org/ValueSet/oid-D",
-                ],
-              },
-            ],
-          },
-        },
-      },
-    ];
-
-    const { oidToErsdType } = indexErsdByOid(entries);
-
-    expect(oidToErsdType.get("oid-A")).toBe("dxtc");
-    expect(oidToErsdType.get("oid-B")).toBe("dxtc");
-    expect(oidToErsdType.get("oid-C")).toBe("mrtc");
-    expect(oidToErsdType.get("oid-D")).toBe("mrtc");
-    expect(oidToErsdType.size).toBe(4);
-  });
-
-  it("types immunization-only value sets as iztc without overriding mrtc", () => {
-    const entries: BundleEntry<FhirValueSet>[] = [
-      {
-        resource: {
-          resourceType: "ValueSet",
-          id: "mrtc-3.2.0",
-          status: "active",
-          compose: {
-            include: [{ valueSet: ["http://example.org/ValueSet/oid-shared"] }],
-          },
-        },
-      },
-      {
-        resource: {
-          resourceType: "ValueSet",
-          id: "iztc-3.2.0",
-          status: "active",
-          compose: {
-            include: [
-              { valueSet: ["http://example.org/ValueSet/oid-shared"] },
-              { valueSet: ["http://example.org/ValueSet/oid-iz-only"] },
-            ],
-          },
-        },
-      },
-    ];
-
-    const { oidToErsdType } = indexErsdByOid(entries);
-
-    expect(oidToErsdType.get("oid-shared")).toBe("mrtc");
-    expect(oidToErsdType.get("oid-iz-only")).toBe("iztc");
-  });
-
-  it("collects only non-umbrella resources into nonUmbrellaValueSets", () => {
-    const leafValueSet: FhirValueSet = {
-      resourceType: "ValueSet",
-      id: "oid-A",
-      status: "active",
-    };
-    const entries: BundleEntry<FhirValueSet>[] = [
-      {
-        resource: {
-          resourceType: "ValueSet",
-          id: "dxtc-3.1.2",
-          status: "active",
-          compose: { include: [{ valueSet: ["http://x/ValueSet/oid-A"] }] },
-        },
-      },
-      { resource: leafValueSet },
-    ];
-
-    const { nonUmbrellaValueSets } = indexErsdByOid(entries);
-
-    expect(nonUmbrellaValueSets).toHaveLength(1);
-    expect(nonUmbrellaValueSets[0].id).toBe("oid-A");
   });
 });
 

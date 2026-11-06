@@ -1,15 +1,15 @@
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import ExampleVsacValueSet from "../../tests/assets/VSACValueSet.json";
 import { ValueSet as FhirValueSet } from "fhir/r4";
-import {
-  isUmbrellaErsdId,
-  stripErsdVersionSuffix,
-  translateVSACToInternalValueSet,
-} from "./utils";
-import { fetchConditionWithRetry } from "./service";
 import { getVSACValueSet } from "@/app/backend/code-systems/service";
 import { INVALID_API_KEY_LITERAL, MISSING_API_KEY_LITERAL } from "@/constants";
 import { suppressConsoleLogs } from "@/app/tests/integration/fixtures";
+import { fetchConditionWithRetry } from "@/seed/fetch-external-artifacts";
+import {
+  translateVSACToInternalValueSet,
+  stripErsdVersionSuffix,
+  isUmbrellaErsdId,
+} from "@/seed/process-data";
 
 jest.mock("@/app/backend/code-systems/service", () => ({
   getVSACValueSet: jest.fn(),

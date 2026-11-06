@@ -14,7 +14,7 @@ jest.mock("../code-systems/service", () => ({
 
 import { Bundle, ValueSet } from "fhir/r4";
 import { getERSD } from "../code-systems/service";
-import { indexErsdResponseByOid } from "./lib";
+import { fetchErsdPayload } from "@/seed/fetch-external-artifacts";
 
 const mockGetERSD = getERSD as unknown as jest.Mock;
 
@@ -116,7 +116,7 @@ const ERSD_BUNDLE: Bundle = {
   ] as Bundle["entry"],
 };
 
-describe("indexErsdResponseByOid", () => {
+describe("fetchErsdPayload", () => {
   let warnSpy: jest.SpyInstance;
 
   beforeEach(() => {
@@ -130,13 +130,13 @@ describe("indexErsdResponseByOid", () => {
   });
 
   it("only queues OID-identified value sets for VSAC lookup", async () => {
-    const { oids } = await indexErsdResponseByOid();
+    const { oids } = await fetchErsdPayload();
 
     expect(oids).toEqual([LAB_OID, IZ_OID]);
   });
 
   it("warns about the value sets it leaves out", async () => {
-    await indexErsdResponseByOid();
+    await fetchErsdPayload();
 
     expect(warnSpy).toHaveBeenCalledTimes(1);
     const message = warnSpy.mock.calls[0][0] as string;
@@ -147,7 +147,7 @@ describe("indexErsdResponseByOid", () => {
   });
 
   it("only links conditions to value sets that will be fetched", async () => {
-    const { conditions } = await indexErsdResponseByOid();
+    const { conditions } = await fetchErsdPayload();
 
     expect(conditions).toEqual([
       {
@@ -166,9 +166,9 @@ describe("indexErsdResponseByOid", () => {
   });
 
   it("types immunization value sets so they land in a concept category", async () => {
-    const { oidToErsdType } = await indexErsdResponseByOid();
+    const { oidToErsdResourceMap } = await fetchErsdPayload();
 
-    expect(oidToErsdType.get(LAB_OID)).toBe("lrtc");
-    expect(oidToErsdType.get(IZ_OID)).toBe("iztc");
+    expect(oidToErsdResourceMap.get(LAB_OID)).toBe("lrtc");
+    expect(oidToErsdResourceMap.get(IZ_OID)).toBe("iztc");
   });
 });
