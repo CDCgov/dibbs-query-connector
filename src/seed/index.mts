@@ -15,10 +15,10 @@ import { VSAC_FETCH_BATCH_SIZE } from "./constants";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const ERSD_ARTIFACT_PATH = `${__dirname}/artifacts/ersd`;
-const ERSD_MANIFEST_PATH = `${__dirname}/artifacts/ersd/manifest.json`;
-const VSAC_ARTIFACT_PATH = `${__dirname}/artifacts/vsac`;
-const VSAC_MANIFEST_PATH = `${__dirname}/artifacts/vsac/manifest.json`;
+const ERSD_ARTIFACT_PATH = `${__dirname}/../app/artifacts/ersd`;
+const ERSD_MANIFEST_PATH = `${__dirname}/../app/artifacts/ersd/manifest.json`;
+const VSAC_ARTIFACT_PATH = `${__dirname}/../app/artifacts/vsac`;
+const VSAC_MANIFEST_PATH = `${__dirname}/../app/artifacts/vsac/manifest.json`;
 
 // bump manifest version when the eRSD / VSAC API's introduce breaking changes
 // to the parsing code

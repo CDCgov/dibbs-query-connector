@@ -198,7 +198,7 @@ export async function writeVSACData(
   const fileHash = await calculateSha256(filePath);
   const { manifestDetails } = await generateVsacManifestDetails(
     valueSets,
-    filename,
+    filePath,
     releaseVersion,
     releaseDate,
     fileHash,
