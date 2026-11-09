@@ -183,13 +183,17 @@ export async function writeVSACData(
   outputDir: string,
   manifestVersion: number,
 ) {
-  const { releaseVersion, releaseDate, filename } =
-    await generateVsacIdentificationProperties();
+  const {
+    releaseVersion,
+    releaseDate,
+    filename: vsacFilename,
+  } = await generateVsacIdentificationProperties();
   const { filename: ersdFilename } = generateErsdIdentificationProperties(ersd);
 
   const valueSets = data.map((r) => r.vs);
 
-  const filePath = `${outputDir}/${filename}_${ersdFilename}.json`;
+  const filename = `${vsacFilename}_${ersdFilename}.json`;
+  const filePath = `${outputDir}/${filename}`;
 
   console.log(`📡  📝 Writing ${valueSets.length} resources to disk`);
   await writeFile(filePath, JSON.stringify(valueSets), "utf-8");
@@ -198,7 +202,7 @@ export async function writeVSACData(
   const fileHash = await calculateSha256(filePath);
   const { manifestDetails } = await generateVsacManifestDetails(
     valueSets,
-    filePath,
+    filename,
     releaseVersion,
     releaseDate,
     fileHash,
