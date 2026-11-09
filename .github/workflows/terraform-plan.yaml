@@ -84,7 +84,7 @@ jobs:
 
       - name: Comment plan on the pull request
         if: always() && steps.plan.outcome != 'skipped'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           ROOT: ${{ matrix.root }}
           EXIT_CODE: ${{ steps.plan.outputs.exit_code }}
