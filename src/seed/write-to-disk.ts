@@ -192,8 +192,8 @@ export async function writeVSACData(
 
   const valueSets = data.map((r) => r.vs);
 
-  const filename = `${vsacFilename}_${ersdFilename}.json`;
-  const filePath = `${outputDir}/${filename}`;
+  const filename = `${vsacFilename}_${ersdFilename}`;
+  const filePath = `${outputDir}/${filename}.json`;
 
   console.log(`📡  📝 Writing ${valueSets.length} resources to disk`);
   await writeFile(filePath, JSON.stringify(valueSets), "utf-8");
