@@ -18,6 +18,8 @@ services:
       - ${ENV_FILE:-.env}
     environment:
       JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:-}
+      KC_HOSTNAME: http://localhost:8081
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: true
     restart: always
     command:
       - start-dev
