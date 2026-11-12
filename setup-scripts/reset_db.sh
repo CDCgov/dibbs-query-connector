@@ -12,7 +12,6 @@ docker compose exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "
     TRUNCATE TABLE valuesets CASCADE; 
     TRUNCATE TABLE concepts CASCADE;
     TRUNCATE TABLE query CASCADE;
-    TRUNCATE TABLE category_data;
 "'
 
 echo "Database reset complete"
