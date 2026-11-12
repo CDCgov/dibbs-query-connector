@@ -1,4 +1,5 @@
-import { fetchDbPassword, buildSslConfig } from "@/app/backend/db/config";
+import { buildSslConfig } from "@/app/backend/db/config";
+import { fetchDbPassword } from "@/app/backend/db/util";
 
 import fs from "fs";
 

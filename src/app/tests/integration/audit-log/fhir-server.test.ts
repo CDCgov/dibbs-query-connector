@@ -10,8 +10,8 @@ import {
   updateFhirServer,
   deleteFhirServer,
 } from "@/app/backend/fhir-servers/service";
-import { resetMocksToDefault } from "../mocks";
 import { suppressConsoleLogs } from "../fixtures";
+import { resetMocksToDefault } from "../mocks";
 
 const TEST_FHIR_SERVER = {
   id: "jolly-roger-bay",

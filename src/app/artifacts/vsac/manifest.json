@@ -1,0 +1,13 @@
+{
+  "manifestVersion": 1,
+  "name": "vsac",
+  "files": {
+    "vsac-fhir_2.26.18_ersd_3.2.0": {
+      "version": "2.26.18",
+      "releaseDate": "2026-11-03T20:43:20-05:00",
+      "hash": "2503f320a5012e1ff17fea2dcbbb33c83a5380dd66e68e9fcd52fa4b5d7d4ca4",
+      "fetchedAtUtc": "2026-11-09T18:13:56.122Z",
+      "resourceCount": 1577
+    }
+  }
+}
