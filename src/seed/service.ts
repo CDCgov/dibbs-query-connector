@@ -153,7 +153,7 @@ export type VsacResult = {
 };
 
 type VsacErrorResult = {
-  error: OperationOutcome | PromiseRejectedResult;
+  error: OperationOutcome;
   oid: string;
 };
 
@@ -207,13 +207,9 @@ export async function batchFetchVsacValuesets(oidsToFetch: string[]): Promise<{
           !isFhirValueset(item.vs),
       )
       .map((i) => {
-        const details = i.vs.issue[0].details;
-        const errorDisplay = details?._text
-          ? details.text
-          : JSON.stringify(details);
-
+        const details = i.vs.issue[0]?.diagnostics ?? "unknown VSAC error";
         console.error(
-          `VSAC fetch with OID ${i.oid} resolved with OperationOutcome issue ${errorDisplay}`,
+          `VSAC fetch with OID ${i.oid} resolved with OperationOutcome issue ${details}`,
         );
 
         return { error: i.vs, oid: i.oid };
@@ -258,7 +254,7 @@ export async function fetchValueSetsFromVsac(
   console.info(
     `Attempting fetch for ${ersdPayload.oids?.length} VSAC value sets.`,
   );
-  while (startIdx < ersdPayload.oids.length && attempt < maxRetries) {
+  while (startIdx < ersdPayload.oids.length) {
     const boundedLastIdx = Math.min(lastIdx, ersdPayload.oids.length);
 
     console.info(
@@ -270,7 +266,10 @@ export async function fetchValueSetsFromVsac(
     const { vsacResults, errors } = batchValuesets;
 
     if (errors.length > 0) {
-      if (attempt > maxRetries) {
+      if (errors.some((e) => e.error)) {
+      }
+
+      if (attempt >= maxRetries) {
         throw new Error(
           `VSAC fetch returned errors in batch ${batch}. Verify UMLS_API_KEY is valid and not expired.`,
         );

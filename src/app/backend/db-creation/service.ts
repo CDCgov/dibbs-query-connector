@@ -58,7 +58,9 @@ class SeedingService {
     );
     const MAX_RETRIES = 3;
     for (const vs of valuesets) {
-      if (vs) {
+      // Retired value sets can come back without concepts. They're tracked in
+      // retiredOids for the condition mappings below, so skip the insert.
+      if (vs?.concepts !== undefined) {
         await insertValueSet(vs, dbClient);
 
         let missingData = await checkValueSetInsertion(vs, dbClient);

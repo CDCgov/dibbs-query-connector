@@ -20,40 +20,55 @@ const ERSD_MANIFEST_PATH = `${__dirname}/../app/artifacts/ersd/manifest.json`;
 const VSAC_ARTIFACT_PATH = `${__dirname}/../app/artifacts/vsac`;
 const VSAC_MANIFEST_PATH = `${__dirname}/../app/artifacts/vsac/manifest.json`;
 
-// bump manifest version when the eRSD / VSAC API's introduce breaking changes
-// to the parsing code
+// TODO: manually bump the manifest version when the eRSD / VSAC API's introduce
+// breaking changes to the parsing code
 const ERSD_MANIFEST_VERSION = 1;
 const VSAC_MANIFEST_VERSION = 1;
 
 // check for mainfest existence and validate the version is compatible with
 // the existing hardcoded version
+try {
+  const isErsdManifestCompatible = await checkForCompatibleManifest(
+    ERSD_MANIFEST_PATH,
+    ERSD_MANIFEST_VERSION,
+  );
+  if (!isErsdManifestCompatible.compatible) {
+    throw Error(
+      `Incompatible eRSD manifest: expected ${ERSD_MANIFEST_VERSION} incompatible with ${isErsdManifestCompatible.version}`,
+    );
+  }
 
-await checkForCompatibleManifest(ERSD_MANIFEST_PATH, ERSD_MANIFEST_VERSION);
+  const ersd = await fetchAndProcessErsdResources();
+  const { ersdManifest, ersdValueSets } = await writeErsdData(
+    ersd,
+    ERSD_ARTIFACT_PATH,
+    ERSD_MANIFEST_VERSION,
+  );
+  await createManifest(ERSD_MANIFEST_PATH, ersdManifest);
 
-const ersd = await fetchAndProcessErsdResources();
-const { ersdManifest, ersdValueSets } = await writeErsdData(
-  ersd,
-  ERSD_ARTIFACT_PATH,
-  ERSD_MANIFEST_VERSION,
-);
-await createManifest(ERSD_MANIFEST_PATH, ersdManifest);
+  const isVsacManifestCompatible = await checkForCompatibleManifest(
+    VSAC_MANIFEST_PATH,
+    VSAC_MANIFEST_VERSION,
+  );
 
-await checkForCompatibleManifest(VSAC_MANIFEST_PATH, VSAC_MANIFEST_VERSION);
-const ersdPayload = createErsdPayload(ersdValueSets);
-const vsacValueSets = await fetchValueSetsFromVsac(
-  ersdPayload,
-  VSAC_FETCH_BATCH_SIZE,
-);
+  if (!isVsacManifestCompatible.compatible) {
+    throw Error(
+      `Incompatible VSAC manifest: expected ${VSAC_MANIFEST_VERSION} incompatible with ${isVsacManifestCompatible.version}`,
+    );
+  }
+  const ersdPayload = createErsdPayload(ersdValueSets);
+  const vsacValueSets = await fetchValueSetsFromVsac(
+    ersdPayload,
+    VSAC_FETCH_BATCH_SIZE,
+  );
 
-const vsacManifest = await writeVSACData(
-  vsacValueSets,
-  ersd,
-  VSAC_ARTIFACT_PATH,
-  VSAC_MANIFEST_VERSION,
-);
-await createManifest(VSAC_MANIFEST_PATH, vsacManifest);
-
-// // based on the outputted data, update manifest file metadata
-// } catch (error) {
-//   console.error("❌ Error writing file:", error);
-// }
+  const vsacManifest = await writeVSACData(
+    vsacValueSets,
+    ersd,
+    VSAC_ARTIFACT_PATH,
+    VSAC_MANIFEST_VERSION,
+  );
+  await createManifest(VSAC_MANIFEST_PATH, vsacManifest);
+} catch (error) {
+  console.error("❌ Error updating API artifact files:", error);
+}

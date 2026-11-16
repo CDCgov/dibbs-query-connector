@@ -227,10 +227,16 @@ export async function checkForCompatibleManifest(
     await access(mainfestPath, constants.F_OK);
     const mainfestData = JSON.parse(await readFile(mainfestPath, "utf-8"));
 
-    return mainfestData["manifestVersion"] === curManifestVersion;
+    return {
+      version: mainfestData["manifestVersion"],
+      compatible: mainfestData["manifestVersion"] === curManifestVersion,
+    };
   } catch {
     // otherwise, no artifacts are present, so we're good to go
-    return true;
+    return {
+      version: 0,
+      compatible: true,
+    };
   }
 }
 
