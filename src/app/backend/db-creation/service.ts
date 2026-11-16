@@ -202,19 +202,25 @@ class SeedingService {
       await dbClient.query("BEGIN");
       try {
         const ersdPayload = await fetchErsdPayload();
-
-        if (ersdPayload) {
-          console.log("Seeding valuesets and relationships from VSAC");
-          await SeedingService.seedBatchValueSetsFromVsac(
-            ersdPayload,
-            dbClient,
-          );
-        } else {
-          console.error("Could not load eRSD, aborting DIBBs DB creation");
+        if (!ersdPayload) {
+          throw new Error("Could not load eRSD, aborting DIBBs DB creation");
         }
+
+        console.log("Seeding valuesets and relationships from VSAC");
+        await SeedingService.seedBatchValueSetsFromVsac(ersdPayload, dbClient);
         console.log(
           "Valuesets and relationships seeded successfully. Proceeding to seed static custom data.",
         );
+
+        // recreate intermediary table if needed
+        await dbClient.query(`
+        CREATE TABLE IF NOT EXISTS category_data (
+          condition_name TEXT,
+          condition_code TEXT PRIMARY KEY,
+          category TEXT,
+          FOREIGN KEY(condition_code) REFERENCES conditions(id)
+        );
+        `);
 
         const insertionTypes = [
           "valuesets",
