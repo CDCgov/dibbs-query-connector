@@ -108,7 +108,9 @@ export function translateVSACToInternalValueSet(
  *  - conditions extracted from the eRSD
  *  - a mapping between the OIDs <> eRSD resources for future scripting use.
  * */
-export function createErsdPayload(ersdValuesets: BundleEntry[] | undefined) {
+export function createErsdPayload(
+  ersdValuesets: BundleEntry[] | undefined,
+): ErsdPayload {
   const oidToErsdResourceMap = new Map<string, string>();
 
   Object.keys(ersdToDibbsConceptMap).forEach((k) => {
@@ -170,6 +172,7 @@ export function createErsdPayload(ersdValuesets: BundleEntry[] | undefined) {
             "us-ph-usage-context",
           ),
       );
+
       (conditionSchemes || []).forEach((usc) => {
         const ersdCond: ErsdCondition = {
           code: (usc.valueCodeableConcept?.coding || [])[0].code || "",
