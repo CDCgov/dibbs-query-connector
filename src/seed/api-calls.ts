@@ -130,7 +130,7 @@ export async function getERSD(
   }
 }
 
-export type VsacCapabilityStatement = Resource & {
+type VsacCapabilityStatement = Resource & {
   software: {
     name: string;
     version: string;

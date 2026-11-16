@@ -1,10 +1,4 @@
-import {
-  Bundle,
-  OperationOutcome,
-  Parameters,
-  Resource,
-  ValueSet,
-} from "fhir/r4";
+import { Bundle, OperationOutcome, Parameters, ValueSet } from "fhir/r4";
 import { ConditionStruct } from "@/app/backend/db-creation/seedSqlStructs";
 import {
   ErsdConceptType,
@@ -353,11 +347,3 @@ export async function fetchErsdPayload() {
 
   return createErsdPayload(ersdValuesets);
 }
-
-export type VsacCapabilityStatement = Resource & {
-  software: {
-    name: string;
-    version: string;
-    releaseDate: string;
-  };
-};
