@@ -292,13 +292,14 @@ export async function fetchValueSetsFromVsac(
 
     if (errors.length > 0) {
       await handleVsacRetry(errors, attempt, maxRetries, batch, oidsToFetch);
+      attempt += 1;
     } else {
       vsacValuesets.push(...vsacResults);
       startIdx += batchSize;
       lastIdx += batchSize;
       batch += 1;
+      attempt = 0;
     }
-    attempt += 1;
   }
 
   return vsacValuesets;
