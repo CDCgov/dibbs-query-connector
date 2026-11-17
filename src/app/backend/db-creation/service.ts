@@ -26,6 +26,7 @@ import {
   sleep,
   VSAC_BATCH_DELAY_MS,
   VSAC_FETCH_BATCH_SIZE,
+  VSAC_MAX_FETCH_RETRIES,
 } from "@/seed/utils";
 import { auditable } from "../audit-logs/decorator";
 import { adminRequired } from "../db/decorators/auth";
@@ -56,7 +57,6 @@ class SeedingService {
       ersdPayload,
       batchSize,
     );
-    const MAX_RETRIES = 3;
     for (const vs of valuesets) {
       // Retired value sets can come back without concepts. They're tracked in
       // retiredOids for the condition mappings below, so skip the insert.
@@ -72,11 +72,11 @@ class SeedingService {
           (missingData.missingValueSet ||
             missingData.missingConcepts.length > 0 ||
             missingData.missingMappings.length > 0) &&
-          retries < MAX_RETRIES
+          retries < VSAC_MAX_FETCH_RETRIES
         ) {
           retries++;
           console.log(
-            `Resolving missing values or errors for valueset ${vs.valueSetId} (attempt ${retries}/${MAX_RETRIES})`,
+            `Resolving missing values or errors for valueset ${vs.valueSetId} (attempt ${retries}/${VSAC_MAX_FETCH_RETRIES})`,
           );
           await insertValueSet(vs, dbClient);
           missingData = await checkValueSetInsertion(vs, dbClient);
@@ -87,7 +87,7 @@ class SeedingService {
           missingData.missingMappings.length > 0
         ) {
           throw new Error(
-            `Failed to fully insert valueset ${vs.valueSetId} after ${MAX_RETRIES} retries`,
+            `Failed to fully insert valueset ${vs.valueSetId} after ${VSAC_MAX_FETCH_RETRIES} retries`,
           );
         }
       }
