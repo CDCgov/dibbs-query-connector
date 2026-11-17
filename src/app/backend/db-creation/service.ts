@@ -2,7 +2,6 @@
 
 import { randomUUID } from "crypto";
 import {
-  ConditionStruct,
   ConditionToValueSetStruct,
   updatedCancerCategorySql,
   updateErsdCategorySql,
@@ -16,14 +15,8 @@ import {
   insertValueSet,
 } from "./lib";
 import { DbClient } from "../db/service";
-import { fetchConditionWithRetry } from "@/seed/service";
-import {
-  ErsdPayload,
-  sleep,
-  VSAC_BATCH_DELAY_MS,
-  VSAC_FETCH_BATCH_SIZE,
-  VSAC_MAX_FETCH_RETRIES,
-} from "@/seed/utils";
+import { fetchConditionsFromVsac } from "@/seed/service";
+import { ErsdPayload, VSAC_MAX_FETCH_RETRIES } from "@/seed/utils";
 import { auditable } from "../audit-logs/decorator";
 import { adminRequired } from "../db/decorators/auth";
 import {
@@ -57,7 +50,6 @@ class SeedingService {
   static async seedBatchValueSetsFromVsac(
     ersdPayload: ErsdPayload,
     dbClient: DbClient,
-    batchSize = VSAC_FETCH_BATCH_SIZE,
   ) {
     const { valuesets, oidsToVersion, retiredOids } =
       await composeDibbsValueSets(ersdPayload);
@@ -108,35 +100,7 @@ class SeedingService {
       conditionSet.add(repString);
     });
 
-    // Create DB based condition structures. These VSAC lookups used to fire all
-    // at once via Promise.all with no batching, throttling, or retry. On a
-    // constrained egress path (e.g. ECS behind a NAT gateway) a burst of hundreds
-    // of simultaneous TLS connections to VSAC regularly triggers a transient
-    // "fetch failed" (connection reset / timeout), and because Promise.all rejects
-    // on the first failure a single network blip aborted and rolled back the whole
-    // seed. Batch the lookups (matching the value set path's concurrency) and retry
-    // transient failures so the seed survives intermittent network issues.
-    const conditionStrings = Array.from(conditionSet);
-    const conditionStructs: ConditionStruct[] = [];
-
-    for (
-      let startIdx = 0;
-      startIdx < conditionStrings.length;
-      startIdx += batchSize
-    ) {
-      const endIdx = Math.min(startIdx + batchSize, conditionStrings.length);
-      console.log("Fetching condition versions", startIdx, "to", endIdx);
-      const batch = conditionStrings.slice(startIdx, endIdx);
-      const batchResults = await Promise.all(
-        batch.map((cString) => fetchConditionWithRetry(cString)),
-      );
-      conditionStructs.push(...batchResults);
-
-      // Courtesy pause between batches so we don't overwhelm VSAC's API.
-      if (endIdx < conditionStrings.length) {
-        await sleep(VSAC_BATCH_DELAY_MS);
-      }
-    }
+    const conditionStructs = await fetchConditionsFromVsac(conditionSet);
 
     // Now insert them
     await insertDBStructArray(conditionStructs, "conditions", dbClient);

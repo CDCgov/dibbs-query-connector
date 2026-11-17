@@ -12,6 +12,8 @@ import {
   sleep,
   VsacResult,
   isParameters,
+  VSAC_FETCH_BATCH_SIZE,
+  VSAC_BATCH_DELAY_MS,
 } from "./utils";
 import { getERSD, getVsacCondition, getVsacValueSet } from "./api-calls";
 
@@ -295,6 +297,50 @@ export async function fetchValueSetsFromVsac(
   }
 
   return vsacValuesets;
+}
+
+/**
+ * Function to fetch all conditions from VSAC after cross-walking the necessary
+ * ValueSet information from the eRSD.
+ * @param conditionSet - Set of condition OIDs coming from VSAC to follow up on.
+ * @param batchSize - How many parallel VSAC fetches to perform at once.
+ * @returns conditionStructs - condition objects to insert into the DB.
+ */
+export async function fetchConditionsFromVsac(
+  conditionSet: Set<string>,
+  batchSize = VSAC_FETCH_BATCH_SIZE,
+) {
+  // Create DB based condition structures. These VSAC lookups used to fire all
+  // at once via Promise.all with no batching, throttling, or retry. On a
+  // constrained egress path (e.g. ECS behind a NAT gateway) a burst of hundreds
+  // of simultaneous TLS connections to VSAC regularly triggers a transient
+  // "fetch failed" (connection reset / timeout), and because Promise.all rejects
+  // on the first failure a single network blip aborted and rolled back the whole
+  // seed. Batch the lookups (matching the value set path's concurrency) and retry
+  // transient failures so the seed survives intermittent network issues.
+  const conditionStrings = Array.from(conditionSet);
+  const conditionStructs: ConditionStruct[] = [];
+
+  for (
+    let startIdx = 0;
+    startIdx < conditionStrings.length;
+    startIdx += batchSize
+  ) {
+    const endIdx = Math.min(startIdx + batchSize, conditionStrings.length);
+    console.log("Fetching conditions", startIdx, "to", endIdx);
+    const batch = conditionStrings.slice(startIdx, endIdx);
+    const batchResults = await Promise.all(
+      batch.map((cString) => fetchConditionWithRetry(cString)),
+    );
+    conditionStructs.push(...batchResults);
+
+    // Courtesy pause between batches so we don't overwhelm VSAC's API.
+    if (endIdx < conditionStrings.length) {
+      await sleep(VSAC_BATCH_DELAY_MS);
+    }
+  }
+
+  return conditionStructs;
 }
 
 /**

@@ -5,6 +5,7 @@ import { createReadStream } from "fs";
 import { pipeline } from "stream/promises";
 import { getVsacCapability } from "./api-calls";
 import { VsacResult } from "./utils";
+import { ConditionStruct } from "@/app/backend/db-creation/seedSqlStructs";
 
 type ApiManifestFile = {
   version: string;
@@ -171,14 +172,16 @@ async function generateVsacManifestDetails(
 /**
  * Write the fetched VSAC resources to disk
  *
- * @param data Fetched eRSD bundle. Will use the bundle ID as the filename
+ * @param valueSetData Fetched VSAC bundle. Will use the bundle ID as the filename
+ * @param conditionData Condition valuesets fetched from vsac. Will use the bundle ID as the filename
  * @param ersd Corresponding eRSD bundle. Will use the bundle ID in the resulting filename
  * @param outputDir Output directory to write the final artifacts to
  * @param manifestVersion
  * @returns None - compiled resource file will be written to disk
  */
 export async function writeVSACData(
-  data: VsacResult[],
+  valueSetData: VsacResult[],
+  conditionData: ConditionStruct[],
   ersd: Bundle,
   outputDir: string,
   manifestVersion: number,
@@ -190,13 +193,17 @@ export async function writeVSACData(
   } = await generateVsacIdentificationProperties();
   const { filename: ersdFilename } = generateErsdIdentificationProperties(ersd);
 
-  const valueSets = data.map((r) => r.vs);
+  const valueSets = valueSetData.map((r) => r.vs);
 
   const filename = `${vsacFilename}_${ersdFilename}`;
   const filePath = `${outputDir}/${filename}.json`;
 
   console.log(`📡  📝 Writing ${valueSets.length} resources to disk`);
-  await writeFile(filePath, JSON.stringify(valueSets), "utf-8");
+  await writeFile(
+    filePath,
+    JSON.stringify({ valuesets: valueSets, conditions: conditionData }),
+    "utf-8",
+  );
   console.log("✅ File written successfully!");
 
   const fileHash = await calculateSha256(filePath);
