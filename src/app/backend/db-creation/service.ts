@@ -16,11 +16,7 @@ import {
   insertValueSet,
 } from "./lib";
 import { DbClient } from "../db/service";
-import {
-  fetchErsdPayload,
-  fetchConditionWithRetry,
-  fetchDibbsValueSets,
-} from "@/seed/service";
+import { fetchConditionWithRetry } from "@/seed/service";
 import {
   ErsdPayload,
   sleep,
@@ -30,6 +26,16 @@ import {
 } from "@/seed/utils";
 import { auditable } from "../audit-logs/decorator";
 import { adminRequired } from "../db/decorators/auth";
+import {
+  readErsdFromArtifact,
+  readVsacFromArtifact,
+} from "./read-db-artifacts";
+import { ErsdConceptType } from "@/constants";
+import {
+  createErsdPayload,
+  translateVSACToInternalValueSet,
+} from "@/seed/process-data";
+import { ValueSet } from "fhir/r4";
 
 class SeedingService {
   /**
@@ -53,10 +59,9 @@ class SeedingService {
     dbClient: DbClient,
     batchSize = VSAC_FETCH_BATCH_SIZE,
   ) {
-    const { valuesets, oidsToVersion, retiredOids } = await fetchDibbsValueSets(
-      ersdPayload,
-      batchSize,
-    );
+    const { valuesets, oidsToVersion, retiredOids } =
+      await composeDibbsValueSets(ersdPayload);
+
     for (const vs of valuesets) {
       // Retired value sets can come back without concepts. They're tracked in
       // retiredOids for the condition mappings below, so skip the insert.
@@ -201,7 +206,9 @@ class SeedingService {
       await dbClient.connect();
       await dbClient.query("BEGIN");
       try {
-        const ersdPayload = await fetchErsdPayload();
+        console.log("Reading eRSD resource from disk");
+
+        const ersdPayload = await composeErsdPayload();
         if (!ersdPayload) {
           throw new Error("Could not load eRSD, aborting DIBBs DB creation");
         }
@@ -279,3 +286,50 @@ class SeedingService {
 
 export const createDibbsDB = SeedingService.createDibbsDB;
 export const checkDBForData = SeedingService.checkDBForData;
+
+async function composeErsdPayload() {
+  const ersd = await readErsdFromArtifact();
+  const ersdValuesets = ersd.filter(
+    (e) =>
+      (e.resource as { resourceType?: string })?.resourceType === "ValueSet",
+  );
+
+  return createErsdPayload(ersdValuesets);
+}
+
+/**
+ * Function to fetch valuesets from VSAC and map them to internal valueset representation
+ * @param ersdPayload - the eRSD payload to inform which valuesets needing fetching
+ * @param batchSize - batch size to not overwhelm the VSAC API - 100 by default
+ * @returns DibbsValueset[] - an array of DibbsValueset objects
+ */
+export async function composeDibbsValueSets(ersdPayload: ErsdPayload) {
+  const vsacValueSets = (await readVsacFromArtifact()) as ValueSet[];
+
+  const oidsToVersion: Map<String, String> = new Map<String, String>();
+  const retiredOids: Set<String> = new Set<String>();
+
+  const internalValueSets = vsacValueSets
+    .filter((v) => v.id !== undefined)
+    .map((v) => {
+      const eRSDType: ErsdConceptType = ersdPayload.oidToErsdResourceMap.get(
+        v.id as string,
+      ) as ErsdConceptType;
+
+      const internalValueSet = translateVSACToInternalValueSet(v, eRSDType);
+
+      oidsToVersion.set(v.id as string, internalValueSet.valueSetVersion);
+
+      // Found a retired OID, store it so we don't insert condition mappings on it
+      if (internalValueSet.concepts === undefined) {
+        retiredOids.add(internalValueSet.valueSetExternalId || "");
+      }
+      return internalValueSet;
+    });
+
+  return {
+    valuesets: internalValueSets,
+    oidsToVersion: oidsToVersion,
+    retiredOids: retiredOids,
+  };
+}

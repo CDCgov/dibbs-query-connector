@@ -1,19 +1,11 @@
 import { OperationOutcome, ValueSet } from "fhir/r4";
 import { ConditionStruct } from "@/app/backend/db-creation/seedSqlStructs";
-import {
-  ErsdConceptType,
-  INVALID_API_KEY_LITERAL,
-  MISSING_API_KEY_LITERAL,
-} from "@/constants";
-import {
-  createErsdPayload,
-  translateVSACToInternalValueSet,
-} from "./process-data";
+import { INVALID_API_KEY_LITERAL, MISSING_API_KEY_LITERAL } from "@/constants";
+import { createErsdPayload } from "./process-data";
 import {
   VSAC_MAX_FETCH_RETRIES,
   VSAC_RETRY_BASE_DELAY_MS,
   ErsdPayload,
-  VSAC_FETCH_BATCH_SIZE,
   VsacErrorResult,
   isFhirBundle,
   isFhirValueset,
@@ -303,43 +295,6 @@ export async function fetchValueSetsFromVsac(
   }
 
   return vsacValuesets;
-}
-
-/**
- * Function to fetch valuesets from VSAC and map them to internal valueset representation
- * @param ersdPayload - the eRSD payload to inform which valuesets needing fetching
- * @param batchSize - batch size to not overwhelm the VSAC API - 100 by default
- * @returns DibbsValueset[] - an array of DibbsValueset objects
- */
-export async function fetchDibbsValueSets(
-  ersdPayload: ErsdPayload,
-  batchSize = VSAC_FETCH_BATCH_SIZE,
-) {
-  const vsacValueSets = await fetchValueSetsFromVsac(ersdPayload, batchSize);
-  const oidsToVersion: Map<String, String> = new Map<String, String>();
-  const retiredOids: Set<String> = new Set<String>();
-
-  const internalValueSets = vsacValueSets.map((v) => {
-    const eRSDType: ErsdConceptType = ersdPayload.oidToErsdResourceMap.get(
-      v.oid,
-    ) as ErsdConceptType;
-
-    const internalValueSet = translateVSACToInternalValueSet(v.vs, eRSDType);
-
-    oidsToVersion.set(v.oid, internalValueSet.valueSetVersion);
-
-    // Found a retired OID, store it so we don't insert condition mappings on it
-    if (internalValueSet.concepts === undefined) {
-      retiredOids.add(internalValueSet.valueSetExternalId || "");
-    }
-    return internalValueSet;
-  });
-
-  return {
-    valuesets: internalValueSets,
-    oidsToVersion: oidsToVersion,
-    retiredOids: retiredOids,
-  };
 }
 
 /**
