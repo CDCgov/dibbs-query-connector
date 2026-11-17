@@ -3,8 +3,8 @@ import { writeFile, access, constants, readFile } from "fs/promises";
 import { createHash } from "crypto";
 import { createReadStream } from "fs";
 import { pipeline } from "stream/promises";
-import { VsacResult } from "./service";
 import { getVsacCapability } from "./api-calls";
+import { VsacResult } from "./utils";
 
 type ApiManifestFile = {
   version: string;

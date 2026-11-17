@@ -49,6 +49,20 @@ const OPERATION_OUTCOME = {
   success: false,
 };
 
+const OPERATION_OUTCOME_NOT_FOUND = {
+  data: {
+    resourceType: "OperationOutcome",
+    issue: [
+      {
+        severity: "error",
+        code: "processing",
+        diagnostics: "HAPI-0971: Resource ValueSet/blah is not known",
+      },
+    ],
+  },
+  success: false,
+};
+
 describe("fetchConditionWithRetry", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -153,7 +167,7 @@ describe("fetchValueSetsFromVsac", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
-    // suppressConsoleLogs();
+    suppressConsoleLogs();
   });
 
   afterEach(() => {
@@ -191,6 +205,26 @@ describe("fetchValueSetsFromVsac", () => {
 
     expect(result).toEqual(expectedResult);
     expect(mockGetVsacValueSet).toHaveBeenCalledTimes(1);
+  });
+
+  it("throws after trying to query for a non-existant OID", async () => {
+    mockGetVsacValueSet.mockResolvedValue(OPERATION_OUTCOME_NOT_FOUND);
+
+    const promise = fetchValueSetsFromVsac(
+      {
+        ...mockErsdPayload,
+        oids: ["Blah"],
+      },
+      10,
+      VSAC_MAX_FETCH_RETRIES,
+    );
+    const assertion = expect(promise).rejects.toThrow(
+      /VSAC fetch failed after 4 attempts/,
+    );
+    await jest.runAllTimersAsync();
+    await assertion;
+
+    expect(mockGetVsacValueSet).toHaveBeenCalledTimes(4);
   });
 
   it("retries a transient transport failure and then succeeds", async () => {
