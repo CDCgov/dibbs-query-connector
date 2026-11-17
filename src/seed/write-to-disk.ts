@@ -133,13 +133,13 @@ export async function writeErsdData(
 
 async function generateVsacIdentificationProperties() {
   const vsacCapabilityMetadata = await getVsacCapability();
-  if (vsacCapabilityMetadata.resourceType !== "CapabilityStatement") {
+  if (!vsacCapabilityMetadata.success) {
     throw Error("VSAC capability fetch failed");
   }
-
-  const releaseVersion = vsacCapabilityMetadata["software"]["version"];
-  const releaseDate = vsacCapabilityMetadata["software"]["releaseDate"];
-  const filename = `${vsacCapabilityMetadata["software"]["name"]}_${releaseVersion}`;
+  const capability = vsacCapabilityMetadata.data;
+  const releaseVersion = capability["software"]["version"];
+  const releaseDate = capability["software"]["releaseDate"];
+  const filename = `${capability["software"]["name"]}_${releaseVersion}`;
 
   return { releaseVersion, releaseDate, filename };
 }

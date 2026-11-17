@@ -2,7 +2,7 @@ import { Concept } from "@/app/models/entities/concepts";
 import { DibbsValueSet } from "@/app/models/entities/valuesets";
 import { ErsdConceptType, ersdToDibbsConceptMap } from "@/constants";
 import { BundleEntry, ValueSet as FhirValueSet } from "fhir/r4";
-import { ErsdCondition, ErsdPayload } from "./constants";
+import { ErsdCondition, ErsdPayload } from "./utils";
 
 /**
  * Helper function to clean URL info from code system data

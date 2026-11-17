@@ -26,7 +26,7 @@ import {
   ErsdPayload,
   VSAC_BATCH_DELAY_MS,
   VSAC_FETCH_BATCH_SIZE,
-} from "@/seed/constants";
+} from "@/seed/utils";
 import { auditable } from "../audit-logs/decorator";
 import { adminRequired } from "../db/decorators/auth";
 
