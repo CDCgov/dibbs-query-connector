@@ -113,6 +113,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV JAVA_HOME=/usr/lib/jvm/default-jvm
 # Add the OpenJDK to the PATH so the java command is available for Flways
 ENV PATH=$JAVA_HOME/bin:$PATH
+# Mitigates CVE-2026-114938 (JDK Base64 intrinsic overflow). Remove once Alpine's
+# openjdk17 package is 17.0.21.1 or later. See keycloak/keycloak#55293.
+ENV JAVA_TOOL_OPTIONS=-XX:-UseBASE64Intrinsics
 
 ENTRYPOINT ["/bin/bash"]
 CMD ["/app/start.sh"]

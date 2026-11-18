@@ -18,6 +18,9 @@ services:
       - ${ENV_FILE:-.env}
     environment:
       JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:-}
+      # Mitigates CVE-2026-114938 (JDK Base64 intrinsic overflow). Remove once
+      # the image ships a patched JDK. See keycloak/keycloak#55293.
+      JAVA_OPTS_APPEND: "-XX:-UseBASE64Intrinsics"
       KC_HOSTNAME: http://localhost:8081
       KC_HOSTNAME_BACKCHANNEL_DYNAMIC: true
     restart: always
@@ -29,7 +32,9 @@ services:
     env_file:
       - ${ENV_FILE:-.env}
     environment:
-      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:-}
+      # Keep the CVE-2026-114938 flag from docker-compose.yaml, which this
+      # value replaces, and append any host-provided JAVA_TOOL_OPTIONS.
+      JAVA_TOOL_OPTIONS: "-XX:-UseBASE64Intrinsics ${JAVA_TOOL_OPTIONS:-}"
       AIDBOX_BASE_URL: http://aidbox:8080
 
   aidbox-seeder:

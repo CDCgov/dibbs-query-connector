@@ -31,6 +31,10 @@ locals {
     PGPORT                                          = "5432"
     PGDATABASE                                      = var.aidbox_database_name
     PGUSER                                          = local.aidbox_db_user
+
+    # Mitigates CVE-2026-114938 (JDK Base64 intrinsic overflow). Remove once
+    # the image ships a patched JDK. See keycloak/keycloak#55293.
+    JAVA_TOOL_OPTIONS = "-XX:-UseBASE64Intrinsics"
   }
 
   aidbox_secret_env = {
