@@ -11,7 +11,8 @@ if [ "$ARCH" = "arm64" ]; then
   CPU_INFO=$(sysctl -n machdep.cpu.brand_string 2>/dev/null)
   if echo "$CPU_INFO" | grep -q "M4"; then
     echo "Detected M4 Mac. Applying workaround for Keycloak."
-    export JAVA_OPTS_APPEND="-XX:UseSVE=0"
+    # Append so flags already set in the image or environment are kept.
+    export JAVA_OPTS_APPEND="${JAVA_OPTS_APPEND:+$JAVA_OPTS_APPEND }-XX:UseSVE=0"
   fi
 fi
 
