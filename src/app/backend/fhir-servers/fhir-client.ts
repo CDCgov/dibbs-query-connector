@@ -428,7 +428,6 @@ class FHIRClient {
   private async discoverTokenEndpoint(): Promise<string> {
     try {
       const wellKnownUrl = `${this.hostname}/.well-known/smart-configuration`;
-
       // Prepare the request options
       const requestInit: RequestInit = {
         method: "GET",

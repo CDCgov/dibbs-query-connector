@@ -14,7 +14,7 @@ services:
       retries: 20
 
   flyway:
-    image: flyway/flyway:12-alpine
+    image: flyway/flyway:13.11-alpine
     command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
     environment:
       # Mitigates CVE-2026-114938 (JDK Base64 intrinsic overflow). Remove once

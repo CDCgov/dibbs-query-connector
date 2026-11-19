@@ -6,7 +6,7 @@
 export async function register() {
   if (process.env.DB_SECRET_ARN) {
     try {
-      const { fetchDbPassword } = await import("@/app/backend/db/config");
+      const { fetchDbPassword } = await import("@/app/backend/db/util");
       await fetchDbPassword();
     } catch (error) {
       console.error(
