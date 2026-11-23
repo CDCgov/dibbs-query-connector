@@ -22,14 +22,14 @@ export async function readJsonFromRelativePath(filename: string) {
       continue;
     }
     try {
-      return readFileSync(resolved, "utf-8");
+      return readFileSync(/*turbopackIgnore: true*/ resolved, "utf-8");
     } catch {
       // Try next candidate
     }
   }
 
   console.error(
-    `Could not find asset file ${filename}. Tried: ${allowedDirs.map((d) => path.join(d, filename)).join(", ")}`,
+    `Could not find asset file ${filename}. Tried: ${allowedDirs.map((d) => path.join(/*turbopackIgnore: true*/ d, filename)).join(", ")}`,
   );
   throw new Error(`Could not load asset file "${filename}".`);
 }
