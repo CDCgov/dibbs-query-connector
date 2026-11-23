@@ -16,6 +16,11 @@ RUN gawk -i inplace -v RS= -v ORS='\n\n' \
 FROM keycloak
 USER root
 
+# Mitigates CVE-2026-114938 (JDK Base64 intrinsic overflow). kc.sh appends
+# JAVA_OPTS_APPEND to the JVM options. Remove once the base image ships a
+# patched JDK. See keycloak/keycloak#55293.
+ENV JAVA_OPTS_APPEND=-XX:-UseBASE64Intrinsics
+
 # Replace the trust source and every extracted bundle, Java's cacerts included.
 # COPY only adds files, so clear the old bundles first or the per-certificate
 # files for the dropped roots would stay behind.

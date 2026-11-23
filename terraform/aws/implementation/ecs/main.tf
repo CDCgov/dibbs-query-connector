@@ -189,6 +189,12 @@ module "ecs" {
       registry_url   = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com",
       env_vars = [
         {
+          # Mitigates CVE-2026-114938 (JDK Base64 intrinsic overflow). Remove
+          # once the image ships a patched JDK. See keycloak/keycloak#55293.
+          name  = "JAVA_TOOL_OPTIONS"
+          value = "-XX:-UseBASE64Intrinsics"
+        },
+        {
           name  = "AIDBOX_TERMINOLOGY_SERVICE_BASE_URL"
           value = "https://tx.fhir.org/r4"
         },

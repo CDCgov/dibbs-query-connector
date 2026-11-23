@@ -16,6 +16,10 @@ services:
   flyway:
     image: flyway/flyway:12-alpine
     command: -configFiles=/flyway/conf/flyway.conf -schemas=public -connectRetries=60 migrate
+    environment:
+      # Mitigates CVE-2026-114938 (JDK Base64 intrinsic overflow). Remove once
+      # the image ships a patched JDK. See keycloak/keycloak#55293.
+      JAVA_TOOL_OPTIONS: "-XX:-UseBASE64Intrinsics"
     volumes:
       - ./flyway/sql:/flyway/sql
       - ./flyway/conf/flyway.conf:/flyway/conf/flyway.conf
@@ -44,6 +48,9 @@ services:
     depends_on:
       - aidbox_db
     environment:
+      # Mitigates CVE-2026-114938 (JDK Base64 intrinsic overflow). Remove once
+      # the image ships a patched JDK. See keycloak/keycloak#55293.
+      JAVA_TOOL_OPTIONS: "-XX:-UseBASE64Intrinsics"
       AIDBOX_FHIR_SCHEMA_VALIDATION: "true"
       AIDBOX_CLIENT_SECRET: L6AGe_5V2O
       AIDBOX_ADMIN_PASSWORD: OC1MzJ5QNV
