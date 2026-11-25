@@ -7,14 +7,16 @@ jest.mock("../db/service", () => ({
   DbClient: class {},
 }));
 jest.mock("./assets", () => ({ readJsonFromRelativePath: jest.fn() }));
-jest.mock("../code-systems/service", () => ({
-  getERSD: jest.fn(),
-  getVSACValueSet: jest.fn(),
-}));
+jest.mock("@/seed/api-calls", () => {
+  return {
+    getERSD: jest.fn(),
+    getVSACValueset: jest.fn(),
+  };
+});
 
 import { Bundle, ValueSet } from "fhir/r4";
-import { getERSD } from "../code-systems/service";
-import { indexErsdResponseByOid } from "./lib";
+import { fetchErsdPayload } from "@/seed/service";
+import { getERSD } from "@/seed/api-calls";
 
 const mockGetERSD = getERSD as unknown as jest.Mock;
 
@@ -116,7 +118,7 @@ const ERSD_BUNDLE: Bundle = {
   ] as Bundle["entry"],
 };
 
-describe("indexErsdResponseByOid", () => {
+describe("fetchErsdPayload", () => {
   let warnSpy: jest.SpyInstance;
 
   beforeEach(() => {
@@ -130,13 +132,13 @@ describe("indexErsdResponseByOid", () => {
   });
 
   it("only queues OID-identified value sets for VSAC lookup", async () => {
-    const { oids } = await indexErsdResponseByOid();
+    const { oids } = await fetchErsdPayload();
 
     expect(oids).toEqual([LAB_OID, IZ_OID]);
   });
 
   it("warns about the value sets it leaves out", async () => {
-    await indexErsdResponseByOid();
+    await fetchErsdPayload();
 
     expect(warnSpy).toHaveBeenCalledTimes(1);
     const message = warnSpy.mock.calls[0][0] as string;
@@ -147,7 +149,7 @@ describe("indexErsdResponseByOid", () => {
   });
 
   it("only links conditions to value sets that will be fetched", async () => {
-    const { conditions } = await indexErsdResponseByOid();
+    const { conditions } = await fetchErsdPayload();
 
     expect(conditions).toEqual([
       {
@@ -166,9 +168,9 @@ describe("indexErsdResponseByOid", () => {
   });
 
   it("types immunization value sets so they land in a concept category", async () => {
-    const { oidToErsdType } = await indexErsdResponseByOid();
+    const { oidToErsdResourceMap } = await fetchErsdPayload();
 
-    expect(oidToErsdType.get(LAB_OID)).toBe("lrtc");
-    expect(oidToErsdType.get(IZ_OID)).toBe("iztc");
+    expect(oidToErsdResourceMap.get(LAB_OID)).toBe("lrtc");
+    expect(oidToErsdResourceMap.get(IZ_OID)).toBe("iztc");
   });
 });
