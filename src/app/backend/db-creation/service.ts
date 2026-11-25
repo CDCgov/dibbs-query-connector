@@ -2,7 +2,6 @@
 
 import { randomUUID } from "crypto";
 import {
-  ConditionStruct,
   ConditionToValueSetStruct,
   updatedCancerCategorySql,
   updateErsdCategorySql,
@@ -16,20 +15,20 @@ import {
   insertValueSet,
 } from "./lib";
 import { DbClient } from "../db/service";
-import {
-  fetchErsdPayload,
-  fetchConditionWithRetry,
-  fetchDibbsValueSets,
-} from "@/seed/service";
-import {
-  ErsdPayload,
-  sleep,
-  VSAC_BATCH_DELAY_MS,
-  VSAC_FETCH_BATCH_SIZE,
-  VSAC_MAX_FETCH_RETRIES,
-} from "@/seed/utils";
+import { fetchConditionsFromVsac } from "@/seed/service";
+import { ErsdPayload, VSAC_MAX_FETCH_RETRIES } from "@/seed/utils";
 import { auditable } from "../audit-logs/decorator";
 import { adminRequired } from "../db/decorators/auth";
+import {
+  readErsdFromArtifact,
+  readVsacFromArtifact,
+} from "./read-db-artifacts";
+import { ErsdConceptType } from "@/constants";
+import {
+  createErsdPayload,
+  translateVSACToInternalValueSet,
+} from "@/seed/process-data";
+import { ValueSet } from "fhir/r4";
 
 class SeedingService {
   /**
@@ -51,12 +50,10 @@ class SeedingService {
   static async seedBatchValueSetsFromVsac(
     ersdPayload: ErsdPayload,
     dbClient: DbClient,
-    batchSize = VSAC_FETCH_BATCH_SIZE,
   ) {
-    const { valuesets, oidsToVersion, retiredOids } = await fetchDibbsValueSets(
-      ersdPayload,
-      batchSize,
-    );
+    const { valuesets, oidsToVersion, retiredOids } =
+      await composeDibbsValueSets(ersdPayload);
+
     for (const vs of valuesets) {
       // Retired value sets can come back without concepts. They're tracked in
       // retiredOids for the condition mappings below, so skip the insert.
@@ -103,35 +100,7 @@ class SeedingService {
       conditionSet.add(repString);
     });
 
-    // Create DB based condition structures. These VSAC lookups used to fire all
-    // at once via Promise.all with no batching, throttling, or retry. On a
-    // constrained egress path (e.g. ECS behind a NAT gateway) a burst of hundreds
-    // of simultaneous TLS connections to VSAC regularly triggers a transient
-    // "fetch failed" (connection reset / timeout), and because Promise.all rejects
-    // on the first failure a single network blip aborted and rolled back the whole
-    // seed. Batch the lookups (matching the value set path's concurrency) and retry
-    // transient failures so the seed survives intermittent network issues.
-    const conditionStrings = Array.from(conditionSet);
-    const conditionStructs: ConditionStruct[] = [];
-
-    for (
-      let startIdx = 0;
-      startIdx < conditionStrings.length;
-      startIdx += batchSize
-    ) {
-      const endIdx = Math.min(startIdx + batchSize, conditionStrings.length);
-      console.log("Fetching condition versions", startIdx, "to", endIdx);
-      const batch = conditionStrings.slice(startIdx, endIdx);
-      const batchResults = await Promise.all(
-        batch.map((cString) => fetchConditionWithRetry(cString)),
-      );
-      conditionStructs.push(...batchResults);
-
-      // Courtesy pause between batches so we don't overwhelm VSAC's API.
-      if (endIdx < conditionStrings.length) {
-        await sleep(VSAC_BATCH_DELAY_MS);
-      }
-    }
+    const conditionStructs = await fetchConditionsFromVsac(conditionSet);
 
     // Now insert them
     await insertDBStructArray(conditionStructs, "conditions", dbClient);
@@ -201,7 +170,9 @@ class SeedingService {
       await dbClient.connect();
       await dbClient.query("BEGIN");
       try {
-        const ersdPayload = await fetchErsdPayload();
+        console.log("Reading eRSD resource from disk");
+
+        const ersdPayload = await composeErsdPayload();
         if (!ersdPayload) {
           throw new Error("Could not load eRSD, aborting DIBBs DB creation");
         }
@@ -279,3 +250,50 @@ class SeedingService {
 
 export const createDibbsDB = SeedingService.createDibbsDB;
 export const checkDBForData = SeedingService.checkDBForData;
+
+async function composeErsdPayload() {
+  const ersd = await readErsdFromArtifact();
+  const ersdValuesets = ersd.filter(
+    (e) =>
+      (e.resource as { resourceType?: string })?.resourceType === "ValueSet",
+  );
+
+  return createErsdPayload(ersdValuesets);
+}
+
+/**
+ * Function to fetch valuesets from VSAC and map them to internal valueset representation
+ * @param ersdPayload - the eRSD payload to inform which valuesets needing fetching
+ * @param batchSize - batch size to not overwhelm the VSAC API - 100 by default
+ * @returns DibbsValueset[] - an array of DibbsValueset objects
+ */
+export async function composeDibbsValueSets(ersdPayload: ErsdPayload) {
+  const vsacValueSets = (await readVsacFromArtifact()) as ValueSet[];
+
+  const oidsToVersion: Map<String, String> = new Map<String, String>();
+  const retiredOids: Set<String> = new Set<String>();
+
+  const internalValueSets = vsacValueSets
+    .filter((v) => v.id !== undefined)
+    .map((v) => {
+      const eRSDType: ErsdConceptType = ersdPayload.oidToErsdResourceMap.get(
+        v.id as string,
+      ) as ErsdConceptType;
+
+      const internalValueSet = translateVSACToInternalValueSet(v, eRSDType);
+
+      oidsToVersion.set(v.id as string, internalValueSet.valueSetVersion);
+
+      // Found a retired OID, store it so we don't insert condition mappings on it
+      if (internalValueSet.concepts === undefined) {
+        retiredOids.add(internalValueSet.valueSetExternalId || "");
+      }
+      return internalValueSet;
+    });
+
+  return {
+    valuesets: internalValueSets,
+    oidsToVersion: oidsToVersion,
+    retiredOids: retiredOids,
+  };
+}

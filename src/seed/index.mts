@@ -1,5 +1,6 @@
 import {
   fetchAndProcessErsdResources,
+  fetchConditionsFromVsac,
   fetchValueSetsFromVsac,
 } from "./service";
 import {
@@ -57,6 +58,15 @@ try {
     );
   }
   const ersdPayload = createErsdPayload(ersdValueSets);
+
+  const conditionSet = new Set<string>();
+  ersdPayload.conditions.forEach((c) => {
+    const repString = c.code + "*" + c.system + "*" + c.text;
+    conditionSet.add(repString);
+  });
+
+  const conditionStructs = await fetchConditionsFromVsac(conditionSet);
+
   const vsacValueSets = await fetchValueSetsFromVsac(
     ersdPayload,
     VSAC_FETCH_BATCH_SIZE,
@@ -64,6 +74,7 @@ try {
 
   const vsacManifest = await writeVSACData(
     vsacValueSets,
+    conditionStructs,
     ersd,
     VSAC_ARTIFACT_PATH,
     VSAC_MANIFEST_VERSION,

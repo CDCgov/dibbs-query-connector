@@ -1,25 +1,19 @@
 import { OperationOutcome, ValueSet } from "fhir/r4";
 import { ConditionStruct } from "@/app/backend/db-creation/seedSqlStructs";
-import {
-  ErsdConceptType,
-  INVALID_API_KEY_LITERAL,
-  MISSING_API_KEY_LITERAL,
-} from "@/constants";
-import {
-  createErsdPayload,
-  translateVSACToInternalValueSet,
-} from "./process-data";
+import { INVALID_API_KEY_LITERAL, MISSING_API_KEY_LITERAL } from "@/constants";
+import { createErsdPayload } from "./process-data";
 import {
   VSAC_MAX_FETCH_RETRIES,
   VSAC_RETRY_BASE_DELAY_MS,
   ErsdPayload,
-  VSAC_FETCH_BATCH_SIZE,
   VsacErrorResult,
   isFhirBundle,
   isFhirValueset,
   sleep,
   VsacResult,
   isParameters,
+  VSAC_FETCH_BATCH_SIZE,
+  VSAC_BATCH_DELAY_MS,
 } from "./utils";
 import { getERSD, getVsacCondition, getVsacValueSet } from "./api-calls";
 
@@ -306,40 +300,47 @@ export async function fetchValueSetsFromVsac(
 }
 
 /**
- * Function to fetch valuesets from VSAC and map them to internal valueset representation
- * @param ersdPayload - the eRSD payload to inform which valuesets needing fetching
- * @param batchSize - batch size to not overwhelm the VSAC API - 100 by default
- * @returns DibbsValueset[] - an array of DibbsValueset objects
+ * Function to fetch all conditions from VSAC after cross-walking the necessary
+ * ValueSet information from the eRSD.
+ * @param conditionSet - Set of condition OIDs coming from VSAC to follow up on.
+ * @param batchSize - How many parallel VSAC fetches to perform at once.
+ * @returns conditionStructs - condition objects to insert into the DB.
  */
-export async function fetchDibbsValueSets(
-  ersdPayload: ErsdPayload,
+export async function fetchConditionsFromVsac(
+  conditionSet: Set<string>,
   batchSize = VSAC_FETCH_BATCH_SIZE,
 ) {
-  const vsacValueSets = await fetchValueSetsFromVsac(ersdPayload, batchSize);
-  const oidsToVersion: Map<String, String> = new Map<String, String>();
-  const retiredOids: Set<String> = new Set<String>();
+  // Create DB based condition structures. These VSAC lookups used to fire all
+  // at once via Promise.all with no batching, throttling, or retry. On a
+  // constrained egress path (e.g. ECS behind a NAT gateway) a burst of hundreds
+  // of simultaneous TLS connections to VSAC regularly triggers a transient
+  // "fetch failed" (connection reset / timeout), and because Promise.all rejects
+  // on the first failure a single network blip aborted and rolled back the whole
+  // seed. Batch the lookups (matching the value set path's concurrency) and retry
+  // transient failures so the seed survives intermittent network issues.
+  const conditionStrings = Array.from(conditionSet);
+  const conditionStructs: ConditionStruct[] = [];
 
-  const internalValueSets = vsacValueSets.map((v) => {
-    const eRSDType: ErsdConceptType = ersdPayload.oidToErsdResourceMap.get(
-      v.oid,
-    ) as ErsdConceptType;
+  for (
+    let startIdx = 0;
+    startIdx < conditionStrings.length;
+    startIdx += batchSize
+  ) {
+    const endIdx = Math.min(startIdx + batchSize, conditionStrings.length);
+    console.log("Fetching conditions", startIdx, "to", endIdx);
+    const batch = conditionStrings.slice(startIdx, endIdx);
+    const batchResults = await Promise.all(
+      batch.map((cString) => fetchConditionWithRetry(cString)),
+    );
+    conditionStructs.push(...batchResults);
 
-    const internalValueSet = translateVSACToInternalValueSet(v.vs, eRSDType);
-
-    oidsToVersion.set(v.oid, internalValueSet.valueSetVersion);
-
-    // Found a retired OID, store it so we don't insert condition mappings on it
-    if (internalValueSet.concepts === undefined) {
-      retiredOids.add(internalValueSet.valueSetExternalId || "");
+    // Courtesy pause between batches so we don't overwhelm VSAC's API.
+    if (endIdx < conditionStrings.length) {
+      await sleep(VSAC_BATCH_DELAY_MS);
     }
-    return internalValueSet;
-  });
+  }
 
-  return {
-    valuesets: internalValueSets,
-    oidsToVersion: oidsToVersion,
-    retiredOids: retiredOids,
-  };
+  return conditionStructs;
 }
 
 /**
